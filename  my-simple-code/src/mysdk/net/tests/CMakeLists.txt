@@ -1,0 +1,6 @@
+add_executable(echoserver_unittest EchoServer_unittest.cc)
+target_link_libraries(echoserver_unittest mysdk_net)
+
+add_executable(echoclient_unittest EchoClient_unittest.cc)
+target_link_libraries(echoclient_unittest mysdk_net)
+
