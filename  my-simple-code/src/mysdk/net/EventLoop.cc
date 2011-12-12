@@ -45,8 +45,6 @@ EventLoop::EventLoop():
 		quit_(false),
 		callingPendingFunctors_(false),
 		wakeupFd_(createEventfd()),
-		//wakeupSession_(this, wakeupFd_),
-		//pTimerQueue_(new TimerQueue(this)),
 		pPoller_(Poller::newDefaultPoller(this))
 {
 	pTimerQueue_ = new TimerQueue(this);

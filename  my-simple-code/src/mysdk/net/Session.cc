@@ -20,12 +20,12 @@ Session::Session(EventLoop* loop, int sfd):
 		loop_(loop),
 		fd_(sfd),
 		events_(Session::kNoneEvent),
-		fireEvents_(Session::kNoneEvent)
+		fireEvents_(Session::kNoneEvent),
+		readCallback_(NULL),
+		writeCallback_(NULL),
+		closeCallback_(NULL),
+		errorCallback_ (NULL)
 {
-	readCallback_ = NULL;
-	writeCallback_ = NULL;
-	closeCallback_ = NULL;
-	errorCallback_ = NULL;
 }
 
 Session::~Session()
@@ -91,7 +91,6 @@ void Session::handleEvent(Timestamp receiveTime)
 				LOG_TRACE << " In read Event " << fd();
 				if (readCallback_) readCallback_(receiveTime);
 			}
-
 	  }
 }
 

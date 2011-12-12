@@ -13,6 +13,8 @@ namespace mysdk
 namespace net
 {
 	class EventLoop;
+	//@berif 会话
+	// 每一个连接就要求有一个Session类实例
 	class Session
 	{
 	public:
@@ -30,16 +32,20 @@ namespace net
 		~Session();
 
 		void handleEvent(Timestamp receiveTime);
-
+		//@berif 设置读事件回调函数
 		void setReadCallback(const ReadEventCallback& cb) { readCallback_ = cb; }
+		//@berif 设置写事件回调函数
 		void setWriteCallback(const EventCallback& cb) { writeCallback_ = cb; }
+		//@berif 设置断开连接事件回调函数
 		void setCloseCallback(const EventCallback& cb) { closeCallback_ = cb; }
+		//@berif 设置发生错误事件回调函数
 		void setErrorCallback(const EventCallback& cb) {errorCallback_ = cb; }
 
 		int fd() const { return fd_; }
 		EventLoop* getLoop() { return loop_; }
 
 		int events() const { return events_; }
+		//@berif 设置要处理的事件有那些
 		void setFireEvents(int fireEvents) { fireEvents_ = fireEvents;}
 
 		void enableReading();

@@ -17,6 +17,7 @@ namespace mysdk
 namespace net
 {
 	class Poller;
+	//@berif 事件处理中心
 	class EventLoop
 	{
 	public:
@@ -53,10 +54,7 @@ namespace net
 		bool eventHanding_;
 		bool callingPendingFunctors_;
 
-		//int wakeupFd_;
-		//Session wakeupSession_;
 		Timestamp pollReturnTime_;
-
 		int wakeupFd_;
 		Session* pWakeupSession_;
 		Poller* pPoller_;

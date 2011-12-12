@@ -5,6 +5,7 @@
 #include <mysdk/net/SocketsOps.h>
 
 #include <google/protobuf/descriptor.h>
+#include <google/protobuf/io/zero_copy_stream_impl_lite.h>
 
 #include <zlib.h>  // adler32
 
@@ -238,6 +239,7 @@ void ProtobufCodec::destroyMessage(google::protobuf::Message* message)
 	}
 }
 
+#define ZEROCOPY
 google::protobuf::Message* ProtobufCodec::parse(const char* buf, int len, ErrorCode* error)
 {
 	google::protobuf::Message* message = NULL;
@@ -260,8 +262,14 @@ google::protobuf::Message* ProtobufCodec::parse(const char* buf, int len, ErrorC
 			{
 		        // parse from buffer
 		        const char* data = buf + kHeaderLen + nameLen;
-		        int32_t dataLen = len - nameLen - 2*kHeaderLen;
+		        int32 dataLen = len - nameLen - 2*kHeaderLen;
+#ifndef	ZEROCOPY
 		        if (message->ParseFromArray(data, dataLen))
+#else
+		       LOG_TRACE << "ZEROCOPY...";
+		        ::google::protobuf::io::ArrayInputStream zeroCopy(static_cast<const void*>(data), dataLen);
+		        if(message->ParseFromZeroCopyStream(&zeroCopy))
+#endif
 		        {
 		          *error = kNoError;
 		        }

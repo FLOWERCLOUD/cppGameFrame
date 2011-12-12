@@ -4,6 +4,7 @@ set(base_SRCS
 	Date.cc
 	Timestamp.cc
 	Logging.cc
+	Thread.cc
   )
 
 add_library(mysdk_base ${base_SRCS})

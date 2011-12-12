@@ -42,6 +42,8 @@ public:
 													google::protobuf::Message* message,
 													mysdk::Timestamp receiveTime) const
 	{
+		LOG_TRACE << message->DebugString();
+
 	    T* concrete = static_cast<T*>(message);
 	    assert(concrete != NULL);
 	    callback_(pCon, concrete, receiveTime);
