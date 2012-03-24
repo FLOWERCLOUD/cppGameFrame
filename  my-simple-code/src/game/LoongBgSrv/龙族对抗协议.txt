@@ -1,0 +1,46 @@
+c 代表客户端 s 代表服务器
+========= 登陆战场服务器 =============
+c -> s
+cmd 0x120001
+param
+uid:int 玩家卡布号
+username:utf 玩家的名字
+md5:utf md5 校验
+
+s->c
+cmd 0x140001
+param
+result:int 0 登陆成功 -1 登陆失败
+
+========= 请求进入莫个战场 =============
+c->s
+cmd 0x120002
+param
+bgid:short 战场ID
+team:short 队伍 （1 	为暗黑军 2 为烈阳军）
+
+s->c
+cmd 0x140002
+param 0 进入成功 -1 满人
+========= 玩家移动 =============
+c->s
+cmd 0x120003
+param uid 卡布号
+x:short x 坐标
+y:short y 坐标
+
+s->c
+cmd 0x140003
+param 
+x:short x 坐标
+y:short y 坐标
+========= 玩家聊天 =============
+客户端自解析, 服务端只做广播操作
+c->s
+cmd 0x120004
+param 
+
+s->c
+cmd 0x140004
+param 
+

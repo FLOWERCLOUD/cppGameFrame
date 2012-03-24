@@ -1,0 +1,22 @@
+package dataserver;
+
+message Select {
+  required int32 key = 1;
+  required string messageName = 2;
+}
+
+message Insert {
+	required int32 key = 1;
+	required string messageName = 2;
+}
+
+message Delete {
+	required int32 key = 1;
+	required string messageName = 2;
+}
+
+message Update {
+	required int32 key = 1;
+	required string messageName = 2;
+}
+
