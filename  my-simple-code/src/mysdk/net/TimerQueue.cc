@@ -67,6 +67,12 @@ TimerQueue::TimerQueue(EventLoop* eventLoop):
 TimerQueue::~TimerQueue()
 {
 	::close(timerfd_);
+
+	for (TimerList::iterator it = timers_.begin(); it != timers_.end(); it++)
+	{
+		delete *it;
+	}
+	timers_.clear();
 }
 
 void TimerQueue::handleRead()
@@ -74,7 +80,7 @@ void TimerQueue::handleRead()
 	Timestamp now(Timestamp::now());
 	uint64 howmany;
 	ssize_t n = ::read(timerfd_, &howmany, sizeof(howmany));
-	LOG_TRACE << "TimerQueue::handleRead() " << howmany << " at " << now.toString();
+	//LOG_TRACE << "TimerQueue::handleRead() " << howmany << " at " << now.toString();
 	if (n != sizeof(howmany))
 	{
 		LOG_ERROR << "TimerQueue::handleRead() reads " << n << " bytes instead of 8";

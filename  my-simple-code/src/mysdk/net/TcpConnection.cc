@@ -57,17 +57,47 @@ TcpConnection::TcpConnection(EventLoop* loop,
 	LOG_DEBUG << "TcpConnection::ctor[" <<  name_ << "] at " << this << " fd=" << sockfd;
 }
 
+TcpConnection::TcpConnection(EventLoop* loop,
+		const std::string& conName,
+		int sockfd,
+		const InetAddress& localAddr,
+		const InetAddress& peerAddr,
+		const ConnectionCallback& concb,
+		const MessageCallback& msgcb,
+		const WriteCompleteCallback& writeComcb,
+		const CloseCallback& closecb):
+			loop_(loop),
+			name_(conName),
+			state_(kConnecting),
+			socket_(sockfd),
+			session_(loop, sockfd),
+			localAddr_(localAddr),
+			peerAddr_(peerAddr),
+			connectionCallback_(concb),
+			messageCallback_(msgcb),
+			writeCompleteCallback_(writeComcb),
+			closeCallback_(closecb),
+			recover_(false),
+			context_(NULL)
+{
+	session_.setReadCallback(std::tr1::bind(&TcpConnection::handleRead, this, std::tr1::placeholders::_1));
+	session_.setWriteCallback(std::tr1::bind(&TcpConnection::handleWrite, this));
+	session_.setCloseCallback(std::tr1::bind(&TcpConnection::handleClose, this));
+	session_.setErrorCallback(std::tr1::bind(&TcpConnection::handleError, this));
+	LOG_DEBUG << "TcpConnection::ctor[" <<  name_ << "] at " << this << " fd=" << sockfd;
+}
+
 TcpConnection::~TcpConnection()
 {
 	 LOG_DEBUG << "TcpConnection::dtor[" <<  name_ << "] at " << this << " fd=" << session_.fd();
 }
 
-void TcpConnection::send(Buffer* buf)
+void TcpConnection::send(const Buffer* buf)
 {
   if (state_ == kConnected)
   {
-	  send(buf->peek(), buf->readableBytes());
-      buf->retrieveAll();
+	  send(const_cast<Buffer* >(buf)->peek(), const_cast<Buffer* >(buf)->readableBytes());
+	  //const_cast<Buffer* >(buf)->retrieveAll();
   }
 }
 
@@ -80,11 +110,13 @@ void TcpConnection::send(const void* data, size_t len)
 {
 	LOG_DEBUG << "TcpConnection::send "  << this ;
 	if (state_ != kConnected) return;
-	LOG_DEBUG << "TcpConnection::send "  << this << " fd=" << session_.fd();
+	LOG_DEBUG << "TcpConnection::send "  << this << " fd=" << session_.fd() << " len=" << len;
 	ssize_t nwrote = 0;
 	if (!session_.isWriting() && outputBuffer_.readableBytes() == 0)
 	{
 		nwrote = ::write(session_.fd(), data, len);
+		//LOG_DEBUG << "========TcpConnection::send "  << this << " fd=" << session_.fd() << " len=" << len
+		//						<< " data: " << data;
 		if (nwrote >= 0)
 		{
 			if (implicit_cast<size_t>(nwrote) < len)
@@ -154,6 +186,8 @@ void TcpConnection::connectDestroyed()
 		connectionCallback_(this);
 	}
 	*/
+	setState(kDisconnected);
+	connectionCallback_(this);
 
 	LOG_TRACE << "TcpConnection::connectDestroyed  " << name_;
 	// must be the last line
@@ -166,6 +200,7 @@ void TcpConnection::handleRead(Timestamp receiveTime)
 
 	int savedErrno;
 	ssize_t n = inputBuffer_.readFd(session_.fd(), &savedErrno);
+	LOG_DEBUG << "TcpConnection::handleRead "  << this << " fd=" << session_.fd() << " n:" << n;
 	if (n > 0)
 	{
 		messageCallback_(this, &inputBuffer_, receiveTime);
@@ -225,7 +260,7 @@ void TcpConnection::handleClose()
 			setState(kDisconnected);
 			session_.disableAll();
 
-			connectionCallback_(this);
+			//connectionCallback_(this);
 	  }
 
 	  loop_->queueInLoop(std::tr1::bind(&TcpConnection::connectDestroyed, this));

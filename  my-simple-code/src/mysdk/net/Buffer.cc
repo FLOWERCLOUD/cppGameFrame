@@ -2,7 +2,7 @@
 #include <mysdk/net/Buffer.h>
 
 #include <mysdk/net/SocketsOps.h>
-
+#include <mysdk/base/Logging.h>
 
 #include <errno.h>
 #include <string.h>
@@ -13,18 +13,33 @@ using namespace mysdk::net;
 
 const char Buffer::kCRLF[] = "\r\n";
 
+
 void Buffer::appendInt32(int32 x)
 {
-  int32 be32 = sockets::hostToNetwork32(x);
+  int32 be32 = x;//sockets::hostToNetwork32(x);
   append(&be32, sizeof be32);
+}
+
+void Buffer::appendInt16(int16 x)
+{
+  int16 be16 = x; //sockets::hostToNetwork16(x);
+  append(&be16, sizeof be16);
 }
 
 int32 Buffer::peekInt32() const
 {
-  //assert(readableBytes() >= sizeof(int32));
   int32 be32 = 0;
   ::memcpy(&be32, peek(), sizeof be32);
-  return sockets::networkToHost32(be32);
+  return be32;
+  //return sockets::networkToHost32(be32);
+}
+
+int16 Buffer::peekInt16() const
+{
+	  int16 be16 = 0;
+	  ::memcpy(&be16, peek(), sizeof be16);
+	  return be16;
+	 // return sockets::networkToHost16(be16);
 }
 
 ssize_t Buffer::readFd(int fd, int* savedErrno)

@@ -88,7 +88,7 @@ void Session::handleEvent(Timestamp receiveTime)
 
 			if (fireEvents_& Session::kReadEvent)
 			{
-				LOG_TRACE << " In read Event " << fd();
+				//LOG_TRACE << " In read Event " << fd();
 				if (readCallback_) readCallback_(receiveTime);
 			}
 	  }

@@ -84,7 +84,7 @@ void EventLoop::loop()
 		pollReturnTime_ = pPoller_->poll(kPollTimeMs, &activeSessions_);
 	    if (Logger::logLevel() <= Logger::TRACE)
 	    {
-	    	printActiveSessions();
+	    	//printActiveSessions();
 	    }
 
 		eventHanding_ = true;

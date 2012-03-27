@@ -39,7 +39,7 @@ Timestamp EPollPoller::poll(int timeoutMs, SessionList* activeSessions)
 	Timestamp now(Timestamp::now());
 	if (numEvents > 0)
 	{
-		LOG_TRACE << numEvents << " events happended";
+		//LOG_TRACE << numEvents << " events happended";
 		fillActiveSessions(numEvents, activeSessions);
 		if (implicit_cast<size_t>(numEvents) == events_.size())
 		{

@@ -39,8 +39,12 @@ TcpServer::~TcpServer()
 		  TcpConnectionArray::size_type size = tcpConnectionArray_.size();
 		  TcpConnectionArray::size_type index = size - 1;
 		  TcpConnection* conn = tcpConnectionArray_[index];
-		  tcpConnectionArray_.erase(index);
-		  delete conn;
+		  if (conn)
+		  {
+			  conn->connectDestroyed();
+		  }
+		  //tcpConnectionArray_.erase(index);
+		  //delete conn;
 	  }
 	  tcpConnectionArray_.clear();
 }
@@ -66,6 +70,7 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
 	           << "] from " << peerAddr.toHostPort();
 
 	InetAddress localAddr(sockets::getLocalAddr(sockfd));
+#if 0
 	TcpConnection* pConn = new TcpConnection(loop_, connName, sockfd, localAddr, peerAddr);
 	assert(pConn != NULL);
 	tcpConnectionArray_.push_back(pConn);
@@ -74,6 +79,16 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
 	pConn->setMessageCallback(messageCallback_);
 	pConn->setWriteCompleteCallback(writeCompleteCallback_);
 	pConn->setCloseCallback(std::tr1::bind(&TcpServer::removeConnection, this, std::tr1::placeholders::_1));
+	pConn->connectEstablished();
+#endif
+	TcpConnection* pConn = new TcpConnection(loop_, connName, sockfd, localAddr, peerAddr,
+															connectionCallback_,
+															messageCallback_,
+															writeCompleteCallback_,
+															std::tr1::bind(&TcpServer::removeConnection, this, std::tr1::placeholders::_1));
+	assert(pConn != NULL);
+	tcpConnectionArray_.push_back(pConn);
+	LOG_DEBUG << "TcpServer::newConnection tcpConnectionArray size[" << tcpConnectionArray_.size() << "]";
 	pConn->connectEstablished();
 }
 

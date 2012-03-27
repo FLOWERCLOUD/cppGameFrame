@@ -27,6 +27,17 @@ namespace net
 				int sockfd,
 				const InetAddress& localAddr,
 				const InetAddress& peerAddr);
+
+		TcpConnection(EventLoop* loop,
+				const std::string& name,
+				int sockfd,
+				const InetAddress& localAddr,
+				const InetAddress& peerAddr,
+				const ConnectionCallback& concb,
+				const MessageCallback& msgcb,
+				const WriteCompleteCallback& writeComcb,
+				const CloseCallback& closecb);
+
 		~TcpConnection();
 
 		EventLoop* getLoop() const { return loop_; }
@@ -35,7 +46,7 @@ namespace net
 		const InetAddress& peerAddress() { return peerAddr_; }
 		bool connected() const { return state_ == kConnected; }
 
-		void send(Buffer* buf);
+		void send(const Buffer* buf);
 		void send(const void* data, size_t len);
 		void send(const void* data);
 		//void send(Buffer* message);

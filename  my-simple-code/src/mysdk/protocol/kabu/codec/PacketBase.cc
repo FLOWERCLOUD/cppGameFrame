@@ -89,7 +89,7 @@ bool PacketBase::getUTF(char* pString, int16 nMaxLen)
 	}
 
 	int16 len = buffer_.readInt16();
-	LOG_TRACE << "PacketBase::getUTF - len = " << len;
+	//LOG_TRACE << "PacketBase::getUTF - len = " << len;
 	if (len >= nMaxLen || static_cast<int16>(buffer_.readableBytes()) < len)
 	{
 		LOG_ERROR << "PacketBase::getUTF -  buffer readableBytes: " << buffer_.readableBytes() << " len: " << len;
@@ -97,7 +97,9 @@ bool PacketBase::getUTF(char* pString, int16 nMaxLen)
 	}
 
 	buffer_.get(pString, len);
+	buffer_.retrieve(len);
 	pString[len] = 0;
+	//LOG_TRACE << "PacketBase::getUTF - STRING= " << pString ;
 	return true;
 }
 

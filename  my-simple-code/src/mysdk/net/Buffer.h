@@ -30,8 +30,8 @@ namespace net
 	class Buffer
 	{
 	public:
-		static const size_t kCheapPrepend = 8;
-		static const size_t kInitialSize = 1024;
+		static const size_t kCheapPrepend = 12;
+		static const size_t kInitialSize = 1012;
 
 		Buffer():
 			buffer_(kCheapPrepend + kInitialSize),
@@ -85,10 +85,15 @@ namespace net
 			readerIndex_ += len;
 		}
 
-		  void retrieveInt32()
-		  {
+		void retrieveInt16()
+		{
+			retrieve(sizeof(int16));
+		}
+
+		void retrieveInt32()
+		{
 		    retrieve(sizeof(int32));
-		  }
+	    }
 
 		void retrieveUntil(const char* end)
 		{
@@ -143,7 +148,7 @@ namespace net
 		  /// Append int32_t using network endian
 		  ///
 		  void appendInt32(int32 x);
-
+		  void appendInt16(int16 x);
 		  ///
 		  /// Read int32_t from network endian
 		  ///
@@ -155,11 +160,24 @@ namespace net
 		    return result;
 		  }
 
+		  int16 readInt16()
+		  {
+			  int16 result = peekInt16();
+			  retrieveInt16();
+			  return result;
+		  }
 		  ///
 		  /// Peek int32_t from network endian
 		  ///
 		  /// Require: buf->readableBytes() >= sizeof(int32_t)
 		  int32 peekInt32() const;
+		  int16 peekInt16() const;
+
+		  void get(char* data, int len)
+		  {
+			  //assert( readableBytes() >= len);
+			  std::copy(peek(), peek() + len, data);
+		  }
 
 		void prepend(const void* data, size_t len)
 		{
