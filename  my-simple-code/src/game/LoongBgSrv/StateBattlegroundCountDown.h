@@ -21,7 +21,7 @@ public:
 	virtual void run(uint32 curTime);
 
 	virtual BgStateE getState() { return BGSTATE_COUNTDOWN; }
-	virtual uint32	getStateTimeLimit() { return 5; }
+	virtual uint32	getStateTimeLimit() { return 5000; }
 	virtual std::string getStateName() { return "倒计时阶段"; }
 };
 

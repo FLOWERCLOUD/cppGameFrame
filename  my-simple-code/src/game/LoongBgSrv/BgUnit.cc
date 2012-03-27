@@ -150,12 +150,22 @@ bool BgUnit::hasSkill(int16 skillId)
 	return false;
 }
 
-bool BgUnit::canUseSkill(int16 skillId)
+bool BgUnit::canUseSkill(int16 skillId, int32 cooldownTime)
+{
+	return false;
+}
+
+bool BgUnit::useSkill(int16 skillId)
 {
 	return false;
 }
 
 // 伤害
-void BgUnit::onHurt(BgUnit* attacker, int32 damage, int16 skillId)
+void BgUnit::onHurt(BgUnit* attacker, int32 damage, const SkillBase& skill)
 {
+}
+
+void BgUnit::onBufHurt(BgUnit* me, int32 damage, const BufBase& buf)
+{
+
 }

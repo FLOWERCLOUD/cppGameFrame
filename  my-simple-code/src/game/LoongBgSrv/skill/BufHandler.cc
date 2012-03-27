@@ -31,8 +31,8 @@ static bool JianSheBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUnit
     for (it = playerMgr.begin(); it != playerMgr.end(); ++it)
     {
     	BgPlayer* player = it->second;
-    	// 自己和被攻击者 不受溅射的伤害
-    	if (player == me || target == target)
+    	// 自己不受溅射的伤害
+    	if (player == me)
     	{
     		continue;
     	}
@@ -41,16 +41,16 @@ static bool JianSheBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUnit
     		continue;
     	}
 
-    	int16 distance = getDistance(target, player);
+    	int32 distance = getDistance(target, player);
     	if ( distance<= bufBase.paramList_[0])
     	{
-    		int16 hp = static_cast<int16>(attackValue * bufBase.paramList_[1] / 100);
-    		player->decHp(hp);
+    		int16 damage = static_cast<int16>(attackValue * bufBase.paramList_[1] / 100);
+    		player->onBufHurt(player, damage, bufBase);
     	}
     	else if (distance <= bufBase.paramList_[2])
     	{
-    		int16 hp = static_cast<int16>(attackValue * bufBase.paramList_[3] / 100);
-    		player->decHp(hp);
+    		int16 damage = static_cast<int16>(attackValue * bufBase.paramList_[3] / 100);
+    		player->onBufHurt(player, damage, bufBase);
     	}
     }
 

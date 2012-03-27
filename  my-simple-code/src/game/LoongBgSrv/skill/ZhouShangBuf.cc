@@ -31,7 +31,7 @@ void ZhouShangBuf::onTick(BgUnit* me)
 	const BufBase& bufbase = sBufBaseMgr.getBufBaseInfo(bufId_);
 	int16 decHp = bufbase.paramList_[0];
 
-	me->decHp(decHp);
+	me->onBufHurt(me, decHp, bufbase);
 }
 
 void ZhouShangBuf::onCacl(BgUnit* me)

@@ -37,7 +37,7 @@ public:
 	virtual void end();
 
 	virtual BgStateE getState() { return BGSTATE_NONE; }
-	virtual uint32	getStateTimeLimit() { return 999; }
+	virtual uint32	getStateTimeLimit() { return 99999999; }
 	virtual std::string getStateName() { return "null!!!"; }
 
 	uint32 getLeftTime();

@@ -5,9 +5,10 @@
 #include <mysdk/base/Common.h>
 
 #include <game/LoongBgSrv/scene/Scene.h>
+#include <game/LoongBgSrv/BattlegroundState.h>
 #include <game/LoongBgSrv/BgUnit.h>
 
-class BattlegroundState;
+
 class BgPlayer;
 class Battleground
 {
@@ -27,6 +28,12 @@ public:
 	bool removeBgPlayer(BgPlayer* player, BgUnit::TeamE team);
 
 	void run(uint32 curTime);
+	void shtudown();
+
+	bool getBgInfo(PacketBase& op);
+
+	BattlegroundState::BgStateE getState();
+	uint32 getLeftTime();
 //
 public:
 	// 战场释放结束啦

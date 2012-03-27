@@ -22,7 +22,7 @@ public:
 	virtual void end();
 
 	virtual BgStateE getState() { return BGSTATE_EXIT; }
-	virtual uint32	getStateTimeLimit() { return 10; }
+	virtual uint32	getStateTimeLimit() { return 10000; }
 	virtual std::string getStateName() { return "关闭阶段"; }
 };
 

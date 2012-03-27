@@ -11,6 +11,7 @@ set(LoongBgSrv_SRCS
   skill/HunXuanBuf.cc
   skill/SkillHandler.cc
   skill/ZhouShangBuf.cc
+  util/md5.cpp
   Battleground.cc
   BattlegroundMgr.cc
   BattlegroundState.cc
@@ -29,4 +30,4 @@ set(LoongBgSrv_SRCS
 add_executable(LoongBgSrv ${LoongBgSrv_SRCS})
 target_link_libraries(LoongBgSrv kabu_codec mysdk_net)
 
-add_subdirectory(test)
+add_subdirectory(tests)

@@ -1,11 +1,21 @@
 c 代表客户端 s 代表服务器
+
+战场状态
+0 
+1 等待状态
+2 倒计时状态
+3 
+4 激战状态
+5 退出战场状态
+
 ========= 登陆战场服务器 =============
 c -> s
 cmd 0x120001
 param
 uid:int 玩家卡布号
 username:utf 玩家的名字
-md5:utf md5 校验
+roletype:int16
+token:utf md5 校验 ( md5(uid + username + roletype + key); key = "9B1492CF6AAE903F63FB7759D3565CD7")
 
 s->c
 cmd 0x140001
@@ -22,18 +32,19 @@ team:short 队伍 （1 	为暗黑军 2 为烈阳军）
 s->c
 cmd 0x140002
 param 0 进入成功 -1 满人
+bgid:short 战场ID
+team:short 队伍
 ========= 玩家移动 =============
+客户端自解析, 服务端只做广播操作
 c->s
 cmd 0x120003
-param uid 卡布号
-x:short x 坐标
-y:short y 坐标
+param
+
 
 s->c
 cmd 0x140003
 param 
-x:short x 坐标
-y:short y 坐标
+
 ========= 玩家聊天 =============
 客户端自解析, 服务端只做广播操作
 c->s
@@ -42,5 +53,111 @@ param
 
 s->c
 cmd 0x140004
+param 
+
+========= 请求战场信息 =============
+c->s
+cmd 0x120005
+param 
+
+s->c
+cmd 0x140005
+param 
+blackNum:int16 暗黑军人数
+whiteNum:int16 烈阳军人数
+state:int16 战场状态
+leftTime:int32 剩余时间 (单位毫秒)
+// 以后有战场物品列表
+========= 上报坐标点  =============
+c->s
+cmd 0x120006
+param uid 卡布号
+x:short x 坐标
+y:short y 坐标
+
+========= 有玩家进入场景  =============
+s ->c
+cmd 0x140007
+param 
+uid:int32 玩家id
+unitType:int16 这个客户端暂时可以不用理
+team:int16 玩家所在队伍
+name:utf 玩家的名字
+roletype:int32 
+
+========= 有玩家离开场景  =============
+s ->c
+cmd 0x140008
+param uid 卡布号
+
+========= 请求战场玩家列表 =============
+c->s
+cmd 0x120009
+param 
+
+s->c
+cmd 0x140009
+param 战场玩家的人数
+uid:int32 玩家id
+unitType:int32 这个客户端暂时可以不用理
+team:int32 玩家所在队伍
+name:utf 玩家的名字
+roletype:int32 
+petId:int 英雄id
+hp:int 血量
+title:int 称号
+
+========= 选择英雄 =============
+c->s
+cmd 0x12000A
+param  英雄ID
+
+s->c
+cmd 0x14000A
+param 
+petID:int 英雄ID
+hp:int 英雄血量
+
+========= 使用技能 =============
+c->s
+cmd 0x12000B
+param  技能ID
+target:int 目标
+
+========= 添加buf =============
+s->c (广播协议)
+cmd 0x14000C
+param  卡布号
+bufId:int 
+
+========= 移除buf =============
+s->c (广播协议)
+cmd 0x14000D
+param  卡布号
+bufId:int 
+
+========= 伤害 =============
+s->c (广播协议)
+cmd 0x14000E
+param  卡布号
+damageType:int 伤害类型 0 技能伤害 1 buf 伤害
+if(damageType == 0)
+{
+	skillId:int 技能ID
+	skillType:int 技能类型 (0 普通攻击 1 技能功能)
+	damage:int 伤害值
+}
+else if (damageType == 1)
+{
+	bufId:int bufID
+	damage:int 伤害值
+}
+
+========= 退出战场 =============
+c->s
+cmd 0x120010
+
+s->c
+cmd 0x140010
 param 
 

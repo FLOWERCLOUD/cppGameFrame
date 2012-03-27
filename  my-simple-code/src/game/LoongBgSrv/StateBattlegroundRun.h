@@ -23,7 +23,7 @@ public:
 	virtual void end();
 
 	virtual BgStateE getState() { return BGSTATE_RUN; }
-	virtual uint32	getStateTimeLimit() { return 600; }
+	virtual uint32	getStateTimeLimit() { return 600000; }
 	virtual std::string getStateName() { return "激战中阶段"; }
 
 private:

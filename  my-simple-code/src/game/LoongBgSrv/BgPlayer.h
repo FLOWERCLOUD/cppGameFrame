@@ -12,7 +12,7 @@
 #include <mysdk/net/TcpConnection.h>
 #include <string>
 #include <list>
-
+#include <map>
 
 class LoongBgSrv;
 class Scene;
@@ -35,6 +35,11 @@ public:
 	bool onMsgHandler(PacketBase& op);
 
 	void setScene(Scene* scene);
+	void setBgId(int16 bgId);
+	void setRoleType(int32 roletype);
+
+	void broadMsg(PacketBase& op);
+	void close();
 public:
 	// 父类的东东
 	virtual bool serialize(PacketBase& op);
@@ -42,21 +47,31 @@ public:
 	virtual bool canBufHurt();
 	virtual bool addBuf(Buf* buf);
 	virtual bool hasSkill(int16 skillId);
-	virtual bool canUseSkill(int16 skillId);
-	virtual void onHurt(BgUnit* attacker, int32 damage, int16 skillId);
-
+	virtual bool canUseSkill(int16 skillId, int32 cooldownTime);
+	virtual bool useSkill(int16 skillId);
+	virtual void onHurt(BgUnit* attacker, int32 damage, const SkillBase& skill);
+	virtual void onBufHurt(BgUnit* me, int32 damage, const BufBase& buf);
 private:
 	void runBuf(uint32 curTime);
 	// 消息处理函数
 	void onEnterBattle(PacketBase& pb);
 	void onMove(PacketBase& pb);
 	void onChat(PacketBase& pb);
+	void onReqBattleInfo(PacketBase& pb);
+	void onStand(PacketBase& pb);
+	void onReqPlayerList(PacketBase& pb);
+	void onSelectPet(PacketBase& pb);
+	void onUseSkill(PacketBase& pb);
+	void onExitBattle(PacketBase& pb);
 private:
 	std::string name_; //玩家的名字
 	int16 killEnemyTimes_;
 	int16 petId_;
-
+	int16 battlegroundId_; //当然玩家所在的战场ID
+	int32 roleType_;
+	int16 title_;
 	std::list<Buf*> bufList_; //玩家中的buf 列表
+	std::map<int16, int32> useSkillMap_;
 
 	Scene* pScene;
 	TcpConnection* pCon_;

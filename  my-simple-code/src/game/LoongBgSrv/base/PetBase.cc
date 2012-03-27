@@ -23,3 +23,9 @@ PetBase::~PetBase()
 {
 }
 
+bool PetBase::serialize(PacketBase& op)
+{
+	op.putInt32(petId_);
+	op.putInt32(hp_);
+	return true;
+}

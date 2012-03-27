@@ -23,6 +23,7 @@ public:
 	bool init();
 	void shutdown();
 
+	bool checkPetId(int16 petId);
 	const PetBase& getPetBaseInfo(int16 petId) const;
 private:
 	int16 curPetBaseNum_;
@@ -30,5 +31,7 @@ private:
 private:
 	DISALLOW_COPY_AND_ASSIGN(PetBaseMgr);
 };
+
+#define sPetBaseMgr mysdk::Singleton<PetBaseMgr>::instance()
 
 #endif /* PETBASEMGR_H_ */

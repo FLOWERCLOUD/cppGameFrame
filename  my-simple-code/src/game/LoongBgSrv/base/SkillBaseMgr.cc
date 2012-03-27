@@ -24,7 +24,7 @@ bool SkillBaseMgr::init()
 	skillBaseList_[curSkillBaseNum_].minAttackValue_ = 80;
 	skillBaseList_[curSkillBaseNum_].maxAttackValue_ =  120;
 	skillBaseList_[curSkillBaseNum_].attackDistance_ = 0;
-	skillBaseList_[curSkillBaseNum_].cooldownTime_ = 2;
+	skillBaseList_[curSkillBaseNum_].cooldownTime_ = 2000;
 	skillBaseList_[curSkillBaseNum_].type_ = SkillBase::NOMAL;
 	skillBaseList_[curSkillBaseNum_].passive_ = 0;
 	curSkillBaseNum_++;
@@ -33,7 +33,7 @@ bool SkillBaseMgr::init()
 	skillBaseList_[curSkillBaseNum_].minAttackValue_ = 80;
 	skillBaseList_[curSkillBaseNum_].maxAttackValue_ =  120;
 	skillBaseList_[curSkillBaseNum_].attackDistance_ = 0;
-	skillBaseList_[curSkillBaseNum_].cooldownTime_ = 2;
+	skillBaseList_[curSkillBaseNum_].cooldownTime_ = 2000;
 	skillBaseList_[curSkillBaseNum_].type_ = SkillBase::MAGIC;
 	skillBaseList_[curSkillBaseNum_].passive_ = 0;
 	skillBaseList_[curSkillBaseNum_].bufNum_ = 1;
@@ -44,7 +44,7 @@ bool SkillBaseMgr::init()
 	skillBaseList_[curSkillBaseNum_].minAttackValue_ = 160;
 	skillBaseList_[curSkillBaseNum_].maxAttackValue_ =  200;
 	skillBaseList_[curSkillBaseNum_].attackDistance_ = 450;
-	skillBaseList_[curSkillBaseNum_].cooldownTime_ = 2;
+	skillBaseList_[curSkillBaseNum_].cooldownTime_ = 2000;
 	skillBaseList_[curSkillBaseNum_].type_ = SkillBase::NOMAL;
 	skillBaseList_[curSkillBaseNum_].passive_ = 0;
 	curSkillBaseNum_++;
@@ -53,7 +53,7 @@ bool SkillBaseMgr::init()
 	skillBaseList_[curSkillBaseNum_].minAttackValue_ = 160;
 	skillBaseList_[curSkillBaseNum_].maxAttackValue_ =  200;
 	skillBaseList_[curSkillBaseNum_].attackDistance_ = 450;
-	skillBaseList_[curSkillBaseNum_].cooldownTime_ = 3;
+	skillBaseList_[curSkillBaseNum_].cooldownTime_ = 3000;
 	skillBaseList_[curSkillBaseNum_].type_ = SkillBase::MAGIC;
 	skillBaseList_[curSkillBaseNum_].passive_ = 0;
 	skillBaseList_[curSkillBaseNum_].bufNum_ = 1;
@@ -64,7 +64,7 @@ bool SkillBaseMgr::init()
 	skillBaseList_[curSkillBaseNum_].minAttackValue_ = 70;
 	skillBaseList_[curSkillBaseNum_].maxAttackValue_ =  100;
 	skillBaseList_[curSkillBaseNum_].attackDistance_ = 0;
-	skillBaseList_[curSkillBaseNum_].cooldownTime_ = 1;
+	skillBaseList_[curSkillBaseNum_].cooldownTime_ = 1000;
 	skillBaseList_[curSkillBaseNum_].type_ = SkillBase::NOMAL;
 	skillBaseList_[curSkillBaseNum_].passive_ = 0;
 	curSkillBaseNum_++;
@@ -73,7 +73,7 @@ bool SkillBaseMgr::init()
 	skillBaseList_[curSkillBaseNum_].minAttackValue_ = 70;
 	skillBaseList_[curSkillBaseNum_].maxAttackValue_ =  100;
 	skillBaseList_[curSkillBaseNum_].attackDistance_ = 0;
-	skillBaseList_[curSkillBaseNum_].cooldownTime_ = 4;
+	skillBaseList_[curSkillBaseNum_].cooldownTime_ = 4000;
 	skillBaseList_[curSkillBaseNum_].type_ = SkillBase::MAGIC;
 	skillBaseList_[curSkillBaseNum_].passive_ = 0;
 	skillBaseList_[curSkillBaseNum_].bufNum_ = 1;

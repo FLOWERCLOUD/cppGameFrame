@@ -11,10 +11,7 @@
 
 BattlegroundMgr::BattlegroundMgr()
 {
-	for (int i = 0; i < sMaxBgNum; i++)
-	{
-		bgList_[i].setId(i + 1);
-	}
+	init();
 }
 
 BattlegroundMgr::~BattlegroundMgr()
@@ -24,6 +21,10 @@ BattlegroundMgr::~BattlegroundMgr()
 
 bool BattlegroundMgr::init()
 {
+	for (int i = 0; i < sMaxBgNum; i++)
+	{
+		bgList_[i].setId(i + 1);
+	}
 	return true;
 }
 
@@ -31,12 +32,19 @@ void BattlegroundMgr::run(uint32 curTime)
 {
 	for (int i = 0; i < sMaxBgNum; i++)
 	{
-		bgList_[i].run(curTime);
+		if (bgList_[i].getState() != BattlegroundState::BGSTATE_NONE)
+		{
+			bgList_[i].run(curTime);
+		}
 	}
 }
 
 void BattlegroundMgr::shutdown()
 {
+	for (int i = 0; i < sMaxBgNum; i++)
+	{
+		bgList_[i].shtudown();
+	}
 }
 
 Battleground& BattlegroundMgr::getBattleground(int16 bgId)

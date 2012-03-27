@@ -9,18 +9,20 @@
 #define GAME_UTIL_H_
 
 #include <mysdk/base/Common.h>
+#include <mysdk/base/Timestamp.h>
 
 #include <game/LoongBgSrv/BgUnit.h>
 
+#include <sys/time.h>
 #include <stdlib.h>
 
 using namespace mysdk;
 
-static inline int16 getDistance(BgUnit* me, BgUnit* target)
+static inline int32 getDistance(BgUnit* me, BgUnit* target)
 {
-	int16 deltaX = static_cast<int16>(me->getX() - target->getX());
-	int16 deltaY = static_cast<int16>(me->getY() - target->getY());
-	return static_cast<int16>(deltaX * deltaX + deltaY * deltaY);
+	int32 deltaX = (me->getX() - target->getX());
+	int32 deltaY = (me->getY() - target->getY());
+	return (deltaX * deltaX + deltaY * deltaY);
 }
 
 static inline int32 getRandomBetween(int32 nBegin, int32 nEnd)
@@ -41,7 +43,10 @@ static inline int16 getBonusValue(BgUnit* me, BgUnit* target)
 
 static inline uint32 getCurTime()
 {
-	return 0;
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	uint32 seconds = tv.tv_sec;
+	return seconds * 1000 + tv.tv_usec / 1000;
 }
 
 static inline uint16 GetHeight16(const int32 t)
@@ -53,5 +58,15 @@ static inline uint16 GetLow16(const int32 t)
 {
 	return static_cast<uint16>(t & 0x0000FFFF);
 }
+
+#define TIME_FUNCTION_CALL(p, t) \
+{       Timestamp oldTimeStamp = Timestamp::now(); \
+        (p); \
+        Timestamp newTimeStamp = Timestamp::now(); \
+        double diff = timeDifference(newTimeStamp, oldTimeStamp); \
+        if (diff > t)\
+        LOG_WARN << "call function: " << #p << " , time[ms] = " << diff; \
+}
+
 
 #endif /* UTIL_H_ */

@@ -24,7 +24,9 @@ public:
 
 	void broadMsg(PacketBase& op);
 
+	bool init();
 	void run(uint32 curTime);
+	void shutdown();
 
 	std::map<int32, BgPlayer*>& getPlayerMgr()
 	{

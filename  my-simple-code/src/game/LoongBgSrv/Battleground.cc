@@ -25,6 +25,10 @@ Battleground::Battleground():
 
 Battleground::~Battleground()
 {
+	if (pState_)
+	{
+		delete pState_;
+	}
 }
 
 void Battleground::init()
@@ -35,6 +39,11 @@ void Battleground::init()
 		teamNum_[i] = 0;
 	}
 	teamNum_[0] = 99;
+}
+
+void Battleground::shtudown()
+{
+	scene_.shutdown();
 }
 
 void Battleground::setId(int32 Id)
@@ -75,6 +84,34 @@ bool Battleground::removeBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 void Battleground::run(uint32 curTime)
 {
 	scene_.run(curTime);
+}
+
+bool Battleground::getBgInfo(PacketBase& op)
+{
+	op.putInt16(teamNum_[BgUnit::kBlack_TEAM]);
+	op.putInt16(teamNum_[BgUnit::kWhite_TEAM]);
+	op.putInt16(getState());
+	op.putInt32(getLeftTime());
+	//
+	return true;
+}
+
+BattlegroundState::BgStateE Battleground::getState()
+{
+	if (pState_)
+	{
+		pState_->getState();
+	}
+	return BattlegroundState::BGSTATE_NONE;
+}
+
+uint32 Battleground::getLeftTime()
+{
+	if (pState_)
+	{
+		pState_->getLeftTime();
+	}
+	return 999;
 }
 
 bool Battleground::isFull()

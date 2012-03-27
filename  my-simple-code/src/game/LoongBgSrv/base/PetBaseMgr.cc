@@ -59,3 +59,9 @@ const PetBase& PetBaseMgr::getPetBaseInfo(int16 petId) const
 
 	return petBaseList_[petId - 1];
 }
+
+bool PetBaseMgr::checkPetId(int16 petId)
+{
+	if (petId < 0 || petId > curPetBaseNum_) return false;
+	return true;
+}

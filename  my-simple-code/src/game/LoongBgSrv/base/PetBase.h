@@ -10,6 +10,8 @@
 
 #include <mysdk/base/Common.h>
 
+#include <mysdk/protocol/kabu/codec/PacketBase.h>
+
 #include <string>
 using namespace mysdk;
 class PetBase
@@ -27,6 +29,7 @@ public:
 	PetBase();
 	~PetBase();
 
+	bool serialize(PacketBase& op);
 public:
 	int16 petId_; //宠物的ID
 	std::string petName_; // 宠物的名字

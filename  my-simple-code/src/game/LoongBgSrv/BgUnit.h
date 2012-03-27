@@ -11,6 +11,8 @@
 #include <mysdk/base/Common.h>
 
 #include <mysdk/protocol/kabu/codec/PacketBase.h>
+#include <game/LoongBgSrv/base/SkillBase.h>
+#include <game/LoongBgSrv/base/BufBase.h>
 
 using namespace mysdk;
 class Buf;
@@ -49,9 +51,11 @@ public:
 	// 添加buf
 	virtual bool addBuf(Buf* buf);
 	virtual bool hasSkill(int16 skillId);
-	virtual bool canUseSkill(int16 skillId);
+	virtual bool canUseSkill(int16 skillId, int32 cooldownTime);
+	virtual bool useSkill(int16 skillId);
 	// 伤害
-	virtual void onHurt(BgUnit* attacker, int32 damage, int16 skillId);
+	virtual void onHurt(BgUnit* attacker, int32 damage, const SkillBase& skill);
+	virtual void onBufHurt(BgUnit* me, int32 damage, const BufBase& buf);
 
 	bool isDead();
 
