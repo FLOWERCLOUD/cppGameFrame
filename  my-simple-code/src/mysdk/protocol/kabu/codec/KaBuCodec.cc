@@ -66,18 +66,21 @@ void KaBuCodec::send(mysdk::net::TcpConnection* pCon, PacketBase& pb)
 {
 	if (!pCon) return;
 
-	int16 len = pb.getContentLen();
-	//LOG_DEBUG << "============ KaBuCodec::send - len:" << len ;
-	int32 op = pb.getOP();
-	int32 param = pb.getParam();
 	// 这个地方 等有时间要在回来优化哦
 #if 1
-	Buffer buf;
-	buf.appendInt16(PACKET_MAGIC_D);
-	buf.appendInt16(len);
-	buf.appendInt32(op);
-	buf.appendInt32(param);
-	pb.prepend(buf);
+	if (pb.prependableBytes() >= kHeaderLen)
+	{
+		int16 len = pb.getContentLen();
+		int32 op = pb.getOP();
+		int32 param = pb.getParam();
+
+		Buffer buf;
+		buf.appendInt16(PACKET_MAGIC_D);
+		buf.appendInt16(len);
+		buf.appendInt32(op);
+		buf.appendInt32(param);
+		pb.prepend(buf);
+	}
 #else
 	char buf[16];
 	int32 tmp = ( (len << 16) & PACKET_MAGIC_D); //(PACKET_MAGIC_D << 16 & len);

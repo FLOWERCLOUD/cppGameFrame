@@ -5,6 +5,7 @@
 #include <game/LoongBgSrv/util/md5.h>
 #include <game/LoongBgSrv/BattlegroundMgr.h>
 #include <game/LoongBgSrv/BgPlayer.h>
+#include <game/LoongBgSrv/PlayerMgr.h>
 #include <game/LoongBgSrv/Util.h>
 
 #include <string.h>
@@ -117,7 +118,7 @@ void LoongBgSrv::onKaBuMessage(mysdk::net::TcpConnection* pCon, PacketBase& pb, 
 		BgPlayer* player = static_cast<BgPlayer*>(pCon->getContext());
 		if (player != NULL)
 		{
-			TIME_FUNCTION_CALL(player->onMsgHandler(pb), 0.005);
+			TIME_FUNCTION_CALL(player->onMsgHandler(pb), 10);
 		}
 	}
 }
@@ -125,13 +126,14 @@ void LoongBgSrv::onKaBuMessage(mysdk::net::TcpConnection* pCon, PacketBase& pb, 
 bool LoongBgSrv::login(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::Timestamp timestamp)
 {
 	int32 playerId = pb.getInt32();
-	char playerName[56];
-	if (!pb.getUTF(playerName, 55))
+	char playerName[128];
+	if (!pb.getUTF(playerName, 127))
 	{
 		return false;
 	}
 
 	int32 roleType = pb.getInt32();
+	int32 times = pb.getInt32();
 
 	char token[100];
 	if (!pb.getUTF(token, 99))
@@ -142,20 +144,24 @@ bool LoongBgSrv::login(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::T
 	LOG_DEBUG << "LoongBgSrv::login - playerId:"  << playerId
 							<< " playerName: " << playerName
 							<< " roleType: " << roleType
+							<< " times: " << times
 							<< " address: "<< pCon->peerAddress().toHostPort();
 
 	static const char key[] =  "9B1492CF6AAE903F63FB7759D3565CD7";
-	char buf[100];
-	//md5(uid + username + roletype + key);
-	snprintf(buf, 99, "%d%s%d%s", playerId, playerName, roleType, key);
+	char buf[256];
+	//md5(uid + username + roletype + times +  key);
+	snprintf(buf, 255, "%d%s%d%d%s", playerId, playerName, roleType, times, key);
 	char* tmp = MD5String(buf);
 	if (strcmp(tmp, token) != 0)
 	{
-			free(tmp);
 			LOG_ERROR << "LoongBgSrv::login - playerId:"  << playerId
 									<< " playerName: " << playerName
 									<< " token: " << token
-									<< "address: "<< pCon->peerAddress().toHostPort();
+									<< " times: " << times
+									<< " servmd5: " << tmp
+									<< " buf: " << buf
+									<< " address: "<< pCon->peerAddress().toHostPort();
+			free(tmp);
 			return false;
 	}
 	free(tmp);
@@ -164,6 +170,7 @@ bool LoongBgSrv::login(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::T
 	if (!player) return false;
 
 	player->setRoleType(roleType);
+	player->setTimes(static_cast<int16>(times));
 	pCon->setContext(player);
 	//  告诉客户端 登陆成功哦
 	PacketBase op(client::OP_LOGIN, 0);
@@ -174,11 +181,10 @@ bool LoongBgSrv::login(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::T
 
 void LoongBgSrv::tickMe()
 {
-	//LOG_TRACE << "LoongBgSrv::tickMe - "  << Timestamp::now().toString();
 	if (!shutdown_loongBgSrv)
 	{
 		uint32 curTime = getCurTime();
-		sBattlegroundMgr.run(curTime);
+		TIME_FUNCTION_CALL(sBattlegroundMgr.run(curTime), 10);
 	}
 	else
 	{

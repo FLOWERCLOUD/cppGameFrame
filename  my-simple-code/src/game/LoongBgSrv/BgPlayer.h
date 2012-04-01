@@ -9,6 +9,8 @@
 #define GAME_BGPLAYER_H_
 
 #include <game/LoongBgSrv/BgUnit.h>
+#include <game/LoongBgSrv/package/Package.h>
+
 #include <mysdk/net/TcpConnection.h>
 #include <string>
 #include <list>
@@ -23,12 +25,8 @@ public:
 	BgPlayer(int32 playerId, char* playerName, mysdk::net::TcpConnection* pCon, LoongBgSrv* pSrv);
 	virtual ~BgPlayer();
 
-	void incKillEnemyTime();
-
 	void setPetId(int16 petId);
 	bool hasPet();
-
-	void sendPacket(PacketBase& op);
 
 	void run(uint32 curTime);
 
@@ -37,9 +35,13 @@ public:
 	void setScene(Scene* scene);
 	void setBgId(int16 bgId);
 	void setRoleType(int32 roletype);
+	void setTimes(int16 times);
 
 	void broadMsg(PacketBase& op);
 	void close();
+
+	bool addItem(int32 itemId);
+	void incBgPlayerTimes();
 public:
 	// 父类的东东
 	virtual bool serialize(PacketBase& op);
@@ -51,8 +53,14 @@ public:
 	virtual bool useSkill(int16 skillId);
 	virtual void onHurt(BgUnit* attacker, int32 damage, const SkillBase& skill);
 	virtual void onBufHurt(BgUnit* me, int32 damage, const BufBase& buf);
+	virtual void incKillEnemyTime();
+	virtual void fullHp();
+	virtual void sendPacket(PacketBase& op);
 private:
 	void runBuf(uint32 curTime);
+	void removeAllBuf();
+	void selectPet(const PetBase& petBase, PacketBase& pb);
+
 	// 消息处理函数
 	void onEnterBattle(PacketBase& pb);
 	void onMove(PacketBase& pb);
@@ -63,6 +71,8 @@ private:
 	void onSelectPet(PacketBase& pb);
 	void onUseSkill(PacketBase& pb);
 	void onExitBattle(PacketBase& pb);
+	void onPickUpItem(PacketBase& pb);
+	void onUseItem(PacketBase& pb);
 private:
 	std::string name_; //玩家的名字
 	int16 killEnemyTimes_;
@@ -70,9 +80,10 @@ private:
 	int16 battlegroundId_; //当然玩家所在的战场ID
 	int32 roleType_;
 	int16 title_;
+	int16 times_; //该玩家已经玩了多少次了
 	std::list<Buf*> bufList_; //玩家中的buf 列表
 	std::map<int16, int32> useSkillMap_;
-
+	Package package_;
 	Scene* pScene;
 	TcpConnection* pCon_;
 	LoongBgSrv* pSrv_;

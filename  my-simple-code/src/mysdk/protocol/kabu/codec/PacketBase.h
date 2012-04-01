@@ -57,6 +57,8 @@ public:
 
 	void prepend(const void* data, size_t len);
 	void prepend(mysdk::net::Buffer& buf);
+	size_t prependableBytes();
+
 	const mysdk::net::Buffer* getBufferContent() const
 	{
 		return &buffer_;
@@ -64,6 +66,7 @@ public:
 private:
 	KaBuHead head_;
 	Buffer buffer_;
+	bool flag_;
 private:
 	DISALLOW_COPY_AND_ASSIGN(PacketBase);
 };

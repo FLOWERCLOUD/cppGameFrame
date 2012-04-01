@@ -13,7 +13,8 @@
 #include <mysdk/protocol/kabu/codec/PacketBase.h>
 
 Scene::Scene():
-	sceneId_(0)
+	sceneId_(0),
+	dropItemMgr_(this)
 {
 
 }
@@ -27,6 +28,7 @@ bool Scene::addPlayer(BgPlayer* player)
 	assert(player != NULL);
 	int32 playerId = player->getId();
 	playerMgr_.insert(std::pair<int32, BgPlayer*>(playerId, player));
+	player->setScene(this);
 
 	PacketBase op(client::OP_ADD_PLAYER, 0);
 	player->serialize(op);
@@ -60,21 +62,13 @@ void Scene::broadMsg(PacketBase& op)
 }
 bool Scene::init()
 {
+	dropItemMgr_.init();
 	return true;
 }
 
 void Scene::shutdown()
 {
-	std::map<int32, BgPlayer*>::iterator iter;
-	for(iter = playerMgr_.begin(); iter != playerMgr_.end(); iter++)
-	{
-		BgPlayer* player = iter->second;
-		if (player)
-		{
-			LOG_INFO << "============ Scene::shutdown() playerId: " << player->getId();
-			delete player;
-		}
-	}
+	dropItemMgr_.shutdown();
 }
 
 void Scene::run(uint32 curTime)
@@ -88,6 +82,7 @@ void Scene::run(uint32 curTime)
 			player->run(curTime);
 		}
 	}
+	dropItemMgr_.run(curTime);
 }
 
 BgPlayer* Scene::getPlayer(int playerId)
@@ -99,4 +94,24 @@ BgPlayer* Scene::getPlayer(int playerId)
 		return iter->second;
 	}
 	return NULL;
+}
+
+bool Scene::hasItem(int16 x, int16 y)
+{
+	return false;
+}
+
+bool Scene::pickUpItem(BgPlayer* player, int16 x, int16 y)
+{
+	return dropItemMgr_.pickUpItem(player, x, y);
+}
+
+bool Scene::serializeItem(PacketBase& op)
+{
+	return dropItemMgr_.serialize(op);
+}
+
+bool Scene::serializePlayer(PacketBase& op)
+{
+	return true;
 }

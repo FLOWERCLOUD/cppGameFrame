@@ -10,19 +10,21 @@
 
 #include <mysdk/base/Common.h>
 
+using namespace mysdk;
 class Item
 {
 public:
-	Item(int16 itemId, int16 num, int16 type);
+	Item();
+	Item(int16 itemId, int16 num);
 	~Item();
 
 	int16 getItemId();
 	int16 getNum();
-	int16 getType();
+	void setItemId(int16 itemId);
+	void setItemNum(int16 num);
 private:
 	int16 itemId_; // 物品ID
 	int16 num_; // 物品数量
-	int16 type_; //物品类型
 private:
 	DISALLOW_COPY_AND_ASSIGN(Item);
 };

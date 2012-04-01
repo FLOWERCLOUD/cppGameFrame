@@ -3,18 +3,25 @@ set(LoongBgSrv_SRCS
   base/BufBaseMgr.cc
   base/PetBase.cc
   base/PetBaseMgr.cc
+  base/ItemBase.cc
+  base/ItemBaseMgr.cc
   base/SkillBase.cc
   base/SkillBaseMgr.cc
+  package/Item.cc
+  package/Package.cc
+  scene/DropItemMgr.cc
   scene/Scene.cc
   skill/Buf.cc
   skill/BufHandler.cc
   skill/HunXuanBuf.cc
   skill/SkillHandler.cc
+  skill/ItemHandler.cc
   skill/ZhouShangBuf.cc
   util/md5.cpp
   Battleground.cc
   BattlegroundMgr.cc
   BattlegroundState.cc
+  BgBuilding.cc
   StateBattlegroundCountDown.cc
   StateBattlegroundExit.cc
   StateBattlegroundRun.cc
@@ -22,6 +29,9 @@ set(LoongBgSrv_SRCS
   StateBattlegroundWait.cc
   BgPlayer.cc
   BgUnit.cc
+  JoinTimesMgr.cc
+  Player.cc
+  PlayerMgr.cc
   LoongBgSrv.cc
   main.cc
   )

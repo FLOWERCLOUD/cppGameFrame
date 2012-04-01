@@ -13,6 +13,7 @@
 #include <mysdk/protocol/kabu/codec/PacketBase.h>
 #include <game/LoongBgSrv/base/SkillBase.h>
 #include <game/LoongBgSrv/base/BufBase.h>
+#include <game/LoongBgSrv/base/PetBase.h>
 
 using namespace mysdk;
 class Buf;
@@ -28,19 +29,11 @@ public:
 		kCOUNT_TEAM,
 	} TeamE;
 
-	typedef enum tagUnitTypeE
-	{
-		KNONE_UNITTYPE = 0,
-		KONE_UNITTYPE	= 1, // 傀儡巨人
-		KSECOND_UNITTYPE = 2,  //黑石大炮
-		KTHREE_UNITTYPE	= 3, //地裂兽
-		KFOUR_UNITTYPE = 4, //王座
-	} UnitTypeE;
-
 public:
 	BgUnit();
 	explicit BgUnit(UnitTypeE unitType);
 	BgUnit(int32 unitId, UnitTypeE unitType);
+	BgUnit(int32 unitId, UnitTypeE unitType, TeamE team);
 	virtual ~BgUnit();
 
 	virtual bool serialize(PacketBase& op);
@@ -56,6 +49,15 @@ public:
 	// 伤害
 	virtual void onHurt(BgUnit* attacker, int32 damage, const SkillBase& skill);
 	virtual void onBufHurt(BgUnit* me, int32 damage, const BufBase& buf);
+	virtual void incKillEnemyTime();
+	virtual void fullHp();
+	virtual void sendPacket(PacketBase& op);
+	typedef enum tagAlertCodeTypeE
+	{
+		NOMAL_ALERTCODETYPE	= 0,
+		FLOW_ALERTCODETYPE = 1,
+	} AlertCodeTypeE;
+	virtual void alert(AlertCodeTypeE type, int32 code);
 
 	bool isDead();
 
@@ -64,6 +66,7 @@ public:
 	int16 getY();
 	TeamE getTeam();
 	UnitTypeE getUnitType();
+	int32 getHp();
 
 	// 设置是否操作
 	void setOperation(bool op);

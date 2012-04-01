@@ -33,5 +33,6 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 include_directories(${PROJECT_SOURCE_DIR})
 
 add_subdirectory(mysdk)
+add_subdirectory(game)
 
 

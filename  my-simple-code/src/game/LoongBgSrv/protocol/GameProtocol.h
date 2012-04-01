@@ -27,6 +27,8 @@ namespace game
 	// 0x0012000D
 	// 0x0012000E
 	static const uint32 OP_EXIT_BATTLE			= 0x00120010; //退出战场
+	static const uint32 OP_PICKUP_ITEM			= 0x00120011; //拾取物品
+	static const uint32 OP_USE_ITEM					= 0x00120012; //使用物品
 }
 
 namespace client
@@ -45,7 +47,13 @@ namespace client
 	static const uint32 OP_ADD_BUF					= 0x0014000C; // 中了buf
 	static const uint32 OP_REMOVE_BUF			= 0x0014000D;// 移除buf
 	static const uint32 OP_ON_HURT				= 0x0014000E;// 伤害
-	static const uint32 OP_EXIT_BATTLE			= 0x0014000B; //退出战场
+	static const uint32 OP_EXIT_BATTLE			= 0x00140010; //退出战场
+	static const uint32 OP_PICKUP_ITEM			= 0x00140011; //拾取物品
+	static const uint32 OP_USE_ITEM					= 0x00140012; //使用物品
+	static const uint32 OP_TELLCLIENT_STATE = 0x00140013; //战场状态
+	static const uint32 OP_DROP_ITEM				 = 0x00140014; //战场掉落了一个物品
+	static const uint32 OP_ALERT_CODE			 = 0x00140015; // 错误码
+	static const uint32 OP_PET_DEAD		 		 = 0x00140016; // 英雄死了
 }
 
 #endif /* GAMEPROTOCOL_H_ */

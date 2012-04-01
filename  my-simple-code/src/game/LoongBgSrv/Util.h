@@ -10,6 +10,7 @@
 
 #include <mysdk/base/Common.h>
 #include <mysdk/base/Timestamp.h>
+#include <mysdk/base/Logging.h>
 
 #include <game/LoongBgSrv/BgUnit.h>
 
@@ -25,10 +26,11 @@ static inline int32 getDistance(BgUnit* me, BgUnit* target)
 	return (deltaX * deltaX + deltaY * deltaY);
 }
 
+// return [nBegin, nEnd)
 static inline int32 getRandomBetween(int32 nBegin, int32 nEnd)
 {
 	return nBegin + static_cast<int32>(static_cast<long long>(rand()) * (nEnd - nBegin) / RAND_MAX + 1);
-	return 0;
+	//return 0;
 }
 
 //获得加成数值
@@ -38,6 +40,12 @@ static inline int16 getBonusValue(BgUnit* me, BgUnit* target)
 
 	int meUnitType = me->getUnitType() - 1;
 	int targetUnitType = target->getUnitType() - 1;
+
+	LOG_DEBUG << "getBonusValue - meId: " << me->getId()
+							<< " meType: " << me->getUnitType()
+							<< " target: " << target->getId()
+							<< " targetType: " << target->getUnitType()
+							<< " bonusTable: " << bonusTable[meUnitType][targetUnitType];
 	return bonusTable[meUnitType][targetUnitType];
 }
 
@@ -59,13 +67,18 @@ static inline uint16 GetLow16(const int32 t)
 	return static_cast<uint16>(t & 0x0000FFFF);
 }
 
+static inline int32 MakeInt32(const int16 height, const int16 low)
+{
+	return ( (height << 16) & 0x0000FFFF ) & (low & 0x0000FFFF);
+}
+
 #define TIME_FUNCTION_CALL(p, t) \
 {       Timestamp oldTimeStamp = Timestamp::now(); \
         (p); \
         Timestamp newTimeStamp = Timestamp::now(); \
         double diff = timeDifference(newTimeStamp, oldTimeStamp); \
         if (diff > t)\
-        LOG_WARN << "call function: " << #p << " , time[ms] = " << diff; \
+        LOG_WARN << "call function: " << #p << " , time[us] = " << diff; \
 }
 
 

@@ -10,7 +10,7 @@
 BufBaseMgr::BufBaseMgr():
 	curBufBaseNum_(0)
 {
-
+	init();
 }
 
 BufBaseMgr::~BufBaseMgr()
@@ -35,7 +35,7 @@ bool BufBaseMgr::init()
 	bufBaseList_[curBufBaseNum_].type_ = 2;
 	bufBaseList_[curBufBaseNum_].who_ = BufBase::OTHER;
 	bufBaseList_[curBufBaseNum_].paramNum_ = 1;
-	bufBaseList_[curBufBaseNum_].paramList_[0] = 3;
+	bufBaseList_[curBufBaseNum_].paramList_[0] = 3000; //单元ms
 	curBufBaseNum_++;
 	bufBaseList_[curBufBaseNum_].id_ = 3;
 	bufBaseList_[curBufBaseNum_].name_ = "灼伤";
@@ -43,14 +43,14 @@ bool BufBaseMgr::init()
 	bufBaseList_[curBufBaseNum_].who_ = BufBase::OTHER;
 	bufBaseList_[curBufBaseNum_].paramNum_ = 2;
 	bufBaseList_[curBufBaseNum_].paramList_[0] = 5;
-	bufBaseList_[curBufBaseNum_].paramList_[1] = 15;
+	bufBaseList_[curBufBaseNum_].paramList_[1] = 15000; //单元ms
 	curBufBaseNum_++;
 	bufBaseList_[curBufBaseNum_].id_ = 4;
 	bufBaseList_[curBufBaseNum_].name_ = "免疫";
 	bufBaseList_[curBufBaseNum_].type_ = 4;
 	bufBaseList_[curBufBaseNum_].who_ = BufBase::ME;
 	bufBaseList_[curBufBaseNum_].paramNum_ = 1;
-	bufBaseList_[curBufBaseNum_].paramList_[0] = 6;
+	bufBaseList_[curBufBaseNum_].paramList_[0] = 6000; //单元ms
 
 	return true;
 }

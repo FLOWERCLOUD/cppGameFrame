@@ -29,6 +29,8 @@ public:
 										mysdk::net::Buffer* buf,
 										mysdk::Timestamp receiveTime);
 private:
+	void tickMe();
+
 	EventLoop* loop_;
 	TcpServer server_;
 private:

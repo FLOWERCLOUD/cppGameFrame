@@ -21,7 +21,7 @@ static bool defaultBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUnit
 {
 	return false;
 }
-
+// 溅射buff
 static bool JianSheBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUnit* target, Scene* scene)
 {
 	const BufBase& bufBase = sBufBaseMgr.getBufBaseInfo(bufId);
@@ -56,7 +56,7 @@ static bool JianSheBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUnit
 
 	return true;
 }
-
+// 昏眩buff
 static bool hunXuanBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUnit* target, Scene* scene)
 {
 	const BufBase& bufbase = sBufBaseMgr.getBufBaseInfo(bufId);
@@ -68,7 +68,7 @@ static bool hunXuanBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUnit
 	target->addBuf(buf);
 	return true;
 }
-
+// 灼烧buff
 static bool zhouShangBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUnit* target, Scene* scene)
 {
 	const BufBase& bufbase = sBufBaseMgr.getBufBaseInfo(bufId);

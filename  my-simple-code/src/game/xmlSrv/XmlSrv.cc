@@ -2,6 +2,39 @@
 #include <game/xmlSrv/XmlSrv.h>
 
 #include <string.h>
+#include <signal.h>
+
+static bool shutdown_loongBgSrv = false;
+static void sigtermHandler(int sig)
+{
+    LOG_WARN << "Received SIGTERM, scheduling shutdown...";
+    shutdown_loongBgSrv = true;
+}
+
+void setupSignalHandlers(void)
+{
+	//LOG_WARN << "setupSignalHandlers ...";
+
+    struct sigaction act;
+
+    /* When the SA_SIGINFO flag is set in sa_flags then sa_sigaction is used.
+     * Otherwise, sa_handler is used. */
+    sigemptyset(&act.sa_mask);
+    act.sa_flags = SA_NODEFER | SA_ONSTACK | SA_RESETHAND;
+    act.sa_handler = sigtermHandler;
+    sigaction(SIGTERM, &act, NULL);
+    sigaction(SIGINT, &act, NULL);
+#ifdef HAVE_BACKTRACE
+    sigemptyset(&act.sa_mask);
+    act.sa_flags = SA_NODEFER | SA_ONSTACK | SA_RESETHAND | SA_SIGINFO;
+    act.sa_sigaction = sigsegvHandler;
+    sigaction(SIGSEGV, &act, NULL);
+    sigaction(SIGBUS, &act, NULL);
+    sigaction(SIGFPE, &act, NULL);
+    sigaction(SIGILL, &act, NULL);
+#endif
+    return;
+}
 
 XmlSrv::XmlSrv(EventLoop* loop, InetAddress& serverAddr):
 	loop_(loop),
@@ -17,6 +50,7 @@ XmlSrv::XmlSrv(EventLoop* loop, InetAddress& serverAddr):
 														std::tr1::placeholders::_2,
 														std::tr1::placeholders::_3));
 
+    loop->runEvery(1, std::tr1::bind(&XmlSrv::tickMe, this));
 }
 
 XmlSrv::~XmlSrv()
@@ -25,6 +59,7 @@ XmlSrv::~XmlSrv()
 
 void XmlSrv::start()
 {
+	setupSignalHandlers();
 	server_.start();
 }
 
@@ -71,3 +106,10 @@ void XmlSrv::onMessage(mysdk::net::TcpConnection* pCon,
     pCon->shutdown();
 }
 
+void XmlSrv::tickMe()
+{
+	if (shutdown_loongBgSrv)
+	{
+		loop_->quit();
+	}
+}

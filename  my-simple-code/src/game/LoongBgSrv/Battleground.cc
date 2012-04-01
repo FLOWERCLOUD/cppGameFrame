@@ -14,11 +14,18 @@
 #include <game/LoongBgSrv/StateBattlegroundRun.h>
 #include <game/LoongBgSrv/StateBattlegroundStart.h>
 #include <game/LoongBgSrv/StateBattlegroundWait.h>
+#include <game/LoongBgSrv/JoinTimesMgr.h>
+#include <game/LoongBgSrv/base/PetBase.h>
+
+#include <game/LoongBgSrv/protocol/GameProtocol.h>
 
 Battleground::Battleground():
 	id_(0),
 	bFirst_(true),
-	pState_(NULL)
+	bgResult_(KNONE_BGRESULT),
+	pState_(NULL),
+	blackBuildings_(1, KFOUR_UNITTYPE, BgUnit::kBlack_TEAM, &scene_),
+	whiteBuildings_(2, KFOUR_UNITTYPE, BgUnit::kWhite_TEAM, &scene_)
 {
 	init();
 }
@@ -39,6 +46,9 @@ void Battleground::init()
 		teamNum_[i] = 0;
 	}
 	teamNum_[0] = 99;
+
+	blackBuildings_.init();
+	whiteBuildings_.init();
 }
 
 void Battleground::shtudown()
@@ -71,6 +81,7 @@ bool Battleground::addBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 	}
 	teamNum_[team]++;
 	player->setTeam(team);
+
 	return scene_.addPlayer(player);
 }
 
@@ -84,14 +95,21 @@ bool Battleground::removeBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 void Battleground::run(uint32 curTime)
 {
 	scene_.run(curTime);
+	if (pState_)
+	{
+		pState_->run(curTime);
+	}
 }
 
 bool Battleground::getBgInfo(PacketBase& op)
 {
-	op.putInt16(teamNum_[BgUnit::kBlack_TEAM]);
-	op.putInt16(teamNum_[BgUnit::kWhite_TEAM]);
-	op.putInt16(getState());
+	op.putInt32(teamNum_[BgUnit::kBlack_TEAM]);
+	op.putInt32(teamNum_[BgUnit::kWhite_TEAM]);
+	op.putInt32(getState());
 	op.putInt32(getLeftTime());
+	op.putInt32(blackBuildings_.getHp());
+	op.putInt32(whiteBuildings_.getHp());
+	scene_.serializeItem(op);
 	//
 	return true;
 }
@@ -100,7 +118,7 @@ BattlegroundState::BgStateE Battleground::getState()
 {
 	if (pState_)
 	{
-		pState_->getState();
+		return pState_->getState();
 	}
 	return BattlegroundState::BGSTATE_NONE;
 }
@@ -109,9 +127,34 @@ uint32 Battleground::getLeftTime()
 {
 	if (pState_)
 	{
-		pState_->getLeftTime();
+		return pState_->getLeftTime();
 	}
-	return 999;
+	return 999999;
+}
+
+BgUnit* Battleground::getTargetUnit(int32 playerId, int32 uintType)
+{
+	enum
+	{
+		PLAYER_UNITTYPE	= 	0,
+		BLACK_BUILDING_UNITTYPE = 1,
+		WHITE_BUILDING_UNITTYPE = 2,
+	};
+
+	BgUnit* target = NULL;
+	if (uintType == PLAYER_UNITTYPE)
+	{
+		target = scene_.getPlayer(playerId);
+	}
+	else if (uintType == BLACK_BUILDING_UNITTYPE)
+	{
+		return &blackBuildings_;
+	}
+	else if (uintType == WHITE_BUILDING_UNITTYPE)
+	{
+		return &whiteBuildings_;
+	}
+	return target;
 }
 
 bool Battleground::isFull()
@@ -134,22 +177,60 @@ bool Battleground::isEmpty()
 
 bool Battleground::isGameOver()
 {
+	if (blackBuildings_.isDead() && whiteBuildings_.isDead())
+	{
+		bgResult_ = KDRAW_BGRESULT;
+		return true;
+	}
+
+	if (blackBuildings_.isDead())
+	{
+		bgResult_ = KWHITE_BGRESULT;
+		return true;
+	}
+
+	if (whiteBuildings_.isDead())
+	{
+		bgResult_ = KDRAW_BGRESULT;
+		return true;
+	}
 	return false;
 }
 
 void Battleground::settlement()
 {
-
+	//统计战场结果 发放战斗奖励
+	std::map<int32, BgPlayer*> playerMgr = scene_.getPlayerMgr();
+	std::map<int32, BgPlayer*>::iterator iter;
+	for(iter = playerMgr.begin(); iter != playerMgr.end(); iter++)
+	{
+		BgPlayer* player = iter->second;
+		if (player)
+		{
+		}
+	}
 }
 
 void Battleground::incBgPlayerTimes()
 {
-
+	std::map<int32, BgPlayer*> playerMgr = scene_.getPlayerMgr();
+	std::map<int32, BgPlayer*>::iterator iter;
+	for(iter = playerMgr.begin(); iter != playerMgr.end(); iter++)
+	{
+		BgPlayer* player = iter->second;
+		if (player)
+		{
+			sJoinTimesMgr.incJoinTimes(player->getId());
+		}
+	}
 }
 
 void Battleground::tellClientBgState()
 {
-
+	PacketBase op(client::OP_TELLCLIENT_STATE, 0);
+	op.putInt32(getState());
+	op.putInt32(getLeftTime());
+	scene_.broadMsg(op);
 }
 
 bool Battleground::haveOtherTeamEmpty()
@@ -209,6 +290,7 @@ void Battleground::switchExitState()
 
 void Battleground::closeBattleground()
 {
+	LOG_DEBUG << "Battleground::closeBattleground - " << this->getId();
 	if (pState_)
 	{
 		pState_->end();

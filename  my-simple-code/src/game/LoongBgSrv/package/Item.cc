@@ -5,12 +5,18 @@
  *    
  */
 
-#include <game/LoongBgsrv/package/Item.h>
+#include <game/LoongBgSrv/package/Item.h>
 
-Item::Item(int16 itemId, int16 num, int16 type):
+Item::Item():
+	itemId_(0),
+	num_(0)
+{
+
+}
+
+Item::Item(int16 itemId, int16 num):
 	itemId_(itemId),
-	num_(num),
-	type_(type)
+	num_(num)
 {
 }
 
@@ -28,8 +34,13 @@ int16 Item::getNum()
 	return num_;
 }
 
-int16 Item::getType()
+void Item::setItemId(int16 itemId)
 {
-	return type_;
+	itemId_ = itemId;
+}
+
+void Item::setItemNum(int16 num)
+{
+	num_ = num;
 }
 

@@ -12,6 +12,7 @@
 #include <game/LoongBgSrv/pet/Pet.h>
 #include <game/LoongBgSrv/protocol/GameProtocol.h>
 #include <game/LoongBgSrv/skill/Buf.h>
+#include <game/LoongBgSrv/skill/ItemHandler.h>
 #include <game/LoongBgSrv/skill/SkillHandler.h>
 #include <game/LoongBgSrv/LoongBgSrv.h>
 #include <game/LoongBgSrv/BattlegroundMgr.h>
@@ -27,6 +28,7 @@ BgPlayer::BgPlayer(int32 playerId, std::string& playerName, mysdk::net::TcpConne
 	battlegroundId_(0),
 	roleType_(0),
 	title_(0),
+	times_(0),
 	pScene(NULL),
 	pCon_(pCon),
 	pSrv_(pSrv)
@@ -42,6 +44,7 @@ BgPlayer::BgPlayer(int32 playerId, char* playerName, mysdk::net::TcpConnection* 
 	battlegroundId_(0),
 	roleType_(0),
 	title_(0),
+	times_(0),
 	pScene(NULL),
 	pCon_(pCon),
 	pSrv_(pSrv)
@@ -51,6 +54,8 @@ BgPlayer::BgPlayer(int32 playerId, char* playerName, mysdk::net::TcpConnection* 
 
 BgPlayer::~BgPlayer()
 {
+	bufList_.clear();
+	useSkillMap_.clear();
 	LOG_DEBUG << "---------BgPlayer::~BgPlayer - playerId: " << this->getId() << name_;
 }
 
@@ -69,9 +74,14 @@ void BgPlayer::setRoleType(int32 roleType)
 	roleType_ = roleType;
 }
 
+void BgPlayer::setTimes(int16 times)
+{
+	times_ = times;
+}
+
 void BgPlayer::broadMsg(PacketBase& op)
 {
-	if (!pScene)
+	if (pScene)
 	{
 		pScene->broadMsg(op);
 	}
@@ -85,9 +95,19 @@ void BgPlayer::close()
 	}
 }
 
-void BgPlayer::incKillEnemyTime()
+bool BgPlayer::addItem(int32 itemId)
 {
-	killEnemyTimes_++;
+	if (package_.addItem(static_cast<int16>(itemId)) == Package::kSuccess_AddItemRtn)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+void BgPlayer::incBgPlayerTimes()
+{
+	//sJoinTimesMgr.incJoinTimes(this->getId());
 }
 
 bool BgPlayer::hasPet()
@@ -123,6 +143,8 @@ bool BgPlayer::serialize(PacketBase& op)
 	op.putInt32(petId_);
 	op.putInt32(hp_);
 	op.putInt32(title_);
+	op.putInt32(x_);
+	op.putInt32(y_);
 	return true;
 }
 
@@ -182,8 +204,22 @@ void BgPlayer::onHurt(BgUnit* attacker, int32 damage, const SkillBase& skill)
 		damage = hp_;
 	}
 	decHp(damage);
+	if (isDead())
+	{
+		attacker->incKillEnemyTime();
+		//
+		PacketBase op(client::OP_PET_DEAD, this->getId());
+		broadMsg(op);
+	}
+
+	LOG_DEBUG <<  "BgPlayer::onHurt - playerId: " << this->getId()
+							<< " damage: " << damage
+							<< " attacker: " << attacker->getId()
+							<< " skillId:" << skill.skillId_;
+
 	// 告诉客户端 你受到什么伤害 伤害是多少
 	PacketBase pb(client::OP_ON_HURT, this->getId());
+	pb.putInt32(0); //单元类型
 	pb.putInt32(0); //技能伤害
 	pb.putInt32(skill.skillId_);
 	pb.putInt32(skill.type_);
@@ -199,16 +235,45 @@ void BgPlayer::onBufHurt(BgUnit* me, int32 damage, const BufBase& buf)
 		damage = hp_;
 	}
 	decHp(damage);
+
+	if (isDead())
+	{
+		PacketBase op(client::OP_PET_DEAD, this->getId());
+		broadMsg(op);
+	}
 	// 告诉客户端 你受到什么伤害 伤害是多少
 	PacketBase pb(client::OP_ON_HURT, this->getId());
+	pb.putInt32(0); //单元类型
 	pb.putInt32(1); // buf 伤害
 	pb.putInt32(buf.id_);
 	pb.putInt32(damage);
 	broadMsg(pb);
 }
 
+void BgPlayer::incKillEnemyTime()
+{
+	this->killEnemyTimes_++;
+}
+
+void BgPlayer::fullHp()
+{
+	if (petId_ > 0)
+	{
+		if (!sPetBaseMgr.checkPetId(petId_))
+		{
+			return;
+		}
+
+		PetBase petbase = sPetBaseMgr.getPetBaseInfo(petId_);
+		setPetId(petId_);
+		setHp(petbase.hp_);
+	}
+}
+
 void BgPlayer::runBuf(uint32 curTime)
 {
+	if (isDead()) return;
+
 	std::list<Buf*>::iterator itList;
 	for (itList = bufList_.begin(); itList != bufList_.end(); )
 	{
@@ -230,6 +295,18 @@ void BgPlayer::runBuf(uint32 curTime)
 			itList++;
 		}
 	}
+}
+
+void BgPlayer::removeAllBuf()
+{
+	std::list<Buf*>::iterator itList;
+	for (itList = bufList_.begin(); itList != bufList_.end(); ++itList)
+	{
+		Buf* buf = *itList;
+		assert(buf);
+		delete buf;
+	}
+	bufList_.clear();
 }
 
 #define BENGIN_MESSAGEHANDLE() switch (op) { \
@@ -278,6 +355,13 @@ bool BgPlayer::onMsgHandler(PacketBase& pb)
 		break;
 	case game::OP_EXIT_BATTLE:
 		onExitBattle(pb);
+		break;
+	case game::OP_PICKUP_ITEM:
+		onPickUpItem(pb);
+		break;
+	case game::OP_USE_ITEM:
+		onUseItem(pb);
+		break;
 	default:
 		break;
 	}
@@ -294,8 +378,8 @@ bool BgPlayer::onMsgHandler(PacketBase& pb)
 // 消息处理函数
 void BgPlayer::onEnterBattle(PacketBase& pb)
 {
-	int16 bgId = pb.getInt16();
-	int16 teamValue = pb.getInt16();
+	int16 bgId = static_cast<int16>(pb.getInt32());
+	int16 teamValue = static_cast<int16>(pb.getInt32());
 
 	if (!sBattlegroundMgr.checkBattlegroundId(bgId))
 	{
@@ -305,13 +389,17 @@ void BgPlayer::onEnterBattle(PacketBase& pb)
 	BgUnit::TeamE team = (teamValue == BgUnit::kBlack_TEAM) ? BgUnit::kBlack_TEAM :BgUnit::kWhite_TEAM;
 
 	PacketBase op(client::OP_ENTER_BATTLE, -1);
-	op.putInt16(bgId);
-	op.putInt16(teamValue);
+	op.putInt32(bgId);
+	op.putInt32(teamValue);
 	Battleground& bg = sBattlegroundMgr.getBattleground(bgId);
-	if(bg.addBgPlayer(this, team))
+	if (bg.getState() == BattlegroundState::BGSTATE_EXIT)
+	{
+		op.setParam(-2);
+	}
+	else if(bg.addBgPlayer(this, team))
 	{
 		setBgId(bgId);
-		op.setOP(0);
+		op.setParam(0);
 	}
 	this->sendPacket(op);
 }
@@ -321,7 +409,8 @@ void BgPlayer::onMove(PacketBase& pb)
 	if (!pScene) return;
 
 	// 广播给其他玩家
-	pb.setParam(client::OP_MOVE);
+	pb.setOP(client::OP_MOVE);
+	//pb.setFlag(false);
 	pScene->broadMsg(pb);
 }
 
@@ -330,6 +419,7 @@ void BgPlayer::onChat(PacketBase& pb)
 	if (!pScene) return;
 
 	pb.setOP(client::OP_CHAT);
+	//pb.setFlag(false);
 	pScene->broadMsg(pb);
 }
 
@@ -346,8 +436,8 @@ void BgPlayer::onReqBattleInfo(PacketBase& pb)
 
 void BgPlayer::onStand(PacketBase& pb)
 {
-	int16 x = pb.getInt16();
-	int16 y = pb.getInt16();
+	int16 x = static_cast<int16>(pb.getInt32());
+	int16 y = static_cast<int16>(pb.getInt32());
 	setX(x);
 	setY(y);
 }
@@ -367,25 +457,40 @@ void BgPlayer::onReqPlayerList(PacketBase& pb)
 			player->serialize(pb);
 		}
 	}
+	pb.setOP(client::OP_REQ_PLAYER_LIST);
 	this->sendPacket(pb);
 }
 
+void BgPlayer::selectPet(const PetBase& petBase, PacketBase& pb)
+{
+}
+
+
 void BgPlayer::onSelectPet(PacketBase& pb)
 {
+	if (!pScene) return;
+
 	int16 petId = static_cast<int16>(pb.getParam());
-	LOG_DEBUG << "BgPlayer::onSelectPet petId - " << petId << " playerId: " << this->getId();
+	LOG_DEBUG << "BgPlayer::onSelectPet - petId:" << petId << " playerId: " << this->getId();
 	if (!sPetBaseMgr.checkPetId(petId))
 	{
 		return;
 	}
 
-	PetBase petbase = sPetBaseMgr.getPetBaseInfo(petId);
+	if (!isDead()) return;
+
+	removeAllBuf();
+
+	const PetBase& petbase = sPetBaseMgr.getPetBaseInfo(petId);
 	setPetId(petId);
 	setHp(petbase.hp_);
+	unitType_ = petbase.type_;
 
-	petbase.serialize(pb);
 	pb.setOP(client::OP_SELCET_PET);
-	this->sendPacket(pb);
+	pb.setParam(getId());
+	pb.putInt32(petId);
+	pb.putInt32(hp_);
+	pScene->broadMsg(pb);
 }
 
 void BgPlayer::onUseSkill(PacketBase& pb)
@@ -393,14 +498,20 @@ void BgPlayer::onUseSkill(PacketBase& pb)
 	if (!pScene) return;
 
 	int16 skillId = static_cast<int16>(pb.getParam());
+	int32 uintType = pb.getInt32();
 	int32 playerId = pb.getInt32();
-	LOG_DEBUG << "BgPlayer::onUseSkill skillID - " << skillId << " playerId: " << this->getId();
+	LOG_DEBUG << "BgPlayer::onUseSkill  -  skillID: " << skillId << " playerId: " << this->getId() << " uintType: " << uintType;
 
-	BgPlayer* target = pScene->getPlayer(playerId);
+	int16 bgId = this->battlegroundId_;
+	if (!sBattlegroundMgr.checkBattlegroundId(bgId))
+		return;
+
+	Battleground& bg = sBattlegroundMgr.getBattleground(bgId);
+
+	BgUnit* target = bg.getTargetUnit(playerId, uintType);
 	if (!target) return;
-
 	// 不能攻击同一个队伍的人
-	if (target->getTeam() != this->getTeam()) return;
+	if (target->getTeam() == this->getTeam()) return;
 
 	SkillHandler::onEmitSkill(skillId, this, target, pScene);
 }
@@ -411,4 +522,27 @@ void BgPlayer::onExitBattle(PacketBase& pb)
 	pScene->removePlayer(this);
 	pb.setOP(client::OP_EXIT_BATTLE);
 	this->sendPacket(pb);
+}
+
+void BgPlayer::onPickUpItem(PacketBase& pb)
+{
+	if (!pScene) return;
+
+	int16 x = static_cast<int16>(pb.getInt32());
+	int16 y = static_cast<int16>(pb.getInt32());
+	pScene->pickUpItem(this, x, y);
+	return;
+}
+
+void BgPlayer::onUseItem(PacketBase& pb)
+{
+	int16 itemId = static_cast<int16>(pb.getInt32());
+	if (package_.hasItem(itemId))
+	{
+		package_.delItem(itemId);
+		ItemHandler::onUseItem(itemId, this, NULL, pScene);
+		//
+		pb.setOP(client::OP_USE_ITEM);
+		this->sendPacket(pb);
+	}
 }

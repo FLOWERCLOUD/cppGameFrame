@@ -15,6 +15,7 @@ PacketBase::PacketBase(uint16 magic,
 	head_.op = op;
 	head_.param = param;
 	buffer_.append(buf, bufLen);
+
 }
 
 PacketBase::PacketBase(uint16 magic, uint16 len, uint32 op, uint32 param, const string& buf)
@@ -89,7 +90,6 @@ bool PacketBase::getUTF(char* pString, int16 nMaxLen)
 	}
 
 	int16 len = buffer_.readInt16();
-	//LOG_TRACE << "PacketBase::getUTF - len = " << len;
 	if (len >= nMaxLen || static_cast<int16>(buffer_.readableBytes()) < len)
 	{
 		LOG_ERROR << "PacketBase::getUTF -  buffer readableBytes: " << buffer_.readableBytes() << " len: " << len;
@@ -99,7 +99,6 @@ bool PacketBase::getUTF(char* pString, int16 nMaxLen)
 	buffer_.get(pString, len);
 	buffer_.retrieve(len);
 	pString[len] = 0;
-	//LOG_TRACE << "PacketBase::getUTF - STRING= " << pString ;
 	return true;
 }
 
@@ -143,4 +142,9 @@ void PacketBase::prepend(const void* data, size_t len)
 void PacketBase::prepend(mysdk::net::Buffer& buf)
 {
 	buffer_.prepend(buf.peek(), buf.readableBytes());
+}
+
+size_t PacketBase::prependableBytes()
+{
+	return buffer_.prependableBytes();
 }

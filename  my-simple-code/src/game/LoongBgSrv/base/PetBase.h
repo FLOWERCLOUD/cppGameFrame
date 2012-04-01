@@ -14,15 +14,20 @@
 
 #include <string>
 using namespace mysdk;
+
+typedef enum tagUnitTypeE
+{
+	KNONE_UNITTYPE = 0,
+	KONE_UNITTYPE	= 1, // 傀儡巨人
+	KSECOND_UNITTYPE = 2,  //黑石大炮
+	KTHREE_UNITTYPE	= 3, //地裂兽
+	KFOUR_UNITTYPE = 4, //王座
+
+	KCOUNT_UNITTYPE,
+} UnitTypeE;
+
 class PetBase
 {
-public:
-	typedef enum tagPetTypeE
-	{
-		ONE_PETTYPE	= 0, // 傀儡巨人
-		SECOND_PETTYPE = 1, //黑石大炮
-		THREE_PETTYPE = 2, //地裂兽
-	} PetTypeE;
 public:
 	static const int sMaxSkillNum = 3;
 public:
@@ -35,7 +40,7 @@ public:
 	std::string petName_; // 宠物的名字
 	int16 speed_; // 宠物的速度
 	int16 hp_; // 宠物的血量
-	PetTypeE type_; //宠物类型
+	UnitTypeE type_; //宠物类型
     // 宠物的技能列表
 	int16 skillNum_;
 	int16 skillList_[sMaxSkillNum];

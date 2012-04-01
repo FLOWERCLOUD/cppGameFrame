@@ -14,8 +14,9 @@ cmd 0x120001
 param
 uid:int 玩家卡布号
 username:utf 玩家的名字
-roletype:int16
-token:utf md5 校验 ( md5(uid + username + roletype + key); key = "9B1492CF6AAE903F63FB7759D3565CD7")
+roletype:int32
+times:int32 该玩家参加战场的次数
+token:utf md5 校验 ( md5(uid + username + roletype + times  + key); key = "9B1492CF6AAE903F63FB7759D3565CD7")
 
 s->c
 cmd 0x140001
@@ -26,14 +27,14 @@ result:int 0 登陆成功 -1 登陆失败
 c->s
 cmd 0x120002
 param
-bgid:short 战场ID
-team:short 队伍 （1 	为暗黑军 2 为烈阳军）
+bgid:int 战场ID
+team:int 队伍 （1 	为暗黑军 2 为烈阳军）
 
 s->c
 cmd 0x140002
-param 0 进入成功 -1 满人
-bgid:short 战场ID
-team:short 队伍
+param 0 进入成功 -1 满人 -2 战场在清理中
+bgid:int 战场ID
+team:int 队伍
 ========= 玩家移动 =============
 客户端自解析, 服务端只做广播操作
 c->s
@@ -63,25 +64,31 @@ param
 s->c
 cmd 0x140005
 param 
-blackNum:int16 暗黑军人数
-whiteNum:int16 烈阳军人数
-state:int16 战场状态
+blackNum:int32 暗黑军人数
+whiteNum:int32 烈阳军人数
+state:int32 战场状态
 leftTime:int32 剩余时间 (单位毫秒)
-// 以后有战场物品列表
+blackhp:int32 暗黑军王座血量
+whitehp:int32 烈阳军血量
+itemList:array 战场物品列表
+{
+itemId:int32 战场物品ID
+}
+
 ========= 上报坐标点  =============
 c->s
 cmd 0x120006
 param uid 卡布号
-x:short x 坐标
-y:short y 坐标
+x:int32 x 坐标
+y:int32 y 坐标
 
 ========= 有玩家进入场景  =============
 s ->c
 cmd 0x140007
 param 
 uid:int32 玩家id
-unitType:int16 这个客户端暂时可以不用理
-team:int16 玩家所在队伍
+unitType:int32 这个客户端暂时可以不用理
+team:int32 玩家所在队伍
 name:utf 玩家的名字
 roletype:int32 
 
@@ -106,15 +113,18 @@ roletype:int32
 petId:int 英雄id
 hp:int 血量
 title:int 称号
+x:int
+y:int
 
 ========= 选择英雄 =============
 c->s
 cmd 0x12000A
 param  英雄ID
 
+广播协议
 s->c
 cmd 0x14000A
-param 
+param playerId 玩家id
 petID:int 英雄ID
 hp:int 英雄血量
 
@@ -122,7 +132,9 @@ hp:int 英雄血量
 c->s
 cmd 0x12000B
 param  技能ID
+uintType:int 目标单元 (0 玩家 1 暗黑军王座 2 烈阳军王座)
 target:int 目标
+
 
 ========= 添加buf =============
 s->c (广播协议)
@@ -140,6 +152,7 @@ bufId:int
 s->c (广播协议)
 cmd 0x14000E
 param  卡布号
+unitType:int 单元类型 0 玩家 1 暗黑军王座 2 烈阳军王座
 damageType:int 伤害类型 0 技能伤害 1 buf 伤害
 if(damageType == 0)
 {
@@ -160,4 +173,54 @@ cmd 0x120010
 s->c
 cmd 0x140010
 param 
+
+========= 拾取物品 =============
+c->s
+cmd 0x120011
+param
+x:int32 x 坐标点
+y:int32 y 坐标点
+
+s->c
+cmd 0x140011
+param -1 代表没有这个物品( 只告诉拾取者) 0 拾取成功（广播给所有玩家）
+playerId:int32 拾取者
+itemId:int32 物品ID
+x:int32 x 坐标点
+y:int32 y 坐标点
+
+========= 使用物品 =============
+c->s
+cmd 0x120012
+param
+itemId:int32 物品ID
+
+s->c
+cmd 0x140012
+param 
+
+========= 战场状态 =============
+s->c
+cmd 0x140013
+state:int32 战场状态
+leftTime:int32 剩余时间 (单位毫秒)
+
+========= 战场掉落了一个物品 =============
+s->c
+cmd 0x140014
+itemId:int32 物品ID
+x:int32 x 坐标点
+y:int32 y 坐标点
+
+========= alertcode 提示 =============
+s->c
+cmd 0x140015
+param  提示框的类型 0 代表 弹框 1 代表浮动提示框
+code:int32 
+		1; // 距离太远，攻击不到敌人
+		
+========= 英雄死啦 =============
+s->c
+cmd 0x140016
+param 卡布号ID
 
