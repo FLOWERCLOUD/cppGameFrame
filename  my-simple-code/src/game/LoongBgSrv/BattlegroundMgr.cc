@@ -9,7 +9,8 @@
 
 #include <game/LoongBgSrv/Battleground.h>
 
-BattlegroundMgr::BattlegroundMgr()
+BattlegroundMgr::BattlegroundMgr(LoongBgSrv* srv):
+	pSrv_(srv)
 {
 	init();
 }
@@ -23,6 +24,7 @@ bool BattlegroundMgr::init()
 {
 	for (int i = 0; i < sMaxBgNum; i++)
 	{
+		bgList_[i].setSrv(pSrv_);
 		bgList_[i].setId(i + 1);
 	}
 	return true;
@@ -52,7 +54,7 @@ Battleground& BattlegroundMgr::getBattleground(int16 bgId)
 	return bgList_[bgId - 1];
 }
 
-bool BattlegroundMgr::checkBattlegroundId(int16 bgId)
+bool BattlegroundMgr::checkBattlegroundId(int16 bgId) const
 {
 	if (bgId > 0 && bgId < sMaxBgNum) return true;
 	return false;

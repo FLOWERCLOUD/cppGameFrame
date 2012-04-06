@@ -21,7 +21,7 @@ token:utf md5 校验 ( md5(uid + username + roletype + times  + key); key = "9B1
 s->c
 cmd 0x140001
 param
-result:int 0 登陆成功 -1 登陆失败
+result:int 0 登陆成功 -1 登陆失败 -2 已经玩5次啦 不能再玩啦 -3 异地登陆
 
 ========= 请求进入莫个战场 =============
 c->s
@@ -223,4 +223,11 @@ code:int32
 s->c
 cmd 0x140016
 param 卡布号ID
+
+========= 英雄加血 =============
+s->c
+cmd 0x140017
+param 卡布号
+hp:int 总血量
+addhp:int 加的血量值
 

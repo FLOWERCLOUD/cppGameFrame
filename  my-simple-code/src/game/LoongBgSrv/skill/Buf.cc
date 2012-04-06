@@ -7,6 +7,8 @@
 
 #include <game/LoongBgSrv/skill/Buf.h>
 
+#include <mysdk/base/Logging.h>
+
 Buf::Buf():
 	bufId_(0),
 	bufName_("buf"),
@@ -56,6 +58,9 @@ Buf::~Buf()
 
 void Buf::run(BgUnit* me, uint32 curTime)
 {
+	LOG_TRACE << " Buf::run - playerId: " << me->getId()
+							<< " curTime: " << curTime;
+
 	if (tickTime_ > 0)
 	{
 		while (curTime >= tickTime_ + lastTime_)

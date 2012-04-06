@@ -1,3 +1,0 @@
-add_executable(TestLoongBgClient TestLoongBgSrv.cc)
-target_link_libraries(TestLoongBgClient kabu_codec mysdk_net)
-

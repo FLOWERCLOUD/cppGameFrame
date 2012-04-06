@@ -35,12 +35,13 @@ public:
 	~PetBase();
 
 	bool serialize(PacketBase& op);
+	bool hasSkill(int16 skillId) const;
 public:
 	int16 petId_; //宠物的ID
 	std::string petName_; // 宠物的名字
 	int16 speed_; // 宠物的速度
 	int16 hp_; // 宠物的血量
-	UnitTypeE type_; //宠物类型
+	UnitTypeE type_; //战场单元类型
     // 宠物的技能列表
 	int16 skillNum_;
 	int16 skillList_[sMaxSkillNum];

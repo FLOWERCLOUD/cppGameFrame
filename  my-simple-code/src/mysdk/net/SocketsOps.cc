@@ -71,6 +71,7 @@ void sockets::bindOrDie(int sockfd, const struct sockaddr_in& addr)
   if (ret < 0)
   {
     LOG_SYSFATAL << "sockets::bindOrDie";
+    exit(1);
   }
 }
 
@@ -80,6 +81,7 @@ void sockets::listenOrDie(int sockfd)
   if (ret < 0)
   {
     LOG_SYSFATAL << "sockets::listenOrDie";
+    exit(1);
   }
 }
 

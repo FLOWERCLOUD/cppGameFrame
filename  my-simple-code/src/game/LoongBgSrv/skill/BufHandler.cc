@@ -84,9 +84,9 @@ static bool zhouShangBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUn
 BufHandler::bufHandler BufHandler::bufHandlers[] =
 {
 		defaultBufHandler,
-		JianSheBufHandler,
 		hunXuanBufHandler,
 		zhouShangBufHandler,
+		JianSheBufHandler,
 		defaultBufHandler
 };
 

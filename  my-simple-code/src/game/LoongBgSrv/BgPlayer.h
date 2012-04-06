@@ -23,6 +23,7 @@ class BgPlayer:public BgUnit
 public:
 	BgPlayer(int32 playerId, std::string& playerName, mysdk::net::TcpConnection* pCon, LoongBgSrv* pSrv);
 	BgPlayer(int32 playerId, char* playerName, mysdk::net::TcpConnection* pCon, LoongBgSrv* pSrv);
+	BgPlayer(int32 playerId, char* playerName, int32 roleType, int32 joinTimes, mysdk::net::TcpConnection* pCon, LoongBgSrv* pSrv);
 	virtual ~BgPlayer();
 
 	void setPetId(int16 petId);
@@ -35,13 +36,17 @@ public:
 	void setScene(Scene* scene);
 	void setBgId(int16 bgId);
 	void setRoleType(int32 roletype);
-	void setTimes(int16 times);
+	void setJoinTimes(int32 joinTimes);
 
 	void broadMsg(PacketBase& op);
 	void close();
+	void setWaitClose(bool flag);
+	bool getWaitClose();
 
 	bool addItem(int32 itemId);
 	void incBgPlayerTimes();
+
+	void shutdown();
 public:
 	// 父类的东东
 	virtual bool serialize(PacketBase& op);
@@ -59,7 +64,6 @@ public:
 private:
 	void runBuf(uint32 curTime);
 	void removeAllBuf();
-	void selectPet(const PetBase& petBase, PacketBase& pb);
 
 	// 消息处理函数
 	void onEnterBattle(PacketBase& pb);
@@ -80,9 +84,10 @@ private:
 	int16 battlegroundId_; //当然玩家所在的战场ID
 	int32 roleType_;
 	int16 title_;
-	int16 times_; //该玩家已经玩了多少次了
+	int32 joinTimes_; //该玩家已经玩了多少次了
 	std::list<Buf*> bufList_; //玩家中的buf 列表
 	std::map<int16, int32> useSkillMap_;
+	bool bWaitClose_;
 	Package package_;
 	Scene* pScene;
 	TcpConnection* pCon_;

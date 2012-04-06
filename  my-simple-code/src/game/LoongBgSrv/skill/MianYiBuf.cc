@@ -10,7 +10,7 @@
 #include <assert.h>
 
 MianYiBuf::MianYiBuf(int16 bufId, uint32 curTime, uint32 bufferTime):
-	Buf(bufId, "免疫", curTime, 0, bufferTime)
+	Buf(bufId, "免疫", curTime, 6000, bufferTime)
 {
 
 }
@@ -22,6 +22,7 @@ MianYiBuf::~MianYiBuf()
 void MianYiBuf::onDelete(BgUnit* me)
 {
 	assert(me);
+	me->setSkillHurtFlag(true);
 }
 
 void MianYiBuf::onTick(BgUnit* me)
@@ -32,4 +33,5 @@ void MianYiBuf::onTick(BgUnit* me)
 void MianYiBuf::onCacl(BgUnit* me)
 {
 	assert(me);
+	me->setSkillHurtFlag(false);
 }

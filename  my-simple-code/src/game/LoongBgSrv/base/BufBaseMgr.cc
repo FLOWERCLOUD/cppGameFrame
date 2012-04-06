@@ -21,29 +21,29 @@ BufBaseMgr::~BufBaseMgr()
 bool BufBaseMgr::init()
 {
 	bufBaseList_[curBufBaseNum_].id_ = 1;
-	bufBaseList_[curBufBaseNum_].name_ = "溅射";
+	bufBaseList_[curBufBaseNum_].name_ = "晕眩";
 	bufBaseList_[curBufBaseNum_].type_ = 1;
+	bufBaseList_[curBufBaseNum_].who_ = BufBase::OTHER;
+	bufBaseList_[curBufBaseNum_].paramNum_ = 1;
+	bufBaseList_[curBufBaseNum_].paramList_[0] = 3000; //单元ms
+	curBufBaseNum_++;
+	bufBaseList_[curBufBaseNum_].id_ = 2;
+	bufBaseList_[curBufBaseNum_].name_ = "灼伤";
+	bufBaseList_[curBufBaseNum_].type_ = 2;
+	bufBaseList_[curBufBaseNum_].who_ = BufBase::OTHER;
+	bufBaseList_[curBufBaseNum_].paramNum_ = 2;
+	bufBaseList_[curBufBaseNum_].paramList_[0] = 5;
+	bufBaseList_[curBufBaseNum_].paramList_[1] = 15000; //单元ms
+	curBufBaseNum_++;
+	bufBaseList_[curBufBaseNum_].id_ = 3;
+	bufBaseList_[curBufBaseNum_].name_ = "溅射";
+	bufBaseList_[curBufBaseNum_].type_ = 3;
 	bufBaseList_[curBufBaseNum_].who_ = BufBase::OTHER;
 	bufBaseList_[curBufBaseNum_].paramNum_ = 4;
 	bufBaseList_[curBufBaseNum_].paramList_[0] = 10;
 	bufBaseList_[curBufBaseNum_].paramList_[1] = 100;
 	bufBaseList_[curBufBaseNum_].paramList_[2] = 150;
 	bufBaseList_[curBufBaseNum_].paramList_[3] = 30;
-	curBufBaseNum_++;
-	bufBaseList_[curBufBaseNum_].id_ = 2;
-	bufBaseList_[curBufBaseNum_].name_ = "晕眩";
-	bufBaseList_[curBufBaseNum_].type_ = 2;
-	bufBaseList_[curBufBaseNum_].who_ = BufBase::OTHER;
-	bufBaseList_[curBufBaseNum_].paramNum_ = 1;
-	bufBaseList_[curBufBaseNum_].paramList_[0] = 3000; //单元ms
-	curBufBaseNum_++;
-	bufBaseList_[curBufBaseNum_].id_ = 3;
-	bufBaseList_[curBufBaseNum_].name_ = "灼伤";
-	bufBaseList_[curBufBaseNum_].type_ = 3;
-	bufBaseList_[curBufBaseNum_].who_ = BufBase::OTHER;
-	bufBaseList_[curBufBaseNum_].paramNum_ = 2;
-	bufBaseList_[curBufBaseNum_].paramList_[0] = 5;
-	bufBaseList_[curBufBaseNum_].paramList_[1] = 15000; //单元ms
 	curBufBaseNum_++;
 	bufBaseList_[curBufBaseNum_].id_ = 4;
 	bufBaseList_[curBufBaseNum_].name_ = "免疫";

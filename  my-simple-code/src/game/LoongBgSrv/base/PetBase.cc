@@ -29,3 +29,15 @@ bool PetBase::serialize(PacketBase& op)
 	op.putInt32(hp_);
 	return true;
 }
+
+bool PetBase::hasSkill(int16 skillId) const
+{
+	for (int i = 0; i < skillNum_; i++)
+	{
+		if (skillList_[i] == skillId)
+		{
+			return true;
+		}
+	}
+	return false;
+}

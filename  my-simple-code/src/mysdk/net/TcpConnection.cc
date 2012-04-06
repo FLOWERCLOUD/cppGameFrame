@@ -108,9 +108,9 @@ void TcpConnection::send(const void* data)
 
 void TcpConnection::send(const void* data, size_t len)
 {
-	LOG_DEBUG << "TcpConnection::send "  << this ;
+	//LOG_DEBUG << "TcpConnection::send "  << this ;
 	if (state_ != kConnected) return;
-	LOG_DEBUG << "TcpConnection::send "  << this << " fd=" << session_.fd() << " len=" << len;
+	//LOG_DEBUG << "TcpConnection::send "  << this << " fd=" << session_.fd() << " len=" << len;
 	ssize_t nwrote = 0;
 	if (!session_.isWriting() && outputBuffer_.readableBytes() == 0)
 	{
@@ -186,6 +186,7 @@ void TcpConnection::connectDestroyed()
 		connectionCallback_(this);
 	}
 	*/
+
 	setState(kDisconnected);
 	connectionCallback_(this);
 

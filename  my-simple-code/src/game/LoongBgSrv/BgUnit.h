@@ -81,12 +81,19 @@ public:
 	void addHp(int32 hp);
 	// 减血
 	void decHp(int32 hp);
+
+	void setSkillHurtFlag(bool flag);
+	void setBufHurtFlag(bool falg);
+
+	void init();
 protected:
 	int32 unittId_; //战场单元ID
 	int16 x_; //战场单元x坐标点
 	int16 y_; // 战场单元y坐标点
 	int32 hp_; //战场单元的血量
 	bool operation_; //战场单元是否可以操作
+	bool canSkillHurt_; //是否可以受到技能伤害
+	bool canBufHurt_; //是否可以受到buff 伤害
 	TeamE team_; //战场单元所在队伍
 	UnitTypeE unitType_; //战场单元类型
 };

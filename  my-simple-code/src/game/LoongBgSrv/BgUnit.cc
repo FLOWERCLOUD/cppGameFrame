@@ -16,6 +16,8 @@ BgUnit::BgUnit():
 	y_(0),
 	hp_(0),
 	operation_(true),
+	canSkillHurt_(true),
+	canBufHurt_(true),
 	team_(kNONE_TEAM),
 	unitType_(KNONE_UNITTYPE)
 {
@@ -27,6 +29,8 @@ BgUnit::BgUnit(UnitTypeE unitType):
 		y_(0),
 		hp_(0),
 		operation_(true),
+		canSkillHurt_(true),
+		canBufHurt_(true),
 		team_(kNONE_TEAM),
 		unitType_(unitType)
 {
@@ -39,6 +43,8 @@ BgUnit::BgUnit(int32 unitId, UnitTypeE unitType):
 		y_(0),
 		hp_(0),
 		operation_(true),
+		canSkillHurt_(true),
+		canBufHurt_(true),
 		team_(kNONE_TEAM),
 		unitType_(unitType)
 {
@@ -51,6 +57,8 @@ BgUnit::BgUnit(int32 unitId, UnitTypeE unitType, TeamE team):
 				y_(0),
 				hp_(0),
 				operation_(true),
+				canSkillHurt_(true),
+				canBufHurt_(true),
 				team_(team),
 				unitType_(unitType)
 {
@@ -70,12 +78,12 @@ bool BgUnit::serialize(PacketBase& op)
 // 是否可以受到技能伤害
 bool BgUnit::canSkillHurt()
 {
-	return true;
+	return canSkillHurt_;
 }
 // 是否可以受到buf 伤害
 bool BgUnit::canBufHurt()
 {
-	return false;
+	return canBufHurt_;
 }
 
 bool BgUnit::addBuf(Buf* buf)
@@ -210,3 +218,21 @@ void BgUnit::alert(AlertCodeTypeE type, int32 code)
 	op.putInt32(code);
 	sendPacket(op);
 }
+
+void BgUnit::setSkillHurtFlag(bool flag)
+{
+	canSkillHurt_ = flag;
+}
+
+void BgUnit::setBufHurtFlag(bool flag)
+{
+	canBufHurt_ = flag;
+}
+
+void BgUnit::init()
+{
+	operation_ = true;
+	canSkillHurt_ = true;
+	canBufHurt_ = true;
+}
+

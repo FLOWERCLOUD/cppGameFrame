@@ -22,7 +22,7 @@ bool ItemBaseMgr::init()
 {
 	itemBaseList_[curItemBaseNum_].itemId_ = 1;
 	itemBaseList_[curItemBaseNum_].itemName_ = "生命药水";
-	itemBaseList_[curItemBaseNum_].functionType_  = 0;
+	itemBaseList_[curItemBaseNum_].functionType_  = 1;
 	curItemBaseNum_++;
 	itemBaseList_[curItemBaseNum_].itemId_ = 2;
 	itemBaseList_[curItemBaseNum_].itemName_ = "无敌药水";

@@ -18,6 +18,7 @@ typedef enum tagBgResultE
 }BgResultE;
 
 class BgPlayer;
+class LoongBgSrv;
 class Battleground
 {
 public:
@@ -28,6 +29,8 @@ public:
 public:
 	Battleground();
 	~Battleground();
+
+	void setSrv(LoongBgSrv* srv);
 
 	void setId(int32 Id);
 	int32 getId();
@@ -78,6 +81,7 @@ private:
 
 	BgBuilding blackBuildings_; //暗黑军王座
 	BgBuilding whiteBuildings_;// 烈阳军王座
+	LoongBgSrv* pSrv_;
 private:
 	DISALLOW_COPY_AND_ASSIGN(Battleground);
 };

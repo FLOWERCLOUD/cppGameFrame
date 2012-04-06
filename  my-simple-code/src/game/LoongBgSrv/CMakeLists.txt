@@ -1,4 +1,5 @@
 set(LoongBgSrv_SRCS
+
   base/BufBase.cc
   base/BufBaseMgr.cc
   base/PetBase.cc
@@ -9,6 +10,8 @@ set(LoongBgSrv_SRCS
   base/SkillBaseMgr.cc
   package/Item.cc
   package/Package.cc
+  php/util/bytesbuffer.cpp
+  php/htmlclient.cpp
   scene/DropItemMgr.cc
   scene/Scene.cc
   skill/Buf.cc
@@ -38,6 +41,6 @@ set(LoongBgSrv_SRCS
 
 
 add_executable(LoongBgSrv ${LoongBgSrv_SRCS})
-target_link_libraries(LoongBgSrv kabu_codec mysdk_net)
+target_link_libraries(LoongBgSrv kabu_codec mysdk_net curl)
 
 add_subdirectory(tests)

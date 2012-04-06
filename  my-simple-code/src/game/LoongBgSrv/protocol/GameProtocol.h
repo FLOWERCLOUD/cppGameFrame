@@ -54,6 +54,7 @@ namespace client
 	static const uint32 OP_DROP_ITEM				 = 0x00140014; //战场掉落了一个物品
 	static const uint32 OP_ALERT_CODE			 = 0x00140015; // 错误码
 	static const uint32 OP_PET_DEAD		 		 = 0x00140016; // 英雄死了
+	static const uint32 OP_ADD_HP		 		 	 = 0x00140017; // 英雄加血
 }
 
 #endif /* GAMEPROTOCOL_H_ */

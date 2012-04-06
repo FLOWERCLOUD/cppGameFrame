@@ -5,6 +5,7 @@
 #include <game/LoongBgSrv/util/md5.h>
 #include <game/LoongBgSrv/BattlegroundMgr.h>
 #include <game/LoongBgSrv/BgPlayer.h>
+#include <game/LoongBgSrv/JoinTimesMgr.h>
 #include <game/LoongBgSrv/PlayerMgr.h>
 #include <game/LoongBgSrv/Util.h>
 
@@ -20,8 +21,6 @@ static void sigtermHandler(int sig)
 
 void setupSignalHandlers(void)
 {
-	//LOG_WARN << "setupSignalHandlers ...";
-
     struct sigaction act;
 
     /* When the SA_SIGINFO flag is set in sa_flags then sa_sigaction is used.
@@ -43,15 +42,34 @@ void setupSignalHandlers(void)
     return;
 }
 
+#include <game/LoongBgSrv/php/htmlclient.h>
+CHtmlClient htmlClient;
+
+void LoongBgSrv::phpThreadHandler()
+{
+	LOG_INFO << "====== phpThreadHandler STARTING ";
+	while (!shutdown_loongBgSrv)
+	{
+		ThreadParam param = queue_.take();
+		int32 id = param.bgId;
+		//htmlClient.loadUrl("http://www.baidu.com");
+		//LOG_TRACE << " Test html: " << htmlClient.getHtmlData().getData();
+		LOG_TRACE << "phpThreadHandler - id: " << id;
+	}
+	LOG_INFO << "======= phpThreadHandler END ";
+}
+
 LoongBgSrv::LoongBgSrv(EventLoop* loop, InetAddress& serverAddr):
-	loop_(loop),
-	server_(loop, serverAddr, "LoongBgSrv"),
 	codec_(
 				std::tr1::bind(&LoongBgSrv::onKaBuMessage,
 				this,
 				std::tr1::placeholders::_1,
 				std::tr1::placeholders::_2,
-				std::tr1::placeholders::_3))
+				std::tr1::placeholders::_3)),
+	phpThread_(std::tr1::bind(&LoongBgSrv::phpThreadHandler, this), "phpThread"),
+	battlegroundMgr_(this),
+	loop_(loop),
+	server_(loop, serverAddr, "LoongBgSrv")
 {
 	server_.setConnectionCallback(std::tr1::bind(&LoongBgSrv::onConnectionCallback,
 																this,
@@ -76,32 +94,42 @@ LoongBgSrv::~LoongBgSrv()
 void LoongBgSrv::start()
 {
 	setupSignalHandlers();
+	phpThread_.start();
 	server_.start();
 }
 
 void LoongBgSrv::stop()
 {
-	sBattlegroundMgr.shutdown();
+	ThreadParam x;
+	x.bgId = 0;
+	queue_.put(x);
+	phpThread_.join();
 }
 
-void LoongBgSrv::onConnectionCallback(mysdk::net::TcpConnection* conn)
+void LoongBgSrv::onConnectionCallback(mysdk::net::TcpConnection* pCon)
 {
-	if (conn)
+	if (pCon)
 	{
-		LOG_TRACE << conn->peerAddress().toHostPort() << " -> "
-				<< conn->localAddress().toHostPort() << " is"
-				<< (conn->connected() ? "UP" : "DOWN");
+		LOG_TRACE << pCon->peerAddress().toHostPort() << " -> "
+				<< pCon->localAddress().toHostPort() << " is"
+				<< (pCon->connected() ? "UP" : "DOWN");
 		// 玩家断开了连接
-		if (!conn->connected())
+		if (!pCon->connected())
 		{
-			BgPlayer* player = static_cast<BgPlayer*>(conn->getContext());
+			BgPlayer* player = static_cast<BgPlayer*>(pCon->getContext());
 			if (player != NULL)
 			{
+				int32 playerId = player->getId();
+				if (!player->getWaitClose())
+				{
+					bgPlayerMap_.erase(playerId);
+				}
+
 				player->close();
 				//
 				delete player;
 			}
-			conn->setContext(NULL);
+			pCon->setContext(NULL);
 		}
 	}
 }
@@ -111,7 +139,7 @@ void LoongBgSrv::onKaBuMessage(mysdk::net::TcpConnection* pCon, PacketBase& pb, 
 	uint32 op = pb.getOP();
 	if (op == game::OP_LOGIN)
 	{
-		login(pCon, pb, timestamp);
+		TIME_FUNCTION_CALL(login(pCon, pb, timestamp), 10);
 	}
 	else
 	{
@@ -145,6 +173,7 @@ bool LoongBgSrv::login(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::T
 							<< " playerName: " << playerName
 							<< " roleType: " << roleType
 							<< " times: " << times
+							<< " token: " << token
 							<< " address: "<< pCon->peerAddress().toHostPort();
 
 	static const char key[] =  "9B1492CF6AAE903F63FB7759D3565CD7";
@@ -154,7 +183,7 @@ bool LoongBgSrv::login(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::T
 	char* tmp = MD5String(buf);
 	if (strcmp(tmp, token) != 0)
 	{
-			LOG_ERROR << "LoongBgSrv::login - playerId:"  << playerId
+			LOG_ERROR << "LoongBgSrv::login(md5 error) - playerId:"  << playerId
 									<< " playerName: " << playerName
 									<< " token: " << token
 									<< " times: " << times
@@ -166,11 +195,68 @@ bool LoongBgSrv::login(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::T
 	}
 	free(tmp);
 
-	BgPlayer* player = new BgPlayer(playerId, playerName, pCon, this);
-	if (!player) return false;
+	// 参加次数限制( 如果以后做成多进程，参战次数要保存在一个公共的地方中去)
+	static const int32 maxJoinTimes = 5;
+	int32 joinTimes = sJoinTimesMgr.getJoinTimes(playerId);
+	if ( joinTimes > maxJoinTimes)
+	{
+		LOG_ERROR << "LoongBgSrv::login (too much join Times) - playerId:"  << playerId
+								<< " playerName: " << playerName
+								<< " joinTimes: " << joinTimes
+								<< " address: "<< pCon->peerAddress().toHostPort();
 
-	player->setRoleType(roleType);
-	player->setTimes(static_cast<int16>(times));
+		PacketBase op(client::OP_LOGIN, 0);
+		op.putInt32(-2); // 已经玩5次啦 不能再玩啦
+		send(pCon, op);
+
+		pCon->shutdown();
+		return false;
+	}
+
+	joinTimes = joinTimes > times ? joinTimes : times;
+	LOG_TRACE << "LoongBgSrv::login - playerId:"  << playerId
+							<< " playerName: " << playerName
+							<< " roleType: " << roleType
+							<< " jointimes: " << joinTimes
+							<< " token: " << token
+							<< " address: "<< pCon->peerAddress().toHostPort();
+
+	// 这个玩家是否已经在战场上了
+	bool bInBg = false;
+	if (hasBgPlayer(playerId))
+	{
+		LOG_DEBUG << "LoongBgSrv::login(in battle) - playerId:"  << playerId
+								<< " playerName: " << playerName
+								<< " roleType: " << roleType
+								<< " jointimes: " << joinTimes
+								<< " address: "<< pCon->peerAddress().toHostPort();
+		bInBg = true;
+		BgPlayer* bgPlayer = bgPlayerMap_[playerId];
+		if (bgPlayer)
+		{
+			bgPlayer->setWaitClose(true);
+
+			PacketBase op(client::OP_LOGIN, 0);
+			op.putInt32(-3); //异地登陆啦
+			bgPlayer->sendPacket(op);
+
+			bgPlayer->shutdown();
+		}
+	}
+
+	BgPlayer* player = new BgPlayer(playerId, playerName, roleType, joinTimes, pCon, this);
+	if (!player) return false;
+	if (bInBg)
+	{
+		bgPlayerMap_[playerId] = player;
+		LOG_DEBUG << "LoongBgSrv::login(in battle) - === playerId:"  << playerId
+					<< " player: " << player;
+	}
+	else
+	{
+		bgPlayerMap_.insert(std::pair<int32, BgPlayer*>(playerId, player));
+	}
+
 	pCon->setContext(player);
 	//  告诉客户端 登陆成功哦
 	PacketBase op(client::OP_LOGIN, 0);
@@ -184,7 +270,7 @@ void LoongBgSrv::tickMe()
 	if (!shutdown_loongBgSrv)
 	{
 		uint32 curTime = getCurTime();
-		TIME_FUNCTION_CALL(sBattlegroundMgr.run(curTime), 10);
+		TIME_FUNCTION_CALL(battlegroundMgr_.run(curTime), 10);
 	}
 	else
 	{
@@ -195,4 +281,15 @@ void LoongBgSrv::tickMe()
 void LoongBgSrv::send(mysdk::net::TcpConnection* pCon, PacketBase& pb)
 {
 	codec_.send(pCon, pb);
+}
+
+bool LoongBgSrv::hasBgPlayer(int32 playerId)
+{
+	BgPlayerMapT::iterator iter;
+	iter = bgPlayerMap_.find(playerId);
+	if (iter != bgPlayerMap_.end())
+	{
+		return true;
+	}
+	return false;
 }

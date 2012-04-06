@@ -38,6 +38,11 @@ Battleground::~Battleground()
 	}
 }
 
+void Battleground::setSrv(LoongBgSrv* srv)
+{
+	pSrv_ = srv;
+}
+
 void Battleground::init()
 {
 	bFirst_ = true;
@@ -71,6 +76,9 @@ bool Battleground::addBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 	if (teamNum_[team] >= sMaxTeamNum)
 	{
 		//  告诉客户端, 这个队伍已经满人啦！不能进这个队伍啦
+		LOG_DEBUG << " Battleground::addBgPlayer - playerId: " << player->getId()
+								<< " team: " << team
+								<< " num: " << teamNum_[team];
 		return false;
 	}
 
@@ -80,6 +88,7 @@ bool Battleground::addBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 		bFirst_ = false;
 	}
 	teamNum_[team]++;
+	player->setBgId(getId());
 	player->setTeam(team);
 
 	return scene_.addPlayer(player);
@@ -87,7 +96,12 @@ bool Battleground::addBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 
 bool Battleground::removeBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 {
+	LOG_DEBUG << " Battleground::removeBgPlayer - playerId: " << player->getId()
+							<< " team: " << team
+							<< " num: " << teamNum_[team];
+
 	teamNum_[team]--;
+	player->setBgId(0);
 	player->setTeam(BgUnit::kNONE_TEAM);
 	return scene_.removePlayer(player);
 }
