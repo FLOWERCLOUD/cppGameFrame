@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+
+use FileHandle;
+
+$server = $ARGV[0];
+$lines = $ARGV[1];
+$name = $server . "_log";
+
+$log_level = 1;
+
+STDOUT->autoflush;
+
+openLog();
+while (my $line = <STDIN>)
+{
+	$count++;
+
+	if($log_level == 1)
+	{
+		print LOG $line;
+	}
+	elsif($log_level = 2)
+	{
+		if ($line =~ m/\[LOG\]/ or $line =~ m/\[WARNING\]/ or $line =~ m/\[ERROR\]/)
+		{
+			print LOG $line;
+		}
+	}
+
+	
+	if ($line =~ m/\[LOG\] \[DB\]/)
+	{
+		print $line;
+	}
+	if ($count >= $lines)
+	{
+		rotateLog();
+	}
+}
+close(LOG);
+#rename "$name+", "$name";
+$datetag = `date +%y%m%d_%H%M%S`;
+system("mv $name+ ${name}_${datetag}");
+
+
+# Perform a rotation.
+sub rotateLog
+{
+	my ($logdir) = "../../log";
+	my ($datetag) = `date +%y%m%d_%H%M%S`;
+	my ($host) = `uname -n`;
+	chop($datetag, $host);
+
+	close(LOG);
+	rename "$name+", "$name-";
+	openLog();
+	system("mv $name- ${logdir}/${host}_${server}_log_${datetag}");
+}
+
+
+# Open the active log for writing.
+sub openLog
+{
+	open(LOG, ">$name+") or die "Can't open $name: $!\n";
+	$oldfh = select(LOG);
+	# disable output buffering
+	$| = 1;
+	select($oldfh);
+	$count = 0;
+}
+
