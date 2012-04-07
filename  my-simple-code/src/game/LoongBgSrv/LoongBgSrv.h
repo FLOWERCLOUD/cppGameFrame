@@ -31,8 +31,10 @@ class BgPlayer;
 
 struct BgClient
 {
+	Timestamp lastRecvTimestamp;
 	std::list<BgClient* >::iterator iter;
 	BgPlayer* player;
+	mysdk::net::TcpConnection* pCon;
 };
 
 // 龙族对抗战场服务器
@@ -60,12 +62,14 @@ public:
 private:
 	bool login(mysdk::net::TcpConnection* pCon, PacketBase& pb, Timestamp timestamp);
 	void tickMe();
+	void onTimer();
 	bool hasBgPlayer(int32 playerId);
 	void phpThreadHandler();
 private:
 	KaBuCodec codec_;
 	BgPlayerMapT bgPlayerMap_;
 	Thread phpThread_;
+	std::list<BgClient*> bgClientList_;
 	BattlegroundMgr battlegroundMgr_;
 
 	EventLoop* loop_;

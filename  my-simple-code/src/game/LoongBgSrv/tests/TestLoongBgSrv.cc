@@ -66,11 +66,22 @@ class TestLoongBgClient
 				std::tr1::placeholders::_1,
 				std::tr1::placeholders::_2,
 				std::tr1::placeholders::_3));
+
+	    loop->runEvery(1.0, std::tr1::bind(&TestLoongBgClient::onTimer, this));
 	}
 
 	void connect()
 	{
 		client_.connect();
+	}
+
+	void onTimer()
+	{
+		if (pCon_)
+		{
+			PacketBase op(game::OP_MY_TICKET, 0);
+			codec_.send(pCon_, op);
+		}
 	}
 private:
 	void onConnection(mysdk::net::TcpConnection* pCon)
@@ -82,6 +93,8 @@ private:
 
 		if (pCon->connected())
 		{
+			pCon_ = pCon;
+
 			int32 playerId = getPlayerId();//getRandomBetween(1, 100000);
 
 			int32 roleType = getRandomBetween(1, 5);
@@ -281,6 +294,7 @@ private:
 private:
 	  EventLoop* loop_;
 	  TcpClient client_;
+	  mysdk::net::TcpConnection* pCon_;
 	  KaBuCodec codec_;
 	  int32 testTimes_;
 };

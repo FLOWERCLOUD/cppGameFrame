@@ -83,7 +83,10 @@ namespace net
 
 		void connectEstablished();
 		void connectDestroyed();
-
+		void close()
+		{
+			handleClose();
+		}
 	private:
 		enum StateE
 		{

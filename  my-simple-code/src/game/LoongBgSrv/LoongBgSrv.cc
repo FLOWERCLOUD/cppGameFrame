@@ -83,7 +83,7 @@ LoongBgSrv::LoongBgSrv(EventLoop* loop, InetAddress& serverAddr):
 														std::tr1::placeholders::_3));
 
     loop->runEvery(0.5, std::tr1::bind(&LoongBgSrv::tickMe, this));
-
+    loop->runEvery(8.0, std::tr1::bind(&LoongBgSrv::onTimer, this));
 	LOG_DEBUG << "============ LoongBgSrv::LoongBgSrv ================";
 }
 
@@ -124,20 +124,45 @@ void LoongBgSrv::onConnectionCallback(mysdk::net::TcpConnection* pCon)
 		// 玩家断开了连接
 		if (!pCon->connected())
 		{
-			BgPlayer* player = static_cast<BgPlayer*>(pCon->getContext());
-			if (player != NULL)
+			BgClient* bgClient = static_cast<BgClient*>(pCon->getContext());
+			if (bgClient)
 			{
-				int32 playerId = player->getId();
-				if (!player->getWaitClose())
+				bgClientList_.erase(bgClient->iter);
+				BgPlayer* player = bgClient->player;
+				if (player != NULL)
 				{
-					bgPlayerMap_.erase(playerId);
-				}
+					int32 playerId = player->getId();
+					if (!player->getWaitClose())
+					{
+						bgPlayerMap_.erase(playerId);
+					}
 
-				player->close();
-				//
-				delete player;
+					player->close();
+					//
+					delete player;
+				}
 			}
+			delete bgClient;
 			pCon->setContext(NULL);
+		}
+		else
+		{
+			BgClient* bgClient = new BgClient();
+			if (bgClient)
+			{
+				bgClientList_.push_back(bgClient);
+
+				bgClient->iter = --bgClientList_.end();
+				bgClient->player = NULL;
+				bgClient->lastRecvTimestamp = Timestamp::now();
+				bgClient->pCon = pCon;
+
+				pCon->setContext(bgClient);
+			}
+			else
+			{
+				pCon->close();
+			}
 		}
 	}
 }
@@ -145,21 +170,39 @@ void LoongBgSrv::onConnectionCallback(mysdk::net::TcpConnection* pCon)
 void LoongBgSrv::onKaBuMessage(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::Timestamp timestamp)
 {
 	uint32 op = pb.getOP();
+	if (op == game::OP_MY_TICKET)
+	{
+		BgClient* bgClient = static_cast<BgClient*>(pCon->getContext());
+		if (bgClient)
+		{
+			std::list<BgClient* >::iterator iter = bgClient->iter;
+			bgClientList_.erase(iter);
+			bgClientList_.push_back(bgClient);
+			bgClient->iter = --bgClientList_.end();
+			bgClient->lastRecvTimestamp = timestamp;
+		}
+		return;
+	}
+
 	if (op == game::OP_LOGIN)
 	{
 		bool flag;
 		TIME_FUNCTION_CALL( flag = login(pCon, pb, timestamp), 10);
 		if (!flag)
 		{
-			pCon->setRecover();
+			pCon->close();
 		}
 	}
 	else
 	{
-		BgPlayer* player = static_cast<BgPlayer*>(pCon->getContext());
-		if (player != NULL)
+		BgClient* bgClient = static_cast<BgClient*>(pCon->getContext());
+		if (bgClient != NULL)
 		{
-			TIME_FUNCTION_CALL(player->onMsgHandler(pb), 10);
+			BgPlayer* player = bgClient->player;
+			if (player)
+			{
+				TIME_FUNCTION_CALL(player->onMsgHandler(pb), 10);
+			}
 		}
 	}
 }
@@ -222,7 +265,6 @@ bool LoongBgSrv::login(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::T
 		op.putInt32(-2); // 已经玩5次啦 不能再玩啦
 		send(pCon, op);
 
-		//pCon->setRecover();
 		return false;
 	}
 
@@ -270,7 +312,10 @@ bool LoongBgSrv::login(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::T
 		bgPlayerMap_.insert(std::pair<int32, BgPlayer*>(playerId, player));
 	}
 
-	pCon->setContext(player);
+	BgClient* bgClient = static_cast<BgClient*>(pCon->getContext());
+	assert(bgClient);
+	bgClient->player = player;
+
 	//  告诉客户端 登陆成功哦
 	PacketBase op(client::OP_LOGIN, 0);
 	op.putInt32(0); // 登陆成功
@@ -288,6 +333,31 @@ void LoongBgSrv::tickMe()
 	else
 	{
 		loop_->quit();
+	}
+}
+
+void LoongBgSrv::onTimer()
+{
+	Timestamp now = Timestamp::now();
+	std::list<BgClient* >::iterator itList;
+	for (itList = bgClientList_.begin(); itList != bgClientList_.end(); ++itList)
+	{
+		BgClient* bgClient = *itList;
+		if (timeDifference(now, bgClient->lastRecvTimestamp) > 8.0)
+		{
+			mysdk::net::TcpConnection* pCon = bgClient->pCon;
+			if (pCon)
+			{
+				LOG_TRACE << pCon->peerAddress().toHostPort() << " -> "
+						<< pCon->localAddress().toHostPort() << " recover!!";
+
+				pCon->close();
+			}
+		}
+		else
+		{
+			break;
+		}
 	}
 }
 

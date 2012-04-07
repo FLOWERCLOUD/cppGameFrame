@@ -29,6 +29,12 @@ namespace game
 	static const uint32 OP_EXIT_BATTLE			= 0x00120010; //退出战场
 	static const uint32 OP_PICKUP_ITEM			= 0x00120011; //拾取物品
 	static const uint32 OP_USE_ITEM					= 0x00120012; //使用物品
+	// 0x00120013
+	// 0x00120014
+	// 0x00120015
+	// 0x00120016
+	// 0x00120017
+	static const uint32 OP_MY_TICKET				= 0x00120018; // 应用程序心跳
 }
 
 namespace client
