@@ -69,8 +69,8 @@ private:
 	KaBuCodec codec_;
 	BgPlayerMapT bgPlayerMap_;
 	Thread phpThread_;
-	std::list<BgClient*> bgClientList_;
 	BattlegroundMgr battlegroundMgr_;
+	std::list<BgClient*> bgClientList_;
 
 	EventLoop* loop_;
 	TcpServer server_;
