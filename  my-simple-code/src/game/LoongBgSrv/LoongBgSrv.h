@@ -16,6 +16,7 @@
 
 #include <game/LoongBgSrv/BattlegroundMgr.h>
 
+#include <list>
 #include <map>
 
 using namespace mysdk;
@@ -26,8 +27,15 @@ struct ThreadParam
 	int32 bgId;
 };
 
-// 龙族对抗战场服务器
 class BgPlayer;
+
+struct BgClient
+{
+	std::list<BgClient* >::iterator iter;
+	BgPlayer* player;
+};
+
+// 龙族对抗战场服务器
 class LoongBgSrv
 {
 public:

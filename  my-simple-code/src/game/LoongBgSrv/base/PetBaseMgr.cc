@@ -10,7 +10,7 @@
 PetBaseMgr::PetBaseMgr():
 	curPetBaseNum_(0)
 {
-	init();
+	//init();
 }
 
 PetBaseMgr::~PetBaseMgr()
@@ -45,6 +45,33 @@ bool PetBaseMgr::init()
 	petBaseList_[curPetBaseNum_].skillNum_ = 2;
 	petBaseList_[curPetBaseNum_].skillList_[0] = 5;
 	petBaseList_[curPetBaseNum_].skillList_[1] = 6;
+
+	return true;
+}
+
+bool PetBaseMgr::init(TestDatabaseWorkerPool& databaseWorkPool)
+{
+	const char* sql = "select heroid, heroname, herotype, herospeed, herohp, heroskilllist from hero";
+	ResultSet* res = databaseWorkPool.query(sql);
+	if (!res) return false;
+
+	while (res->nextRow())
+	{
+		const Field* field = res->fetch();
+		petBaseList_[curPetBaseNum_].petId_ =  field[0].getInt16();
+		petBaseList_[curPetBaseNum_].petName_ = field[1].getString();
+		petBaseList_[curPetBaseNum_].type_  =  static_cast<UnitTypeE>(field[2].getInt16());
+		petBaseList_[curPetBaseNum_].speed_  =  field[3].getInt16();
+		petBaseList_[curPetBaseNum_].hp_  =  field[4].getInt16();
+		ColonBuf buf(field[5].getCString());
+		int16 num = petBaseList_[curPetBaseNum_].skillNum_= buf.GetShort();
+		for (int32 i = 0; i < num; i++)
+		{
+			petBaseList_[curPetBaseNum_].skillList_[i] = buf.GetShort();
+		}
+		curPetBaseNum_++;
+	}
+	delete res;
 
 	return true;
 }

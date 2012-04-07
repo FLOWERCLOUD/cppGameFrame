@@ -1,5 +1,5 @@
 set(LoongBgSrv_SRCS
-
+  base/Base.cc
   base/BufBase.cc
   base/BufBaseMgr.cc
   base/PetBase.cc
@@ -39,8 +39,10 @@ set(LoongBgSrv_SRCS
   main.cc
   )
 
+include_directories("/usr/include/mysql/")
+link_directories("/usr/lib/mysql/")
 
 add_executable(LoongBgSrv ${LoongBgSrv_SRCS})
-target_link_libraries(LoongBgSrv kabu_codec mysdk_net curl)
+target_link_libraries(LoongBgSrv kabu_codec mysdk_mysql mysdk_net curl mysqlclient )
 
 add_subdirectory(tests)

@@ -119,15 +119,16 @@ void BgPlayer::close()
 	}
 
 
-	if (pScene)
-	{
-		pScene->removePlayer(this);
-	}
+	//if (pScene)
+	//{
+	//	pScene->removePlayer(this);
+	//}
 }
 
 void BgPlayer::setWaitClose(bool flag)
 {
 	bWaitClose_ = true;
+	close();
 }
 
 bool BgPlayer::getWaitClose()
@@ -143,11 +144,6 @@ bool BgPlayer::addItem(int32 itemId)
 	}
 
 	return false;
-}
-
-void BgPlayer::incBgPlayerTimes()
-{
-	//sJoinTimesMgr.incJoinTimes(this->getId());
 }
 
 void BgPlayer::shutdown()
@@ -281,6 +277,7 @@ void BgPlayer::onHurt(BgUnit* attacker, int32 damage, const SkillBase& skill)
 	}
 
 	LOG_DEBUG <<  "BgPlayer::onHurt - playerId: " << this->getId()
+							<< " name: " << name_
 							<< " damage: " << damage
 							<< " attacker: " << attacker->getId()
 							<< " skillId:" << skill.skillId_;
@@ -309,6 +306,11 @@ void BgPlayer::onBufHurt(BgUnit* me, int32 damage, const BufBase& buf)
 		PacketBase op(client::OP_PET_DEAD, this->getId());
 		broadMsg(op);
 	}
+	LOG_DEBUG <<  "BgPlayer::onBufHurt - playerId: " << this->getId()
+							<< " name: " << name_
+							<< " damage: " << damage
+							<< " bufid:" << buf.id_;
+
 	// 告诉客户端 你受到什么伤害 伤害是多少
 	PacketBase pb(client::OP_ON_HURT, this->getId());
 	pb.putInt32(0); //单元类型

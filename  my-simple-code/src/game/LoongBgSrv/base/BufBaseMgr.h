@@ -11,6 +11,7 @@
 #include <mysdk/base/Common.h>
 #include <mysdk/base/Singleton.h>
 
+#include <game/LoongBgSrv/base/Base.h>
 #include <game/LoongBgSrv/base/BufBase.h>
 
 class BufBaseMgr
@@ -22,6 +23,7 @@ public:
 	~BufBaseMgr();
 
 	bool init();
+	bool init(TestDatabaseWorkerPool& databaseWorkPool);
 	void shutdown();
 
 	const BufBase& getBufBaseInfo(int16 bufId) const;

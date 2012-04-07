@@ -11,6 +11,7 @@
 #include <mysdk/base/Common.h>
 #include <mysdk/base/Singleton.h>
 
+#include <game/LoongBgSrv/base/Base.h>
 #include <game/LoongBgSrv/base/SkillBase.h>
 
 class SkillBaseMgr
@@ -22,6 +23,8 @@ public:
 	~SkillBaseMgr();
 
 	bool init();
+	bool init(TestDatabaseWorkerPool& databaseWorkPool);
+
 	void shutdown();
 
 	const SkillBase& getSkillBaseInfo(int16 skillId) const;

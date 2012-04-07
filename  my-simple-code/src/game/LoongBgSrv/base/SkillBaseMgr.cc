@@ -10,7 +10,7 @@
 SkillBaseMgr::SkillBaseMgr():
 	curSkillBaseNum_(0)
 {
-	init();
+	//init();
 }
 
 SkillBaseMgr::~SkillBaseMgr()
@@ -78,6 +78,36 @@ bool SkillBaseMgr::init()
 	skillBaseList_[curSkillBaseNum_].passive_ = 0;
 	skillBaseList_[curSkillBaseNum_].bufNum_ = 1;
 	skillBaseList_[curSkillBaseNum_].bufList_[0] = 3;
+
+	return true;
+}
+
+bool SkillBaseMgr::init(TestDatabaseWorkerPool& databaseWorkPool)
+{
+	const char* sql = "select skillid, skillname, minAttackValue, maxAttackValue, attackDistance, cooldownTime, skilltype, passive, skillbuff from skill";
+	ResultSet* res = databaseWorkPool.query(sql);
+	if (!res) return false;
+
+	while (res->nextRow())
+	{
+		const Field* field = res->fetch();
+		skillBaseList_[curSkillBaseNum_].skillId_ = field[0].getInt16();
+		skillBaseList_[curSkillBaseNum_].skillName_ = field[1].getString();
+		skillBaseList_[curSkillBaseNum_].minAttackValue_ = field[2].getInt16();
+		skillBaseList_[curSkillBaseNum_].maxAttackValue_ = field[3].getInt16();
+		skillBaseList_[curSkillBaseNum_].attackDistance_  = field[4].getInt16();
+		skillBaseList_[curSkillBaseNum_].cooldownTime_ = field[5].getInt16();
+		skillBaseList_[curSkillBaseNum_].type_ = field[6].getInt16();
+		skillBaseList_[curSkillBaseNum_].passive_ = field[7].getInt16();
+		ColonBuf buf(field[8].getCString());
+		int32 bufNum = skillBaseList_[curSkillBaseNum_].bufNum_ = buf.GetShort();
+		for (int32 i = 0; i < bufNum; i++)
+		{
+			skillBaseList_[curSkillBaseNum_].bufList_[i] = buf.GetShort();
+		}
+		curSkillBaseNum_++;
+	}
+	delete res;
 
 	return true;
 }

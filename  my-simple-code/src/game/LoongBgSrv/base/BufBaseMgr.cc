@@ -10,7 +10,7 @@
 BufBaseMgr::BufBaseMgr():
 	curBufBaseNum_(0)
 {
-	init();
+	//init();
 }
 
 BufBaseMgr::~BufBaseMgr()
@@ -55,6 +55,32 @@ bool BufBaseMgr::init()
 	return true;
 }
 
+bool BufBaseMgr::init(TestDatabaseWorkerPool& databaseWorkPool)
+{
+	const char* sql = "select buffid, buffname, bufftype, buffwho, buffparam from buff";
+	ResultSet* res = databaseWorkPool.query(sql);
+	if (!res) return false;
+
+	while (res->nextRow())
+	{
+		const Field* field = res->fetch();
+		bufBaseList_[curBufBaseNum_].id_ =  field[0].getInt16();
+		bufBaseList_[curBufBaseNum_].name_ = field[1].getString();
+		bufBaseList_[curBufBaseNum_].type_ =  field[2].getInt16();
+		bufBaseList_[curBufBaseNum_].who_ = field[3].getInt16();
+		ColonBuf buf(field[4].getCString());
+		int16 num = bufBaseList_[curBufBaseNum_].paramNum_ = buf.GetShort();
+		for (int32 i = 0; i < num; i++)
+		{
+			bufBaseList_[curBufBaseNum_].paramList_[i] = buf.GetShort();
+		}
+		curBufBaseNum_++;
+	}
+	delete res;
+
+	return true;
+}
+
 void BufBaseMgr::shutdown()
 {
 
@@ -63,7 +89,7 @@ void BufBaseMgr::shutdown()
 const BufBase& BufBaseMgr::getBufBaseInfo(int16 bufId) const
 {
 	static BufBase null;
-	if (bufId <= 0 || bufId > sMaxBufNum) return null;
+	if (bufId <= 0 || bufId > curBufBaseNum_) return null;
 
 	return bufBaseList_[bufId - 1];
 }

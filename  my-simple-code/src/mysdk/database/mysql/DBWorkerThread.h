@@ -19,7 +19,7 @@
 
 namespace mysdk
 {
-class EventLoop;
+//class EventLoop;
 class MySQLBinds;
 class MySQLConnection;
 class Transaction;
@@ -107,7 +107,7 @@ public:
 	static const int sPipeSize = 128;
 
 public:
-	DBWorkerThread(EventLoop* loop, MySQLConnection* mysqlConn);
+	DBWorkerThread(mysdk::net::EventLoop* loop, MySQLConnection* mysqlConn);
 	~DBWorkerThread();
 
 	void start();
@@ -124,7 +124,7 @@ private:
 private:
 	void ping();
 private:
-	EventLoop* loop_;
+	mysdk::net::EventLoop* loop_;
 	YPipeT<DBMsg, sPipeSize> pipe_;
 	Thread thread_;
 	MySQLConnection* mysqlConn_;

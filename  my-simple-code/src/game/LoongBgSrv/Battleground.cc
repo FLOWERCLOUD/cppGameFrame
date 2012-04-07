@@ -312,6 +312,19 @@ void Battleground::closeBattleground()
 		delete pState_;
 		pState_ = NULL;
 	}
+
+	std::map<int32, BgPlayer*> playerMgr = scene_.getPlayerMgr();
+	std::map<int32, BgPlayer*>::iterator iter;
+	for(iter = playerMgr.begin(); iter != playerMgr.end(); iter++)
+	{
+		BgPlayer* player = iter->second;
+		if (player)
+		{
+			player->setBgId(0);
+			player->setTeam(BgUnit::kNONE_TEAM);
+		}
+	}
+
 	// 重新初始化一下战场哦
 	init();
 }

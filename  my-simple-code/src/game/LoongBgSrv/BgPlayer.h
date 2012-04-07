@@ -44,7 +44,6 @@ public:
 	bool getWaitClose();
 
 	bool addItem(int32 itemId);
-	void incBgPlayerTimes();
 
 	void shutdown();
 public:

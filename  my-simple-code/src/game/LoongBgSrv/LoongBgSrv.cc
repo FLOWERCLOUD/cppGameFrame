@@ -1,6 +1,7 @@
 
 #include <game/LoongBgSrv/LoongBgSrv.h>
 
+#include <game/LoongBgSrv/base/Base.h>
 #include <game/LoongBgSrv/protocol/GameProtocol.h>
 #include <game/LoongBgSrv/util/md5.h>
 #include <game/LoongBgSrv/BattlegroundMgr.h>
@@ -93,6 +94,13 @@ LoongBgSrv::~LoongBgSrv()
 
 void LoongBgSrv::start()
 {
+	std::string host = "192.168.100.6";
+	std::string port_or_socket = "3306";
+	std::string user = "root";
+	std::string password = "4399mysql#CQPZM";
+	std::string database = "kabu_loongBg";
+
+	sBase.init(host, port_or_socket, user, password, database);
 	setupSignalHandlers();
 	phpThread_.start();
 	server_.start();
@@ -139,7 +147,12 @@ void LoongBgSrv::onKaBuMessage(mysdk::net::TcpConnection* pCon, PacketBase& pb, 
 	uint32 op = pb.getOP();
 	if (op == game::OP_LOGIN)
 	{
-		TIME_FUNCTION_CALL(login(pCon, pb, timestamp), 10);
+		bool flag;
+		TIME_FUNCTION_CALL( flag = login(pCon, pb, timestamp), 10);
+		if (!flag)
+		{
+			pCon->setRecover();
+		}
 	}
 	else
 	{
@@ -209,7 +222,7 @@ bool LoongBgSrv::login(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::T
 		op.putInt32(-2); // 已经玩5次啦 不能再玩啦
 		send(pCon, op);
 
-		pCon->shutdown();
+		//pCon->setRecover();
 		return false;
 	}
 

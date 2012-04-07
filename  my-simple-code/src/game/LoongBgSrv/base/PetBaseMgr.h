@@ -10,6 +10,7 @@
 
 #include <mysdk/base/Common.h>
 
+#include <game/LoongBgSrv/base/Base.h>
 #include <game/LoongBgSrv/base/PetBase.h>
 
 class PetBaseMgr
@@ -21,6 +22,7 @@ public:
 	~PetBaseMgr();
 
 	bool init();
+	bool init(TestDatabaseWorkerPool& databaseWorkPool);
 	void shutdown();
 
 	bool checkPetId(int16 petId);

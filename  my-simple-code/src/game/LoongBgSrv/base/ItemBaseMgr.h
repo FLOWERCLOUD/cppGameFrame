@@ -11,6 +11,7 @@
 #include <mysdk/base/Common.h>
 #include <mysdk/base/Singleton.h>
 
+#include <game/LoongBgSrv/base/Base.h>
 #include <game/LoongBgSrv/base/ItemBase.h>
 
 class ItemBaseMgr
@@ -22,6 +23,7 @@ public:
 	~ItemBaseMgr();
 
 	bool init();
+	bool init(TestDatabaseWorkerPool& databaseWorkPool);
 	void shutdown();
 
 	bool checkItemId(int16 itemId);

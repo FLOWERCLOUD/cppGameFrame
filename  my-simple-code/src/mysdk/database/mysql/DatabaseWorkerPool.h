@@ -11,9 +11,8 @@
 
 namespace mysdk
 {
-//using namespace net;
 
-class EventLoop;
+//class EventLoop;
 class MySQLConnectionInfo;
 class MySQLConnection;
 class MySQLBinds;
@@ -28,7 +27,7 @@ public:
 	DatabaseWorkerPool();
 	~DatabaseWorkerPool();
 
-	bool open(EventLoop* loop, const MySQLConnectionInfo& connInfo, uint8 sync_conNums, uint8 async_threads);
+	bool open(mysdk::net::EventLoop* loop, const MySQLConnectionInfo& connInfo, uint8 sync_conNums, uint8 async_threads);
 	void close();
 
 	void execute(const char* sql);

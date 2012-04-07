@@ -43,7 +43,7 @@ DatabaseWorkerPool<T>::~DatabaseWorkerPool()
 }
 
 template <typename T>
-bool DatabaseWorkerPool<T>::open(EventLoop* loop, const MySQLConnectionInfo& connInfo, uint8 sync_conNums, uint8 async_threads)
+bool DatabaseWorkerPool<T>::open(mysdk::net::EventLoop* loop, const MySQLConnectionInfo& connInfo, uint8 sync_conNums, uint8 async_threads)
 {
 	syncConns_.resize(sync_conNums);
 	asyncConns_.resize(async_threads);

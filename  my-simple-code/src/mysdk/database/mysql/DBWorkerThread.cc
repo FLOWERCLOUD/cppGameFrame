@@ -12,7 +12,9 @@
 #include <tr1/functional>
 
 using namespace mysdk;
-DBWorkerThread::DBWorkerThread(EventLoop* loop, MySQLConnection* mysqlConn):
+using namespace mysdk::net;
+
+DBWorkerThread::DBWorkerThread(mysdk::net::EventLoop* loop, MySQLConnection* mysqlConn):
 		loop_(loop),
 		thread_(std::tr1::bind(&DBWorkerThread::run, this), "DBWorkerThread"),
 		mysqlConn_(mysqlConn),
@@ -42,9 +44,10 @@ void DBWorkerThread::quit()
 
 void DBWorkerThread::run()
 {
+	LOG_INFO << "START DBWorkerThread...";
 	while(!quit_)
 	{
-		LOG_TRACE << "========RUN ... ";
+		//LOG_TRACE << "========RUN ... ";
 		DBMsg msg;
 		if (pipe_.read(&msg) )
 		{
@@ -52,6 +55,7 @@ void DBWorkerThread::run()
 		}
 		sleep(1);
 	}
+	LOG_INFO << "END DBWorkerThread...";
 }
 
 void DBWorkerThread::handleDBMsg(DBMsg* msg)

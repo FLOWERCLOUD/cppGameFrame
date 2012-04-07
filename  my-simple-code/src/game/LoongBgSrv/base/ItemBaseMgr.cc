@@ -10,7 +10,7 @@
 ItemBaseMgr::ItemBaseMgr():
 	curItemBaseNum_(0)
 {
-	init();
+	//init();
 }
 
 ItemBaseMgr::~ItemBaseMgr()
@@ -38,6 +38,31 @@ bool ItemBaseMgr::init()
 	itemBaseList_[curItemBaseNum_].itemId_ = 4;
 	itemBaseList_[curItemBaseNum_].itemName_ = "食人花种子";
 	itemBaseList_[curItemBaseNum_].functionType_  = 0;
+
+	return true;
+}
+
+bool ItemBaseMgr::init(TestDatabaseWorkerPool& databaseWorkPool)
+{
+	const char* sql = "select itemid, itemname, functionType, itemBuff from item";
+	ResultSet* res = databaseWorkPool.query(sql);
+	if (!res) return false;
+
+	while (res->nextRow())
+	{
+		const Field* field = res->fetch();
+		itemBaseList_[curItemBaseNum_].itemId_ =  field[0].getInt16();
+		itemBaseList_[curItemBaseNum_].itemName_ = field[1].getString();
+		itemBaseList_[curItemBaseNum_].functionType_ =  field[2].getInt16();
+		ColonBuf buf(field[3].getCString());
+		int16 num = itemBaseList_[curItemBaseNum_].bufNum_= buf.GetShort();
+		for (int16 i = 0; i < num; i++)
+		{
+			itemBaseList_[curItemBaseNum_].bufList_[i] = buf.GetShort();
+		}
+		curItemBaseNum_++;
+	}
+	delete res;
 
 	return true;
 }
