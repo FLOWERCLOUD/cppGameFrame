@@ -49,13 +49,25 @@ CHtmlClient htmlClient;
 void LoongBgSrv::phpThreadHandler()
 {
 	LOG_INFO << "====== phpThreadHandler STARTING ";
+	static const std::string phpAddr(sConfigMgr.MainConfig.GetStringDefault("phpAddr", "path", "115.238.55.103/battlefield/info_in.php"));
+	char buf[1024];
 	while (!shutdown_loongBgSrv)
 	{
 		ThreadParam param = queue_.take();
-		int32 id = param.bgId;
-		//htmlClient.loadUrl("http://www.baidu.com");
-		//LOG_TRACE << " Test html: " << htmlClient.getHtmlData().getData();
-		LOG_TRACE << "phpThreadHandler - id: " << id;
+		if (param.bgId != -1)
+		{
+			snprintf(buf, 1023, "%s?id=%d&type=3&black=%d&white=%d&states=%d",
+				phpAddr.c_str(),
+				param.bgId,
+				param.whiteNum,
+				param.blackNum,
+				param.bgState);
+
+			htmlClient.loadUrl(buf, 1);
+			//LOG_TRACE << " Test html: " << htmlClient.getHtmlData().getData();
+		}
+
+		LOG_TRACE << "phpThreadHandler - id: " << param.bgId;
 	}
 	LOG_INFO << "======= phpThreadHandler END ";
 }
@@ -104,7 +116,7 @@ void LoongBgSrv::start()
 void LoongBgSrv::stop()
 {
 	ThreadParam x;
-	x.bgId = 0;
+	x.bgId = -1;
 	queue_.put(x);
 	phpThread_.join();
 }
@@ -165,7 +177,7 @@ void LoongBgSrv::onConnectionCallback(mysdk::net::TcpConnection* pCon)
 void LoongBgSrv::onKaBuMessage(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::Timestamp timestamp)
 {
 	uint32 op = pb.getOP();
-	if (op == game::OP_MY_TICKET)
+	if (op == game::OP_PING)
 	{
 		BgClient* bgClient = static_cast<BgClient*>(pCon->getContext());
 		if (bgClient)
@@ -355,6 +367,21 @@ void LoongBgSrv::onTimer()
 		{
 			break;
 		}
+	}
+}
+
+void LoongBgSrv::TellPhpBattleInfo(int32 battleId)
+{
+	int16 bgId = static_cast<int16>(battleId);
+	if (battlegroundMgr_.checkBattlegroundId(bgId))
+	{
+		Battleground& bg = battlegroundMgr_.getBattleground(bgId);
+		ThreadParam param;
+		param.bgId = bgId;
+		param.blackNum = bg.getBlackNum();
+		param.whiteNum = bg.getWhiteNum();
+		param.bgState = bg.getState();
+		queue_.put(param);
 	}
 }
 

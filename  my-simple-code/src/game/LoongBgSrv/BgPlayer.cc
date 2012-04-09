@@ -148,14 +148,33 @@ bool BgPlayer::addItem(int32 itemId)
 
 void BgPlayer::shutdown()
 {
-	if (pScene)
-	{
-		pScene->removePlayer(this);
-	}
-
 	if (pCon_)
 	{
-		pCon_->shutdown();
+		pCon_->close();
+	}
+}
+
+void BgPlayer::serializeResult(PacketBase& op, BgResultE bgResult)
+{
+	op.putInt32(getId());
+	op.putInt32(team_);
+	op.putUTF(name_);
+	op.putInt32(killEnemyTimes_);
+	if (bgResult == KDRAW_BGRESULT)
+	{
+		op.putInt32(2);
+	}
+	else if (bgResult == KBLACK_BGRESULT && team_ == BgUnit::kBlack_TEAM)
+	{
+		op.putInt32(5);
+	}
+	else if (bgResult == KWHITE_BGRESULT && team_ == BgUnit::kWhite_TEAM)
+	{
+		op.putInt32(5);
+	}
+	else
+	{
+		op.putInt32(1);
 	}
 }
 

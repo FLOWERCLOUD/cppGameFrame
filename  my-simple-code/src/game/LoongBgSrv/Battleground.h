@@ -34,6 +34,14 @@ public:
 
 	void setId(int32 Id);
 	int32 getId();
+	uint8 getBlackNum()
+	{
+		return teamNum_[BgUnit::kBlack_TEAM];
+	}
+	uint8 getWhiteNum()
+	{
+		return teamNum_[BgUnit::kWhite_TEAM];
+	}
 
 	bool addBgPlayer(BgPlayer* player, BgUnit::TeamE team);
 	bool removeBgPlayer(BgPlayer* player, BgUnit::TeamE team);
@@ -71,6 +79,7 @@ private:
     void init();
     // 战场状态切换
     void setBattlegroundState(BattlegroundState* state);
+    void TellPhpBattleInfo();
 private:
 	int32 id_; // 战场ID
 	uint8 teamNum_[BgUnit::kCOUNT_TEAM];

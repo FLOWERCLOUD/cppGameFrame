@@ -9,6 +9,7 @@
 
 #include <game/LoongBgSrv/BgPlayer.h>
 #include <game/LoongBgSrv/BattlegroundState.h>
+#include <game/LoongBgSrv/LoongBgSrv.h>
 #include <game/LoongBgSrv/StateBattlegroundCountDown.h>
 #include <game/LoongBgSrv/StateBattlegroundExit.h>
 #include <game/LoongBgSrv/StateBattlegroundRun.h>
@@ -82,6 +83,8 @@ bool Battleground::addBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 		return false;
 	}
 
+	TellPhpBattleInfo();
+
 	if (bFirst_)
 	{
 		switchWaitState();
@@ -99,6 +102,8 @@ bool Battleground::removeBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 	LOG_DEBUG << " Battleground::removeBgPlayer - playerId: " << player->getId()
 							<< " team: " << team
 							<< " num: " << teamNum_[team];
+
+	TellPhpBattleInfo();
 
 	teamNum_[team]--;
 	player->setBgId(0);
@@ -214,20 +219,26 @@ bool Battleground::isGameOver()
 void Battleground::settlement()
 {
 	//统计战场结果 发放战斗奖励
-	std::map<int32, BgPlayer*> playerMgr = scene_.getPlayerMgr();
+	std::map<int32, BgPlayer*>& playerMgr = scene_.getPlayerMgr();
 	std::map<int32, BgPlayer*>::iterator iter;
+
+	PacketBase op(client::OP_SETTLEMENT, playerMgr.size());
+	op.putInt32(bgResult_);
 	for(iter = playerMgr.begin(); iter != playerMgr.end(); iter++)
 	{
-		BgPlayer* player = iter->second;
-		if (player)
-		{
-		}
+			BgPlayer* player = iter->second;
+			if (player)
+			{
+				player->serializeResult(op, bgResult_);
+			}
 	}
+
+	scene_.broadMsg(op);
 }
 
 void Battleground::incBgPlayerTimes()
 {
-	std::map<int32, BgPlayer*> playerMgr = scene_.getPlayerMgr();
+	std::map<int32, BgPlayer*>& playerMgr = scene_.getPlayerMgr();
 	std::map<int32, BgPlayer*>::iterator iter;
 	for(iter = playerMgr.begin(); iter != playerMgr.end(); iter++)
 	{
@@ -245,6 +256,8 @@ void Battleground::tellClientBgState()
 	op.putInt32(getState());
 	op.putInt32(getLeftTime());
 	scene_.broadMsg(op);
+
+	TellPhpBattleInfo();
 }
 
 bool Battleground::haveOtherTeamEmpty()
@@ -254,6 +267,14 @@ bool Battleground::haveOtherTeamEmpty()
 		return true;
 	}
 	return false;
+}
+
+void Battleground::TellPhpBattleInfo()
+{
+	if (pSrv_)
+	{
+		pSrv_->TellPhpBattleInfo(getId());
+	}
 }
 
 void Battleground::setBattlegroundState(BattlegroundState* state)
@@ -313,7 +334,7 @@ void Battleground::closeBattleground()
 		pState_ = NULL;
 	}
 
-	std::map<int32, BgPlayer*> playerMgr = scene_.getPlayerMgr();
+	std::map<int32, BgPlayer*>& playerMgr = scene_.getPlayerMgr();
 	std::map<int32, BgPlayer*>::iterator iter;
 	for(iter = playerMgr.begin(); iter != playerMgr.end(); iter++)
 	{

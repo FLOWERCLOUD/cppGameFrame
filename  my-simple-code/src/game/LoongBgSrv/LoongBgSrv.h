@@ -24,7 +24,10 @@ using namespace mysdk::net;
 
 struct ThreadParam
 {
-	int32 bgId;
+	int16 bgId;
+	uint8 blackNum;
+	uint8 whiteNum;
+	int16 bgState;
 };
 
 class BgPlayer;
@@ -59,6 +62,8 @@ public:
 	{
 		return battlegroundMgr_;
 	}
+
+	void TellPhpBattleInfo(int32 bgId);
 private:
 	bool login(mysdk::net::TcpConnection* pCon, PacketBase& pb, Timestamp timestamp);
 	void tickMe();
@@ -72,10 +77,10 @@ private:
 	BattlegroundMgr battlegroundMgr_;
 	std::list<BgClient*> bgClientList_;
 
+	BlockingQueue<ThreadParam> queue_;
+
 	EventLoop* loop_;
 	TcpServer server_;
-public:
-	BlockingQueue<ThreadParam> queue_;
 private:
 	DISALLOW_COPY_AND_ASSIGN(LoongBgSrv);
 };

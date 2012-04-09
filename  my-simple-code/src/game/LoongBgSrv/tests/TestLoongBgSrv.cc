@@ -79,7 +79,7 @@ class TestLoongBgClient
 	{
 		if (pCon_)
 		{
-			PacketBase op(game::OP_MY_TICKET, 0);
+			PacketBase op(game::OP_PING, 0);
 			codec_.send(pCon_, op);
 		}
 	}

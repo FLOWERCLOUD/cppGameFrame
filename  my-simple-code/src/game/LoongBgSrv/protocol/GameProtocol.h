@@ -34,7 +34,7 @@ namespace game
 	// 0x00120015
 	// 0x00120016
 	// 0x00120017
-	static const uint32 OP_MY_TICKET				= 0x00120018; // 应用程序心跳
+	static const uint32 OP_PING				= 0x00120018; // 应用程序心跳
 }
 
 namespace client
@@ -61,6 +61,9 @@ namespace client
 	static const uint32 OP_ALERT_CODE			 = 0x00140015; // 错误码
 	static const uint32 OP_PET_DEAD		 		 = 0x00140016; // 英雄死了
 	static const uint32 OP_ADD_HP		 		 	 = 0x00140017; // 英雄加血
+	// 0x00140018
+	static const uint32 OP_SETTLEMENT			 = 0x00140019; //战场结果
+
 }
 
 #endif /* GAMEPROTOCOL_H_ */

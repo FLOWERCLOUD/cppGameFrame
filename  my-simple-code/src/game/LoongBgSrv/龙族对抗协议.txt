@@ -231,3 +231,22 @@ param 卡布号
 hp:int 总血量
 addhp:int 加的血量值
 
+========= 心跳 =============
+c->s
+cmd 0x140018
+param 
+
+========= 战场结果 =============
+s->c
+cmd 0x140019
+param  玩家人数
+bgResult:int  战场结果 	1.	暗黑军胜利 2. 烈阳军胜利 3. 平局
+for (var i = 0; i < param; i++)
+{
+	id:int32 卡布号
+	team:int32 队伍
+	name:utf 名字
+	killEnemyTime:int32 杀敌次数
+	itemNum:int32 勋章数量
+}
+

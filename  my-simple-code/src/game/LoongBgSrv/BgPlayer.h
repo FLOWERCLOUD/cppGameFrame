@@ -10,6 +10,7 @@
 
 #include <game/LoongBgSrv/BgUnit.h>
 #include <game/LoongBgSrv/package/Package.h>
+#include <game/LoongBgSrv/Battleground.h> // for BgResultE
 
 #include <mysdk/net/TcpConnection.h>
 #include <string>
@@ -46,6 +47,17 @@ public:
 	bool addItem(int32 itemId);
 
 	void shutdown();
+
+	std::string getName()
+	{
+		return name_;
+	}
+	int16 getKillEnemyTimes()
+	{
+		return killEnemyTimes_;
+	}
+
+	void serializeResult(PacketBase& op, BgResultE bgResult);
 public:
 	// 父类的东东
 	virtual bool serialize(PacketBase& op);
