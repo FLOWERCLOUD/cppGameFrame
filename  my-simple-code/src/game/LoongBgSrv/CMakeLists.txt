@@ -8,6 +8,7 @@ set(LoongBgSrv_SRCS
   base/ItemBaseMgr.cc
   base/SkillBase.cc
   base/SkillBaseMgr.cc
+  config/ConfigMgr.h
   package/Item.cc
   package/Package.cc
   php/util/bytesbuffer.cpp
@@ -43,6 +44,6 @@ include_directories("/usr/include/mysql/")
 link_directories("/usr/lib/mysql/")
 
 add_executable(LoongBgSrv ${LoongBgSrv_SRCS})
-target_link_libraries(LoongBgSrv kabu_codec mysdk_mysql mysdk_net curl mysqlclient )
+target_link_libraries(LoongBgSrv kabu_codec mysdk_exconfig mysdk_mysql mysdk_net curl mysqlclient )
 
 add_subdirectory(tests)

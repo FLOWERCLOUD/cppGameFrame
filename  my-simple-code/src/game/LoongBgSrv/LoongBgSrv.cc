@@ -1,7 +1,7 @@
 
 #include <game/LoongBgSrv/LoongBgSrv.h>
 
-#include <game/LoongBgSrv/base/Base.h>
+#include <game/LoongBgSrv/config/ConfigMgr.h>
 #include <game/LoongBgSrv/protocol/GameProtocol.h>
 #include <game/LoongBgSrv/util/md5.h>
 #include <game/LoongBgSrv/BattlegroundMgr.h>
@@ -84,23 +84,18 @@ LoongBgSrv::LoongBgSrv(EventLoop* loop, InetAddress& serverAddr):
 
     loop->runEvery(0.5, std::tr1::bind(&LoongBgSrv::tickMe, this));
     loop->runEvery(8.0, std::tr1::bind(&LoongBgSrv::onTimer, this));
-	LOG_DEBUG << "============ LoongBgSrv::LoongBgSrv ================";
+	LOG_DEBUG << "============ LoongBgSrv::LoongBgSrv serverAddr: "<<  server_.hostport()
+							<< " ================";
 }
 
 LoongBgSrv::~LoongBgSrv()
 {
-	LOG_DEBUG << "============ LoongBgSrv::~LoongBgSrv ================";
+	LOG_DEBUG << "============ LoongBgSrv::~LoongBgSrv serverAddr: " <<  server_.hostport()
+							<< " ================";
 }
 
 void LoongBgSrv::start()
 {
-	std::string host = "192.168.100.6";
-	std::string port_or_socket = "3306";
-	std::string user = "root";
-	std::string password = "4399mysql#CQPZM";
-	std::string database = "kabu_loongBg";
-
-	sBase.init(host, port_or_socket, user, password, database);
 	setupSignalHandlers();
 	phpThread_.start();
 	server_.start();
@@ -232,10 +227,12 @@ bool LoongBgSrv::login(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::T
 							<< " token: " << token
 							<< " address: "<< pCon->peerAddress().toHostPort();
 
-	static const char key[] =  "9B1492CF6AAE903F63FB7759D3565CD7";
+	//static const char key[] =  "9B1492CF6AAE903F63FB7759D3565CD7";
+	static const std::string key(sConfigMgr.MainConfig.GetStringDefault("loginKey", "key", "9B1492CF6AAE903F63FB7759D3565CD7"));
+
 	char buf[256];
 	//md5(uid + username + roletype + times +  key);
-	snprintf(buf, 255, "%d%s%d%d%s", playerId, playerName, roleType, times, key);
+	snprintf(buf, 255, "%d%s%d%d%s", playerId, playerName, roleType, times, key.c_str());
 	char* tmp = MD5String(buf);
 	if (strcmp(tmp, token) != 0)
 	{
