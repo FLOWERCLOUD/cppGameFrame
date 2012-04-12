@@ -3,9 +3,10 @@
 #define GAME_LOONGBGSRV_H_
 
 #include <mysdk/base/Common.h>
+#include <mysdk/base/BlockingQueue.h>
+#include <mysdk/base/PerformanceCounter.h>
 #include <mysdk/base/Timestamp.h>
 #include <mysdk/base/Thread.h>
-#include <mysdk/base/BlockingQueue.h>
 
 #include <mysdk/net/EventLoop.h>
 #include <mysdk/net/InetAddress.h>
@@ -38,6 +39,9 @@ struct BgClient
 	std::list<BgClient* >::iterator iter;
 	BgPlayer* player;
 	mysdk::net::TcpConnection* pCon;
+
+	Timestamp lastSecPacketsTimestamp; //收到包的上一秒的时间
+	uint32 lastSecondsPackets; //上一秒收到的包数
 };
 
 // 龙族对抗战场服务器
@@ -55,6 +59,8 @@ public:
 
 	void onConnectionCallback(mysdk::net::TcpConnection* pCon);
 	void onKaBuMessage(mysdk::net::TcpConnection* pCon, PacketBase& pb, Timestamp timestamp);
+	void onWriteComplete(mysdk::net::TcpConnection* pCon);
+	void printThroughput();
 
 	void send(mysdk::net::TcpConnection* pCon, PacketBase& pb);
 
@@ -78,6 +84,13 @@ private:
 	std::list<BgClient*> bgClientList_;
 
 	BlockingQueue<ThreadParam> queue_;
+
+	// @start 统计相关
+	int64 tmpTransferred_;
+	int64 transferred_;
+	Timestamp startTime_;
+	PerformanceCounter performanceCounter_;
+	// @end 统计相关
 
 	EventLoop* loop_;
 	TcpServer server_;

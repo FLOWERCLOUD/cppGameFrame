@@ -10,6 +10,7 @@
 #include <game/LoongBgSrv/PlayerMgr.h>
 #include <game/LoongBgSrv/Util.h>
 
+
 #include <string.h>
 #include <signal.h>
 
@@ -81,6 +82,9 @@ LoongBgSrv::LoongBgSrv(EventLoop* loop, InetAddress& serverAddr):
 				std::tr1::placeholders::_3)),
 	phpThread_(std::tr1::bind(&LoongBgSrv::phpThreadHandler, this), "phpThread"),
 	battlegroundMgr_(this),
+	tmpTransferred_(0),
+    transferred_(0),
+    startTime_(Timestamp::now()),
 	loop_(loop),
 	server_(loop, serverAddr, "LoongBgSrv")
 {
@@ -94,8 +98,12 @@ LoongBgSrv::LoongBgSrv(EventLoop* loop, InetAddress& serverAddr):
 														std::tr1::placeholders::_2,
 														std::tr1::placeholders::_3));
 
+	server_.setWriteCompleteCallback(
+			std::tr1::bind(&LoongBgSrv::onWriteComplete, this, std::tr1::placeholders::_1));
+
     loop->runEvery(0.5, std::tr1::bind(&LoongBgSrv::tickMe, this));
     loop->runEvery(8.0, std::tr1::bind(&LoongBgSrv::onTimer, this));
+    loop->runEvery(3.0, std::tr1::bind(&LoongBgSrv::printThroughput, this));
 	LOG_DEBUG << "============ LoongBgSrv::LoongBgSrv serverAddr: "<<  server_.hostport()
 							<< " ================";
 }
@@ -163,6 +171,8 @@ void LoongBgSrv::onConnectionCallback(mysdk::net::TcpConnection* pCon)
 				bgClient->player = NULL;
 				bgClient->lastRecvTimestamp = Timestamp::now();
 				bgClient->pCon = pCon;
+				bgClient->lastSecPacketsTimestamp = Timestamp::now();
+				bgClient->lastSecondsPackets = 0;
 
 				pCon->setContext(bgClient);
 			}
@@ -176,18 +186,54 @@ void LoongBgSrv::onConnectionCallback(mysdk::net::TcpConnection* pCon)
 
 void LoongBgSrv::onKaBuMessage(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::Timestamp timestamp)
 {
+	BgClient* bgClient = static_cast<BgClient*>(pCon->getContext());
+	if (!bgClient)
+	{
+		LOG_WARN << " LoongBgSrv::onKaBuMessage - SOME ERROR!!! "
+								<< " address: "<< pCon->peerAddress().toHostPort();
+		return;
+	}
+
+	std::list<BgClient* >::iterator iter = bgClient->iter;
+	bgClientList_.erase(iter);
+	bgClientList_.push_back(bgClient);
+	bgClient->iter = --bgClientList_.end();
+	bgClient->lastRecvTimestamp = timestamp;
+
+	if (timeDifference(timestamp, bgClient->lastSecPacketsTimestamp) < 1.0)
+	{
+		bgClient->lastSecondsPackets++;
+	}
+	else
+	{
+		bgClient->lastSecPacketsTimestamp = timestamp;
+		bgClient->lastSecondsPackets = 1;
+	}
+
+	static uint32 minLimitPacketPerClient = sConfigMgr.MainConfig.GetIntDefault("packet", "minLimit", 10);
+	static uint32 maxLimitPacketPerClient = sConfigMgr.MainConfig.GetIntDefault("packet", "maxLimit", 20);
+	if (bgClient->lastSecondsPackets > minLimitPacketPerClient)
+	{
+		LOG_WARN << " LoongBgSrv::onKaBuMessage - packet too much, so overlook "
+								<< " lastSecondsPackets: " << bgClient->lastSecondsPackets
+								<< " address: "<< pCon->peerAddress().toHostPort();
+
+		// 玩家作弊了！？
+		if (bgClient->lastSecondsPackets > maxLimitPacketPerClient)
+		{
+			LOG_WARN << " LoongBgSrv::onKaBuMessage - packet too much, so  close "
+									<< " lastSecondsPackets: " << bgClient->lastSecondsPackets
+									<< " address: "<< pCon->peerAddress().toHostPort();
+			pCon->close();
+		}
+		return;
+	}
+
 	uint32 op = pb.getOP();
 	if (op == game::OP_PING)
 	{
-		BgClient* bgClient = static_cast<BgClient*>(pCon->getContext());
-		if (bgClient)
-		{
-			std::list<BgClient* >::iterator iter = bgClient->iter;
-			bgClientList_.erase(iter);
-			bgClientList_.push_back(bgClient);
-			bgClient->iter = --bgClientList_.end();
-			bgClient->lastRecvTimestamp = timestamp;
-		}
+		pb.setOP(client::OP_PING);
+		send(pCon, pb);
 		return;
 	}
 
@@ -202,17 +248,35 @@ void LoongBgSrv::onKaBuMessage(mysdk::net::TcpConnection* pCon, PacketBase& pb, 
 	}
 	else
 	{
-		BgClient* bgClient = static_cast<BgClient*>(pCon->getContext());
-		if (bgClient != NULL)
+		BgPlayer* player = bgClient->player;
+		if (player)
 		{
-			BgPlayer* player = bgClient->player;
-			if (player)
-			{
-				TIME_FUNCTION_CALL(player->onMsgHandler(pb), 10);
-			}
+			TIME_FUNCTION_CALL(player->onMsgHandler(pb), 10);
 		}
 	}
 }
+
+void LoongBgSrv::onWriteComplete(mysdk::net::TcpConnection* pCon)
+{
+	transferred_ += tmpTransferred_;
+	tmpTransferred_ = 0;
+}
+
+void LoongBgSrv::printThroughput()
+{
+	Timestamp endTime = Timestamp::now();
+	double time = timeDifference(endTime, startTime_);
+	printf("%4.3f KiB/s  -- transferred: %" MYSDK_LL_FORMAT "d B -- ConnectionNum: %d -- Cpu: %f%%-- RAM: %f M\n",
+			static_cast<double>(transferred_)/time/1024,
+			transferred_,
+			server_.getConnectionNum(),
+			performanceCounter_.GetCurrentCPUUsage(),
+			performanceCounter_.GetCurrentRAMUsage());
+
+	transferred_ = 0;
+	startTime_ = endTime;
+}
+
 
 bool LoongBgSrv::login(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::Timestamp timestamp)
 {
@@ -387,6 +451,8 @@ void LoongBgSrv::TellPhpBattleInfo(int32 battleId)
 
 void LoongBgSrv::send(mysdk::net::TcpConnection* pCon, PacketBase& pb)
 {
+	tmpTransferred_ += pb.getContentLen() + sizeof(PacketBase::KaBuHead);
+	LOG_TRACE << "LoongBgSrv::send - tmpTransferred:" << tmpTransferred_;
 	codec_.send(pCon, pb);
 }
 

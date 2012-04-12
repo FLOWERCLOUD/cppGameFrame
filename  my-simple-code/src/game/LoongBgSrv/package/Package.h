@@ -36,6 +36,8 @@ public:
 	// 一次只能添加一个物品
 	AddItemRtnE addItem(int16 itemId);
 
+	void clear();
+
 	bool serialize(PacketBase& op);
 private:
 	int16 curItemNum_;

@@ -26,8 +26,3 @@ void StateBattlegroundExit::run(uint32 curTime)
 		pBattleground_->closeBattleground();
 	}
 }
-
-void StateBattlegroundExit::end()
-{
-
-}

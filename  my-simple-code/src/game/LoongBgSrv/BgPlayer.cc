@@ -594,6 +594,7 @@ void BgPlayer::onSelectPet(PacketBase& pb)
 
 	if (!isDead()) return;
 
+	package_.clear();
 	removeAllBuf();
 
 	const PetBase& petbase = sPetBaseMgr.getPetBaseInfo(petId);
@@ -660,10 +661,10 @@ void BgPlayer::onUseSkill(PacketBase& pb)
 
 void BgPlayer::onExitBattle(PacketBase& pb)
 {
-	if (!pScene) return;
-	pScene->removePlayer(this);
+	this->close();
+
 	pb.setOP(client::OP_EXIT_BATTLE);
-	this->sendPacket(pb);
+	sendPacket(pb);
 }
 
 void BgPlayer::onPickUpItem(PacketBase& pb)

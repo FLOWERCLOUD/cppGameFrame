@@ -325,7 +325,7 @@ void Battleground::switchExitState()
 
 void Battleground::closeBattleground()
 {
-	LOG_DEBUG << "Battleground::closeBattleground - " << this->getId();
+	LOG_DEBUG << "Battleground::closeBattleground - battlegroundId: " << this->getId();
 	if (pState_)
 	{
 		pState_->end();
@@ -345,6 +345,7 @@ void Battleground::closeBattleground()
 			player->setTeam(BgUnit::kNONE_TEAM);
 		}
 	}
+	playerMgr.clear();
 
 	// 重新初始化一下战场哦
 	init();

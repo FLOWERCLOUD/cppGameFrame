@@ -10,6 +10,8 @@
 #include <game/LoongBgSrv/protocol/GameProtocol.h>
 #include <game/LoongBgSrv/skill/Buf.h>
 
+#include <mysdk/base/Logging.h>
+
 BgUnit::BgUnit():
 	unittId_(0),
 	x_(0),
@@ -21,6 +23,7 @@ BgUnit::BgUnit():
 	team_(kNONE_TEAM),
 	unitType_(KNONE_UNITTYPE)
 {
+	//LOG_TRACE << "+++++BgUnit::BgUnit ";
 }
 
 BgUnit::BgUnit(UnitTypeE unitType):
@@ -34,7 +37,7 @@ BgUnit::BgUnit(UnitTypeE unitType):
 		team_(kNONE_TEAM),
 		unitType_(unitType)
 {
-
+	//LOG_TRACE << "+++++BgUnit::BgUnit ";
 }
 
 BgUnit::BgUnit(int32 unitId, UnitTypeE unitType):
@@ -48,7 +51,7 @@ BgUnit::BgUnit(int32 unitId, UnitTypeE unitType):
 		team_(kNONE_TEAM),
 		unitType_(unitType)
 {
-
+	//LOG_TRACE << "+++++BgUnit::BgUnit ";
 }
 
 BgUnit::BgUnit(int32 unitId, UnitTypeE unitType, TeamE team):
@@ -62,12 +65,12 @@ BgUnit::BgUnit(int32 unitId, UnitTypeE unitType, TeamE team):
 				team_(team),
 				unitType_(unitType)
 {
-
+	//LOG_TRACE << "+++++BgUnit::BgUnit - unitId: " <<  unitId;
 }
 
 BgUnit::~BgUnit()
 {
-
+	//LOG_TRACE << "---------BgUnit::~BgUnit - unitId: "<<  unittId_;
 }
 
 bool BgUnit::serialize(PacketBase& op)

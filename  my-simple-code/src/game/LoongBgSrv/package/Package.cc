@@ -67,6 +67,16 @@ Package::AddItemRtnE Package::addItem(int16 itemId)
 	return kError_AddItemRtn;
 }
 
+void Package::clear()
+{
+	curItemNum_ = 0;
+	for (int16 i = 0; i < sMaxItemNum; i++)
+	{
+		itemList_[i].setItemId(0);
+		itemList_[i].setItemNum(0);
+	}
+}
+
 bool Package::serialize(PacketBase& op)
 {
 	op.putInt32(curItemNum_);
