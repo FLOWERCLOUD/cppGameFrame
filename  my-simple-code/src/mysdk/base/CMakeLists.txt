@@ -5,6 +5,8 @@ set(base_SRCS
 	Timestamp.cc
 	Logging.cc
 	Thread.cc
+	SysInfo.cc
+	PerformanceCounter.cc
   )
 
 add_library(mysdk_base ${base_SRCS})

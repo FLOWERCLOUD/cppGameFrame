@@ -24,6 +24,7 @@ namespace mysdk
         //  just to keep ICC and code checking tools from complaining.
         inline virtual ~array_item_t ()
         {
+
         }
 
         inline void set_array_index (int index_)
