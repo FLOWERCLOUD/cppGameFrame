@@ -55,6 +55,7 @@ void Battleground::init()
 
 	blackBuildings_.init();
 	whiteBuildings_.init();
+	scene_.init();
 }
 
 void Battleground::shtudown()
@@ -224,16 +225,21 @@ void Battleground::settlement()
 
 	PacketBase op(client::OP_SETTLEMENT, playerMgr.size());
 	op.putInt32(bgResult_);
+	PacketBase hotelop(hotel::OP_GET_BATTLEGROUND_AWARD, playerMgr.size());
 	for(iter = playerMgr.begin(); iter != playerMgr.end(); iter++)
 	{
 			BgPlayer* player = iter->second;
 			if (player)
 			{
-				player->serializeResult(op, bgResult_);
+				hotelop.putInt32(id_);
+				hotelop.putInt32(id_);
+				player->serializeResult(op, bgResult_, hotelop);
 			}
 	}
 
 	scene_.broadMsg(op);
+	// 把战斗结果 通知给hotel 让hotel把相应的奖励加给玩家哦
+	sendToHotel(hotelop);
 }
 
 void Battleground::incBgPlayerTimes()
@@ -274,6 +280,14 @@ void Battleground::TellPhpBattleInfo()
 	if (pSrv_)
 	{
 		pSrv_->TellPhpBattleInfo(getId());
+	}
+}
+
+void Battleground::sendToHotel(PacketBase& pb)
+{
+	if (pSrv_)
+	{
+		pSrv_->sendToHotel(pb);
 	}
 }
 
@@ -345,7 +359,6 @@ void Battleground::closeBattleground()
 			player->setTeam(BgUnit::kNONE_TEAM);
 		}
 	}
-	playerMgr.clear();
 
 	// 重新初始化一下战场哦
 	init();

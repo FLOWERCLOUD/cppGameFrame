@@ -64,7 +64,7 @@ void LoongBgSrv::phpThreadHandler()
 				param.blackNum,
 				param.bgState);
 
-			htmlClient.loadUrl(buf, 1);
+			htmlClient.loadUrl(buf);
 			//LOG_TRACE << " Test html: " << htmlClient.getHtmlData().getData();
 		}
 
@@ -72,6 +72,10 @@ void LoongBgSrv::phpThreadHandler()
 	}
 	LOG_INFO << "======= phpThreadHandler END ";
 }
+
+static std::string hotelHost = sConfigMgr.MainConfig.GetStringDefault("hotel", "host", "121.14.36.253");
+static uint16 hotelPort = static_cast<uint16>(sConfigMgr.MainConfig.GetIntDefault("hotel", "port", 12400));
+static InetAddress hotelAddr(hotelHost, hotelPort);
 
 LoongBgSrv::LoongBgSrv(EventLoop* loop, InetAddress& serverAddr):
 	codec_(
@@ -85,6 +89,7 @@ LoongBgSrv::LoongBgSrv(EventLoop* loop, InetAddress& serverAddr):
 	tmpTransferred_(0),
     transferred_(0),
     startTime_(Timestamp::now()),
+    hotel_(loop, hotelAddr),
 	loop_(loop),
 	server_(loop, serverAddr, "LoongBgSrv")
 {
@@ -447,6 +452,11 @@ void LoongBgSrv::TellPhpBattleInfo(int32 battleId)
 		param.bgState = bg.getState();
 		queue_.put(param);
 	}
+}
+
+void LoongBgSrv::sendToHotel(PacketBase& pb)
+{
+	hotel_.send(pb);
 }
 
 void LoongBgSrv::send(mysdk::net::TcpConnection* pCon, PacketBase& pb)

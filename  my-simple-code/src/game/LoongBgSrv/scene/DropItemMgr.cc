@@ -10,7 +10,11 @@
 #include <game/LoongBgSrv/BgPlayer.h>
 #include <game/LoongBgSrv/Util.h>
 
+#include <game/LoongBgSrv/base/ColonBuf.h>
+#include <game/LoongBgSrv/config/ConfigMgr.h>
 #include <game/LoongBgSrv/protocol/GameProtocol.h>
+
+#include <string>
 
 DropItemMgr::DropItemMgr(Scene* pScene):
 	lastTime_(getCurTime()),
@@ -25,6 +29,31 @@ DropItemMgr::~DropItemMgr()
 
 bool DropItemMgr::init()
 {
+	pointList_.clear();
+	itemList_.clear();
+	lastTime_ = getCurTime();
+
+	static std::string pointListStr = sConfigMgr.MainConfig.GetStringDefault("map", "pointlist", "0:");
+	static std::vector<struct point> sPointList;
+	static bool initFlag = true;
+	if (initFlag)
+	{
+		ColonBuf buf(pointListStr.c_str());
+		int count;
+		buf.GetIntDefault(count, 0);
+		for (int i = 0; i < count; i++)
+		{
+			int16 x = buf.GetShort();
+			int16 y = buf.GetShort();
+			struct point p;
+			p.x = x;
+			p.y = y;
+			sPointList.push_back(p);
+		}
+		initFlag = false;
+	}
+
+	pointList_ = sPointList;
 	return true;
 }
 

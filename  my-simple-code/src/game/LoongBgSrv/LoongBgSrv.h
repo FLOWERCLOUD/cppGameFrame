@@ -16,6 +16,7 @@
 #include <mysdk/protocol/kabu/codec/KaBuCodec.h>
 
 #include <game/LoongBgSrv/BattlegroundMgr.h>
+#include <game/LoongBgSrv/Hotel.h>
 
 #include <list>
 #include <map>
@@ -70,6 +71,7 @@ public:
 	}
 
 	void TellPhpBattleInfo(int32 bgId);
+	void sendToHotel(PacketBase& pb);
 private:
 	bool login(mysdk::net::TcpConnection* pCon, PacketBase& pb, Timestamp timestamp);
 	void tickMe();
@@ -91,6 +93,7 @@ private:
 	Timestamp startTime_;
 	PerformanceCounter performanceCounter_;
 	// @end 统计相关
+	Hotel hotel_;
 
 	EventLoop* loop_;
 	TcpServer server_;

@@ -41,6 +41,10 @@ namespace net
 		void setWriteCompleteCallback(const WriteCompleteCallback& cb)
 		{ writeCompleteCallback_ = cb; }
 
+		size_t getConnectionNum()
+		{
+			return tcpConnectionArray_.size();
+		}
 	private:
 		void newConnection(int sockfd, const InetAddress& peerAddr);
 		void removeConnection(TcpConnection* conn);

@@ -66,4 +66,9 @@ namespace client
 
 }
 
+namespace hotel
+{
+	static const uint32 OP_GET_BATTLEGROUND_AWARD			 = 0x00200019; //战场结果
+}
+
 #endif /* GAMEPROTOCOL_H_ */

@@ -38,7 +38,7 @@ namespace net
 				const WriteCompleteCallback& writeComcb,
 				const CloseCallback& closecb);
 
-		~TcpConnection();
+		virtual ~TcpConnection();
 
 		EventLoop* getLoop() const { return loop_; }
 		const std::string& name() const { return name_; }

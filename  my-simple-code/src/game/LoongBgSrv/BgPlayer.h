@@ -57,7 +57,7 @@ public:
 		return killEnemyTimes_;
 	}
 
-	void serializeResult(PacketBase& op, BgResultE bgResult);
+	void serializeResult(PacketBase& op, BgResultE bgResult, PacketBase& hotelop);
 public:
 	// 父类的东东
 	virtual bool serialize(PacketBase& op);

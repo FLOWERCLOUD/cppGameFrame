@@ -154,8 +154,10 @@ void BgPlayer::shutdown()
 	}
 }
 
-void BgPlayer::serializeResult(PacketBase& op, BgResultE bgResult)
+void BgPlayer::serializeResult(PacketBase& op, BgResultE bgResult, PacketBase& hotelop)
 {
+	hotelop.putInt32(getId());
+
 	op.putInt32(getId());
 	op.putInt32(team_);
 	op.putUTF(name_);
@@ -163,18 +165,26 @@ void BgPlayer::serializeResult(PacketBase& op, BgResultE bgResult)
 	if (bgResult == KDRAW_BGRESULT)
 	{
 		op.putInt32(2);
+
+		hotelop.putInt32(3);
 	}
 	else if (bgResult == KBLACK_BGRESULT && team_ == BgUnit::kBlack_TEAM)
 	{
 		op.putInt32(5);
+
+		hotelop.putInt32(1);
 	}
 	else if (bgResult == KWHITE_BGRESULT && team_ == BgUnit::kWhite_TEAM)
 	{
 		op.putInt32(5);
+
+		hotelop.putInt32(1);
 	}
 	else
 	{
 		op.putInt32(1);
+
+		hotelop.putInt32(2);
 	}
 }
 

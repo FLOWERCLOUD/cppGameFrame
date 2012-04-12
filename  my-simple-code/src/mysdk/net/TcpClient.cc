@@ -22,7 +22,8 @@ TcpClient::TcpClient(EventLoop* loop,
 		messageCallback_(defaultMessageCallback),
 		retry_(false),
 		connect_(true),
-		nextConnId_(1)
+		nextConnId_(1),
+		pConnection_(NULL)
 {
 	connector_.setNewConnectionCallback(std::tr1::bind(
 			&TcpClient::newConnection,

@@ -33,6 +33,7 @@ set(LoongBgSrv_SRCS
   StateBattlegroundWait.cc
   BgPlayer.cc
   BgUnit.cc
+  Hotel.cc
   JoinTimesMgr.cc
   Player.cc
   PlayerMgr.cc
@@ -40,10 +41,18 @@ set(LoongBgSrv_SRCS
   main.cc
   )
 
-include_directories("/usr/include/mysql/")
-link_directories("/usr/lib/mysql/")
+#We have our own custom modules that we use. This tells cmakes where to find them.
+set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake_modules/ )
+
+find_package(MYSQL)
+if (MYSQL_FOUND)
+include_directories( ${MYSQL_INCLUDE_DIR} )
+link_directories( ${MYSQL_LIBRARY} )
+else (MYSQL_FOUND)
+message(FATAL_ERROR, "MySQL NOT FOUND!")
+endif (MYSQL_FOUND)
 
 add_executable(LoongBgSrv ${LoongBgSrv_SRCS})
-target_link_libraries(LoongBgSrv kabu_codec mysdk_exconfig mysdk_mysql mysdk_net curl mysqlclient )
+target_link_libraries(LoongBgSrv kabu_codec mysdk_exconfig mysdk_mysql mysdk_net curl)
 
 add_subdirectory(tests)

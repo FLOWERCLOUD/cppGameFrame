@@ -80,6 +80,8 @@ private:
     // 战场状态切换
     void setBattlegroundState(BattlegroundState* state);
     void TellPhpBattleInfo();
+
+    void sendToHotel(PacketBase& pb);
 private:
 	int32 id_; // 战场ID
 	uint8 teamNum_[BgUnit::kCOUNT_TEAM];
