@@ -73,11 +73,8 @@ void LoongBgSrv::phpThreadHandler()
 	LOG_INFO << "======= phpThreadHandler END ";
 }
 
-static std::string hotelHost = sConfigMgr.MainConfig.GetStringDefault("hotel", "host", "121.14.36.253");
-static uint16 hotelPort = static_cast<uint16>(sConfigMgr.MainConfig.GetIntDefault("hotel", "port", 12400));
-static InetAddress hotelAddr(hotelHost, hotelPort);
 
-LoongBgSrv::LoongBgSrv(EventLoop* loop, InetAddress& serverAddr):
+LoongBgSrv::LoongBgSrv(EventLoop* loop, InetAddress& serverAddr, InetAddress& hotelAddr):
 	codec_(
 				std::tr1::bind(&LoongBgSrv::onKaBuMessage,
 				this,
@@ -106,7 +103,7 @@ LoongBgSrv::LoongBgSrv(EventLoop* loop, InetAddress& serverAddr):
 	server_.setWriteCompleteCallback(
 			std::tr1::bind(&LoongBgSrv::onWriteComplete, this, std::tr1::placeholders::_1));
 
-    loop->runEvery(0.5, std::tr1::bind(&LoongBgSrv::tickMe, this));
+    loop->runEvery(0.2, std::tr1::bind(&LoongBgSrv::tickMe, this));
     loop->runEvery(8.0, std::tr1::bind(&LoongBgSrv::onTimer, this));
     loop->runEvery(3.0, std::tr1::bind(&LoongBgSrv::printThroughput, this));
 	LOG_DEBUG << "============ LoongBgSrv::LoongBgSrv serverAddr: "<<  server_.hostport()
@@ -123,6 +120,7 @@ void LoongBgSrv::start()
 {
 	setupSignalHandlers();
 	phpThread_.start();
+	hotel_.connect();
 	server_.start();
 }
 
@@ -271,7 +269,7 @@ void LoongBgSrv::printThroughput()
 {
 	Timestamp endTime = Timestamp::now();
 	double time = timeDifference(endTime, startTime_);
-	printf("%4.3f KiB/s  -- transferred: %" MYSDK_LL_FORMAT "d B -- ConnectionNum: %d -- Cpu: %f%%-- RAM: %f M\n",
+	printf("%4.3f KiB/s  -- transferred: %" MYSDK_LL_FORMAT "d B -- ConnectionNum: %u -- Cpu: %f%%-- RAM: %f M\n",
 			static_cast<double>(transferred_)/time/1024,
 			transferred_,
 			server_.getConnectionNum(),

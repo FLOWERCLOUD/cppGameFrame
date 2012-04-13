@@ -17,7 +17,7 @@ class LoongBgSrv;
 class BattlegroundMgr
 {
 public:
-	static const int16 sMaxBgNum = 500;
+	static const int16 sMaxBgNum = 600;
 public:
 	BattlegroundMgr(LoongBgSrv* srv);
 	~BattlegroundMgr();

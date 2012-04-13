@@ -51,7 +51,7 @@ class LoongBgSrv
 public:
 	typedef std::map<int32, BgPlayer*> BgPlayerMapT;
 public:
-	LoongBgSrv(EventLoop* loop, InetAddress& serverAddr);
+	LoongBgSrv(EventLoop* loop, InetAddress& serverAddr, InetAddress& hotelAddr);
 	~LoongBgSrv();
 
 public:

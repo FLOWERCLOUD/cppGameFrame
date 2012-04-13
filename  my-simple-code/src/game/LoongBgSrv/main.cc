@@ -36,10 +36,14 @@ int main()
 		return -1;
 	}
 
+	std::string hotelHost = sConfigMgr.MainConfig.GetStringDefault("hotel", "host", "121.14.36.253");
+	uint16 hotelPort = static_cast<uint16>(sConfigMgr.MainConfig.GetIntDefault("hotel", "port", 22401));
+	InetAddress hotelAddr(hotelHost, hotelPort);
+
 	CHtmlClient::initialize();
 	EventLoop loop;
 	InetAddress listenAddr(srvPort);
-	LoongBgSrv server(&loop, listenAddr);
+	LoongBgSrv server(&loop, listenAddr, hotelAddr);
 	server.start();
 	loop.loop();
 	server.stop();

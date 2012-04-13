@@ -220,6 +220,7 @@ bool BgPlayer::serialize(PacketBase& op)
 	op.putInt32(roleType_);
 	op.putInt32(petId_);
 	op.putInt32(hp_);
+	op.putInt32(maxhp_);
 	op.putInt32(title_);
 	op.putInt32(x_);
 	op.putInt32(y_);
@@ -276,6 +277,9 @@ bool BgPlayer::canUseSkill(int16 skillId, int32 cooldownTime)
 		int32 curTime = getCurTime();
 		if (curTime - lastUseTime <= cooldownTime)
 		{
+			LOG_TRACE << "BgPlayer::canUseSkill, you can use skill - skillId: " << skillId
+									<< " playerId: " << this->getId()
+									<< " name: " << name_;
 			return false;
 		}
 	}
@@ -285,7 +289,11 @@ bool BgPlayer::canUseSkill(int16 skillId, int32 cooldownTime)
 bool BgPlayer::useSkill(int16 skillId)
 {
 	int32 curTime = getCurTime();
-	useSkillMap_.insert(std::pair<int16, int32>(skillId, curTime));
+	std::pair<std::map<int16, int32>::iterator,bool> res = useSkillMap_.insert(std::pair<int16, int32>(skillId, curTime));
+	if (!res.second)
+	{
+		useSkillMap_[skillId] = curTime;
+	}
 	return true;
 }
 
@@ -610,7 +618,8 @@ void BgPlayer::onSelectPet(PacketBase& pb)
 	const PetBase& petbase = sPetBaseMgr.getPetBaseInfo(petId);
 	setPetId(petId);
 	setHp(petbase.hp_);
-	unitType_ = petbase.type_;
+	setMaxHp(petbase.hp_);
+	setUnitType(petbase.type_);
 	init();
 
 	pb.setOP(client::OP_SELCET_PET);

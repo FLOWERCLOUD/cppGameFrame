@@ -7,6 +7,8 @@
 
 #include <game/LoongBgSrv/BattlegroundMgr.h>
 
+#include <mysdk/base/Logging.h>
+
 #include <game/LoongBgSrv/Battleground.h>
 
 BattlegroundMgr::BattlegroundMgr(LoongBgSrv* srv):
@@ -32,13 +34,20 @@ bool BattlegroundMgr::init()
 
 void BattlegroundMgr::run(uint32 curTime)
 {
-	for (int i = 0; i < sMaxBgNum; i++)
+	static int sStartIndex = 0;
+	static const int sFragment = 3;
+
+	for (int i = sStartIndex; i < sMaxBgNum ; )
 	{
 		if (bgList_[i].getState() != BattlegroundState::BGSTATE_NONE)
 		{
 			bgList_[i].run(curTime);
 		}
+		i += sFragment; //
 	}
+
+	sStartIndex++;
+	sStartIndex = (sStartIndex >= sFragment) ? 0 : sStartIndex;
 }
 
 void BattlegroundMgr::shutdown()

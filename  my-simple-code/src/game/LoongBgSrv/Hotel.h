@@ -26,6 +26,10 @@ public:
 	~Hotel();
 
 	void send(PacketBase& pb);
+	void connect()
+	{
+		client_.connect();
+	}
 private:
 	void onConnection(TcpConnection* pCon);
 	void onKaBuMessage(TcpConnection* pCon, PacketBase& pb, Timestamp timestamp);

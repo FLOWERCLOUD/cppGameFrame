@@ -86,11 +86,22 @@ public:
 	void setBufHurtFlag(bool falg);
 
 	void init();
+
+	void setMaxHp(int32 maxhp)
+	{
+		maxhp_ = maxhp;
+	}
+
+	int32 getMaxHp()
+	{
+		return maxhp_;
+	}
 protected:
 	int32 unittId_; //战场单元ID
 	int16 x_; //战场单元x坐标点
 	int16 y_; // 战场单元y坐标点
 	int32 hp_; //战场单元的血量
+	int32 maxhp_; //战场单元的最大血量
 	bool operation_; //战场单元是否可以操作
 	bool canSkillHurt_; //是否可以受到技能伤害
 	bool canBufHurt_; //是否可以受到buff 伤害

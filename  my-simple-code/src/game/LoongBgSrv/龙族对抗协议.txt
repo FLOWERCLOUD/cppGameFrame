@@ -112,6 +112,7 @@ name:utf 玩家的名字
 roletype:int32 
 petId:int 英雄id
 hp:int 血量
+mxhp:int 最大血量
 title:int 称号
 x:int
 y:int
