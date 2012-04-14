@@ -60,6 +60,7 @@ void Scene::broadMsg(PacketBase& op)
 		}
 	}
 }
+
 bool Scene::init()
 {
 	dropItemMgr_.init();

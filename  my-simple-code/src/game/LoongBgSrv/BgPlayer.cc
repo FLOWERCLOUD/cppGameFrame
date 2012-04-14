@@ -675,6 +675,9 @@ void BgPlayer::onUseSkill(PacketBase& pb)
 	// 不能攻击同一个队伍的人
 	if (target->getTeam() == this->getTeam()) return;
 
+	pb.setOP(client::OP_USE_SKILL);
+	broadMsg(pb);
+
 	SkillHandler::onEmitSkill(skillId, this, target, pScene);
 }
 

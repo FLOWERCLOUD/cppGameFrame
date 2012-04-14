@@ -136,6 +136,11 @@ param  技能ID
 uintType:int 目标单元 (0 玩家 1 暗黑军王座 2 烈阳军王座)
 target:int 目标
 
+s->c (广播协议)
+cmd 0x14000B
+param  技能ID
+uintType:int 目标单元 (0 玩家 1 暗黑军王座 2 烈阳军王座)
+target:int 目标
 
 ========= 添加buf =============
 s->c (广播协议)
