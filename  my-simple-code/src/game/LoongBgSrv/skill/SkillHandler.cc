@@ -60,11 +60,17 @@ bool SkillHandler::onEmitSkill(int16 skillId, BgUnit* me, BgUnit* target, Scene*
 	me->useSkill(skillId);
 	// 看看这个技能 能不能攻击到人家哦
 	int32 attackDistance = (skillbase.attackDistance_  * skillbase.attackDistance_);
-	if (getDistance(me, target)  > attackDistance + 1200)
+	int32 distance = getDistance(me, target);
+	if ( distance > attackDistance + 1200)
 	{
 		LOG_DEBUG << "SkillHandler::onEmitSkill - attackDistance too small, skilld: " << skillId
 								<< " me: " << me->getId()
+								<< " me x: " << me->getX()
+								<< " me y:" << me->getY()
 								<< " target: " << target->getId()
+								<< " target x: " << target->getX()
+								<< " target y: " << target->getY()
+								<< " distance: " << distance
 								<< " attackDistance: " << attackDistance;
 
 		me->alert(BgUnit::FLOW_ALERTCODETYPE, ErrorCode::BG_SKILL_TOO_MUCH_DISTANCE);
