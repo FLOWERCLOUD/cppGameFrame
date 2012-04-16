@@ -62,7 +62,6 @@ namespace net
 
 		SessionList activeSessions_;
 
-		MutexLock mutex_;
 		std::vector<Functor> pendingFunctors_;
 	private:
 		DISALLOW_COPY_AND_ASSIGN(EventLoop);
