@@ -158,22 +158,33 @@ void EventLoop::handleRead()
 
 void EventLoop::doPendingFunctors()
 {
-	callingPendingFunctors_ = true;
-	for (size_t i = 0; i < pendingFunctors_.size(); ++i)
+	 std::vector<Functor> functors;
+	 callingPendingFunctors_ = true;
+
 	{
-		pendingFunctors_[i]();
+	    MutexLockGuard lock(mutex_);
+	    functors.swap(pendingFunctors_);
 	}
-	pendingFunctors_.clear();
+
+	for (size_t i = 0; i < functors.size(); ++i)
+	{
+		functors[i]();
+	}
+
 	callingPendingFunctors_ = false;
 }
 
 void EventLoop::queueInLoop(const Functor& cb)
 {
-	pendingFunctors_.push_back(cb);
-	if (callingPendingFunctors_)
-	{
-		wakeup();
-	}
+	  {
+		  MutexLockGuard lock(mutex_);
+		  pendingFunctors_.push_back(cb);
+	  }
+
+	  if (callingPendingFunctors_)
+	  {
+		  wakeup();
+	  }
 }
 
 void EventLoop::printActiveSessions() const
