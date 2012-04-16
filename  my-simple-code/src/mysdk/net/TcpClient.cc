@@ -53,6 +53,7 @@ void TcpClient::disconnect()
 	if (pConnection_)
 	{
 		pConnection_->shutdown();
+		delete pConnection_;
 		pConnection_ = NULL;
 	}
 }
