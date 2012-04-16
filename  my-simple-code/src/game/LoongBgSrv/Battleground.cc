@@ -75,12 +75,13 @@ int32 Battleground::getId()
 
 bool Battleground::addBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 {
+	LOG_DEBUG << " Battleground::addBgPlayer - playerId: " << player->getId()
+							<< " team: " << team
+							<< " num: " << static_cast<int>(teamNum_[team]);
+
 	if (teamNum_[team] >= sMaxTeamNum)
 	{
 		//  告诉客户端, 这个队伍已经满人啦！不能进这个队伍啦
-		LOG_DEBUG << " Battleground::addBgPlayer - playerId: " << player->getId()
-								<< " team: " << team
-								<< " num: " << teamNum_[team];
 		return false;
 	}
 
@@ -102,7 +103,7 @@ bool Battleground::removeBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 {
 	LOG_DEBUG << " Battleground::removeBgPlayer - playerId: " << player->getId()
 							<< " team: " << team
-							<< " num: " << teamNum_[team];
+							<< " num: " << static_cast<int>(teamNum_[team]);
 
 	TellPhpBattleInfo();
 
