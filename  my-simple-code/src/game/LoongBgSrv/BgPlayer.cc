@@ -646,6 +646,9 @@ void BgPlayer::onUseSkill(PacketBase& pb)
 {
 	if (!pScene) return;
 
+	pb.setOP(client::OP_USE_SKILL);
+	broadMsg(pb);
+
 	if (!hasPet())
 	{
 		LOG_ERROR << "BgPlayer::onUseSkill - YOU DONOT HAS PET, CAN NOT USE SKILL - playerId: " << this->getId()
@@ -687,9 +690,6 @@ void BgPlayer::onUseSkill(PacketBase& pb)
 	if (target->isDead()) return;
 	// 不能攻击同一个队伍的人
 	if (target->getTeam() == this->getTeam()) return;
-
-	pb.setOP(client::OP_USE_SKILL);
-	broadMsg(pb);
 
 	SkillHandler::onEmitSkill(skillId, this, target, pScene);
 }
