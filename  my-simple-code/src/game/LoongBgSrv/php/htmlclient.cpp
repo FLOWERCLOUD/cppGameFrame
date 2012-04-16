@@ -56,6 +56,8 @@ int CHtmlClient::loadUrl( const std::string& url , int timeOut )
 		return -1;
 	} 
 		
+    // 禁用掉alarm超时
+	curl_easy_setopt( purl, CURLOPT_NOSIGNAL, 1L);
 	//DNS超时控制
 	curl_easy_setopt( purl, CURLOPT_DNS_CACHE_TIMEOUT , 3600 );
 	curl_easy_setopt( purl, CURLOPT_TIMEOUT, timeOut );
@@ -66,11 +68,12 @@ int CHtmlClient::loadUrl( const std::string& url , int timeOut )
 
 	curl_easy_setopt(purl, CURLOPT_URL, url.c_str() );
 
-	curl_easy_setopt(purl, CURLOPT_COOKIEJAR,"cookiefile");   
-	curl_easy_setopt(purl, CURLOPT_COOKIESESSION, true);
+	//curl_easy_setopt(purl, CURLOPT_COOKIEJAR,"cookiefile");
+	//curl_easy_setopt(purl, CURLOPT_COOKIESESSION, true);
 	
 	CURLcode ret = curl_easy_perform( purl );
 	_error = ret;
+	printf("error: %d\n", _error);
     if( CURLE_OK != ret )
 	{
 		return -1;
@@ -89,6 +92,8 @@ int CHtmlClient::post(const std::string& url, const std::string& postfield, int 
 		return -1;
 	}
 
+    // 禁用掉alarm超时
+	curl_easy_setopt( purl, CURLOPT_NOSIGNAL, 1L);
 	//DNS超时控制
 	curl_easy_setopt( purl, CURLOPT_DNS_CACHE_TIMEOUT , 3600 );
 	curl_easy_setopt( purl, CURLOPT_TIMEOUT, timeOut );
