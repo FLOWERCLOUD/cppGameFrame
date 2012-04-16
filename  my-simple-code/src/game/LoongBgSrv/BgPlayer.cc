@@ -646,9 +646,6 @@ void BgPlayer::onUseSkill(PacketBase& pb)
 {
 	if (!pScene) return;
 
-	pb.setOP(client::OP_USE_SKILL);
-	broadMsg(pb);
-
 	if (!hasPet())
 	{
 		LOG_ERROR << "BgPlayer::onUseSkill - YOU DONOT HAS PET, CAN NOT USE SKILL - playerId: " << this->getId()
@@ -672,6 +669,17 @@ void BgPlayer::onUseSkill(PacketBase& pb)
 	int16 skillId = static_cast<int16>(pb.getParam());
 	int32 uintType = pb.getInt32();
 	int32 playerId = pb.getInt32();
+	int32 usePlayerId = pb.getInt32();
+	int32 x = pb.getInt32();
+	int32 y = pb.getInt32();
+
+	PacketBase sendPb(client::OP_USE_SKILL, skillId);
+	sendPb.putInt32(uintType);
+	sendPb.putInt32(playerId);
+	sendPb.putInt32(usePlayerId);
+	sendPb.putInt32(x);
+	sendPb.putInt32(y);
+	broadMsg(sendPb);
 
 	LOG_TRACE << "BgPlayer::onUseSkill  -  skillID: " << skillId
 			<< " playerId: " << this->getId()
@@ -680,7 +688,9 @@ void BgPlayer::onUseSkill(PacketBase& pb)
 
 	int16 bgId = battlegroundId_;
 	if (!sBattlegroundMgr.checkBattlegroundId(bgId))
+	{
 		return;
+	}
 
 	Battleground& bg = sBattlegroundMgr.getBattleground(bgId);
 
