@@ -190,7 +190,7 @@ LoongBgSrv::LoongBgSrv(EventLoop* loop, InetAddress& serverAddr, InetAddress& ho
 			std::tr1::bind(&LoongBgSrv::onWriteComplete, this, std::tr1::placeholders::_1));
 
     loop->runEvery(0.2, std::tr1::bind(&LoongBgSrv::tickMe, this));
-    loop->runEvery(8.0, std::tr1::bind(&LoongBgSrv::onTimer, this));
+    loop->runEvery(30.0, std::tr1::bind(&LoongBgSrv::onTimer, this));
     loop->runEvery(3.0, std::tr1::bind(&LoongBgSrv::printThroughput, this));
 	LOG_DEBUG << "============ LoongBgSrv::LoongBgSrv serverAddr: "<<  server_.hostport()
 							<< " ================";
@@ -508,7 +508,7 @@ void LoongBgSrv::onTimer()
 	for (itList = bgClientList_.begin(); itList != bgClientList_.end(); ++itList)
 	{
 		BgClient* bgClient = *itList;
-		if (timeDifference(now, bgClient->lastRecvTimestamp) > 8.0)
+		if (timeDifference(now, bgClient->lastRecvTimestamp) > 30.0)
 		{
 			mysdk::net::TcpConnection* pCon = bgClient->pCon;
 			if (pCon)
