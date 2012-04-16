@@ -431,10 +431,22 @@ void BgPlayer::removeAllBuf()
 	bufList_.clear();
 }
 
+void onEnter(PacketBase& pb)
+{
+	LOG_INFO << "onEnter";
+}
+
+void onExit(PacketBase& pb)
+{
+	LOG_INFO << "onExit";
+}
+
 #define BENGIN_MESSAGEHANDLE() switch (op) { \
 
-#define INSERT_MESSAGEHANDLE(op, handle) case op: \
+#define INSERT_MESSAGEHANDLE(op, pb, handle) case op: \
+																							onEnter(pb); \
 																							handle(pb); \
+																							onExit(pb); \
 																							break; \
 
 #define END_MESSAGEHANDLE() }
@@ -447,9 +459,10 @@ bool BgPlayer::onMsgHandler(PacketBase& pb)
 #if 1
 	char hexop[10];
 	snprintf(hexop, sizeof(hexop), "0x%X", op);
-	LOG_INFO << " === START BgPlayer::onMsgHandler - playerId:"  << this->getId()
+	LOG_INFO << " === START[msgHandler] - playerId:"  << getId()
 							<< " playerName: " << name_
-							<< " op: " << hexop;
+							<< " op: " << hexop
+							<< " contentlen: " << pb.getContentLen();
 	switch(op)
 	{
 	case game::OP_ENTER_BATTLE:
@@ -489,7 +502,7 @@ bool BgPlayer::onMsgHandler(PacketBase& pb)
 		break;
 	}
 
-	LOG_INFO << " === END BgPlayer::onMsgHandler - playerId:"  << this->getId()
+	LOG_INFO << " === END[msgHandler] - playerId:"  << getId()
 							<< " playerName: " << name_
 							<< " op: " << hexop;
 

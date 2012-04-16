@@ -3,11 +3,11 @@
 #include <game/LoongBgSrv/config/ConfigMgr.h>
 #include <game/LoongBgSrv/php/htmlclient.h>
 #include <game/LoongBgSrv/LoongBgSrv.h>
+#include <game/LoongBgSrv/version.h>
 
 #include <mysdk/net/EventLoop.h>
 #include <mysdk/net/InetAddress.h>
 
-#define 	LOONGBGSRVVERSION	0.1
 
 int main()
 {

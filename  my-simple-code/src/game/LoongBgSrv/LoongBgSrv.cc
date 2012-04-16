@@ -9,10 +9,96 @@
 #include <game/LoongBgSrv/JoinTimesMgr.h>
 #include <game/LoongBgSrv/PlayerMgr.h>
 #include <game/LoongBgSrv/Util.h>
-
+#include <game/LoongBgSrv/version.h>
 
 #include <string.h>
 #include <signal.h>
+
+//#define HAVE_BACKTRACE
+
+#ifdef HAVE_BACKTRACE
+#include <execinfo.h>
+#endif
+
+#ifdef HAVE_BACKTRACE
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+static void *getMcontextEip(ucontext_t *uc) {
+#if defined(__FreeBSD__)
+    return (void*) uc->uc_mcontext.mc_eip;
+#elif defined(__dietlibc__)
+    return (void*) uc->uc_mcontext.eip;
+#elif defined(__APPLE__) && !defined(MAC_OS_X_VERSION_10_6)
+  #if __x86_64__
+    return (void*) uc->uc_mcontext->__ss.__rip;
+  #elif __i386__
+    return (void*) uc->uc_mcontext->__ss.__eip;
+  #else
+    return (void*) uc->uc_mcontext->__ss.__srr0;
+  #endif
+#elif defined(__APPLE__) && defined(MAC_OS_X_VERSION_10_6)
+  #if defined(_STRUCT_X86_THREAD_STATE64) && !defined(__i386__)
+    return (void*) uc->uc_mcontext->__ss.__rip;
+  #else
+    return (void*) uc->uc_mcontext->__ss.__eip;
+  #endif
+#elif defined(__i386__)
+    return (void*) uc->uc_mcontext.gregs[14]; /* Linux 32 */
+#elif defined(__X86_64__) || defined(__x86_64__)
+    return (void*) uc->uc_mcontext.gregs[16]; /* Linux 64 */
+#elif defined(__ia64__) /* Linux IA64 */
+    return (void*) uc->uc_mcontext.sc_ip;
+#else
+    return NULL;
+#endif
+}
+
+void bugReportStart()
+{
+	LOG_WARN << "=== LoongBgSrv BUG REPORT START: Cut & paste starting from here ===";
+}
+
+void bugReportEnd()
+{
+	  LOG_WARN <<  "=== LoongBgSrv BUG REPORT END. Make sure to include from START to END. ===";
+}
+
+static void sigsegvHandler(int sig, siginfo_t *info, void *secret)
+{
+    ucontext_t *uc = (ucontext_t*) secret;
+    struct sigaction act;
+
+    bugReportStart();
+    LOG_WARN << "    LoongBgSrv "  << LOONGBGSRVVERSION << " crashed by signal: " << sig;
+
+	void *trace[100];
+    /* Generate the stack trace */
+    int trace_size = backtrace(trace, 100);
+
+    /* overwrite sigaction with caller's address */
+    if (getMcontextEip(uc) != NULL) {
+        trace[1] = getMcontextEip(uc);
+    }
+    char **messages = backtrace_symbols(trace, trace_size);
+    LOG_WARN << "--- STACK TRACE" ;
+    for (int i=1; i<trace_size; ++i)
+    {
+    	 LOG_WARN << messages[i];
+    }
+
+    bugReportEnd();
+
+    /* Make sure we exit with the right signal at the end. So for instance
+     * the core will be dumped if enabled. */
+    sigemptyset (&act.sa_mask);
+    /* When the SA_SIGINFO flag is set in sa_flags then sa_sigaction
+     * is used. Otherwise, sa_handler is used */
+    act.sa_flags = SA_NODEFER | SA_ONSTACK | SA_RESETHAND;
+    act.sa_handler = SIG_DFL;
+    sigaction (sig, &act, NULL);
+    kill(getpid(),sig);
+}
+#pragma GCC diagnostic error "-Wold-style-cast"
+#endif /* HAVE_BACKTRACE */
 
 static bool shutdown_loongBgSrv = false;
 static void sigtermHandler(int sig)
@@ -269,12 +355,15 @@ void LoongBgSrv::printThroughput()
 {
 	Timestamp endTime = Timestamp::now();
 	double time = timeDifference(endTime, startTime_);
-	printf("%4.3f KiB/s  -- transferred: %" MYSDK_LL_FORMAT "d B -- ConnectionNum: %u -- Cpu: %f%%-- RAM: %f M\n",
+	char srvInfo[1024];
+	snprintf(srvInfo, sizeof(srvInfo), "%4.3f KiB/s--transferred: %4" MYSDK_LL_FORMAT "d B--ConnectionNum: %4u--Cpu: %f%%--RAM: %f M ",
 			static_cast<double>(transferred_)/time/1024,
 			transferred_,
 			server_.getConnectionNum(),
 			performanceCounter_.GetCurrentCPUUsage(),
 			performanceCounter_.GetCurrentRAMUsage());
+
+	LOG_INFO << "[srvinfo]" << srvInfo;
 
 	transferred_ = 0;
 	startTime_ = endTime;

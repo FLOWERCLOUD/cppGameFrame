@@ -1,0 +1,1 @@
+#define 	LOONGBGSRVVERSION	0.1

@@ -41,6 +41,8 @@ set(LoongBgSrv_SRCS
   main.cc
   )
 
+add_definitions(-DHAVE_BACKTRACE)
+
 #We have our own custom modules that we use. This tells cmakes where to find them.
 set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake_modules/ )
 
