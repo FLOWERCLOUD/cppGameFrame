@@ -513,7 +513,7 @@ void LoongBgSrv::onTimer()
 		if (timeDifference(now, bgClient->lastRecvTimestamp) > 30.0)
 		{
 			mysdk::net::TcpConnection* pCon = bgClient->pCon;
-			assert(pCon);
+			assert(pCon != NULL);
 
 			bgClientList_.erase(itList++);
 
