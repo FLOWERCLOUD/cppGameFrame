@@ -63,6 +63,8 @@ public:
 	{
 		return &buffer_;
 	}
+
+	std::string getHeadInfo();
 private:
 	KaBuHead head_;
 	Buffer buffer_;
