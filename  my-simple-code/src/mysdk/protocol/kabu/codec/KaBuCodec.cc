@@ -27,11 +27,6 @@ void KaBuCodec::onMessage(mysdk::net::TcpConnection* pCon,
 		int32 tmp = buf->peekInt32();
 		uint16 magic = GetLow16(tmp);
 		uint16 len = GetHeight16(tmp);
-		LOG_TRACE << "KaBuCodec::onMessage - magic: " << magic
-								<< " len: " << len
-								<< " tmp: " << tmp
-								<< " read: " << buf->peekInt32();
-
 		if (magic == PACKET_MAGIC_C)
 		{
 			errorCallback_(pCon, buf, receiveTime, kUnSupportError);
@@ -46,10 +41,10 @@ void KaBuCodec::onMessage(mysdk::net::TcpConnection* pCon,
 			len = buf->readInt16();
 			uint32 op = buf->readInt32();
 			uint32 param = buf->readInt32();
-			LOG_TRACE << "KaBuCodec::onMessage - magic: " << magic
-									<< " len: " << len
-									<< " op: " << op
-									<< " param: " << param;
+
+			char msgBuf[512];
+			snprintf(msgBuf, sizeof(msgBuf), "len: %d, param: %d, hexop: 0x%X", len, param, op);
+			LOG_TRACE << "KaBuCodec::onMessage - msgBuf[ " << msgBuf << " ]";
 
 			PacketBase pb(magic, len, op, param, buf->peek(), len);
 		    messageCallback_(pCon, pb, receiveTime);
