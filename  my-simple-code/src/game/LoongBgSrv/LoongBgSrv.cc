@@ -231,6 +231,8 @@ void LoongBgSrv::onConnectionCallback(mysdk::net::TcpConnection* pCon)
 			BgClient* bgClient = static_cast<BgClient*>(pCon->getContext());
 			if (bgClient)
 			{
+				bgClientList_.erase(bgClient->iter);
+
 				BgPlayer* player = bgClient->player;
 				if (player != NULL)
 				{
@@ -515,7 +517,7 @@ void LoongBgSrv::onTimer()
 			mysdk::net::TcpConnection* pCon = bgClient->pCon;
 			assert(pCon != NULL);
 
-			bgClientList_.erase(itList++);
+			itList++;
 
 			LOG_TRACE << pCon->peerAddress().toHostPort() << " -> "
 						<< pCon->localAddress().toHostPort() << " recover!!";
