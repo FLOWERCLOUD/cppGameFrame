@@ -596,19 +596,19 @@ void BgPlayer::onReqPlayerList(PacketBase& pb)
 {
 	if (!pScene) return;
 
+	PacketBase op(client::OP_REQ_PLAYER_LIST, 0);
 	std::map<int32, BgPlayer*>& playerMgr = pScene->getPlayerMgr();
+	op.setParam(playerMgr.size());
 	std::map<int32, BgPlayer*>::iterator iter;
-	pb.setParam(playerMgr.size());
 	for(iter = playerMgr.begin(); iter != playerMgr.end(); iter++)
 	{
 		BgPlayer* player = iter->second;
 		if (player)
 		{
-			player->serialize(pb);
+			player->serialize(op);
 		}
 	}
-	pb.setOP(client::OP_REQ_PLAYER_LIST);
-	sendPacket(pb);
+	sendPacket(op);
 }
 
 void BgPlayer::onSelectPet(PacketBase& pb)
