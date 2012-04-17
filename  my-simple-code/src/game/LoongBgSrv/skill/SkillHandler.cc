@@ -58,6 +58,7 @@ bool SkillHandler::onEmitSkill(int16 skillId, BgUnit* me, BgUnit* target, Scene*
 		return false;
 	}
 	me->useSkill(skillId);
+	/*
 	// 看看这个技能 能不能攻击到人家哦
 	int32 attackDistance = (skillbase.attackDistance_  * skillbase.attackDistance_);
 	int32 distance = getDistance(me, target);
@@ -76,6 +77,7 @@ bool SkillHandler::onEmitSkill(int16 skillId, BgUnit* me, BgUnit* target, Scene*
 		me->alert(BgUnit::FLOW_ALERTCODETYPE, ErrorCode::BG_SKILL_TOO_MUCH_DISTANCE);
 		return false;
 	}
+	*/
 	// 随机一个攻击值出来
 	int32 maxAttackValue =  skillbase.maxAttackValue_ + 1;
 	int32 minAttackValue = skillbase.minAttackValue_;
