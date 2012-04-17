@@ -1,3 +1,24 @@
+
+set(CXX_FLAGS
+ -g
+ # -DVALGRIND
+ -Wall
+ -Wextra
+ # -m32
+ -Werror
+ -Wconversion
+ -Wno-unused-parameter
+ -Wold-style-cast
+ -Woverloaded-virtual
+ -Wpointer-arith
+ -Wshadow
+ -Wwrite-strings
+ -march=i686
+ # -MMD
+ -std=c++0x
+ -rdynamic
+ )
+ 
 set(LoongBgSrv_SRCS
   base/Base.cc
   base/BufBase.cc

@@ -231,7 +231,6 @@ void LoongBgSrv::onConnectionCallback(mysdk::net::TcpConnection* pCon)
 			BgClient* bgClient = static_cast<BgClient*>(pCon->getContext());
 			if (bgClient)
 			{
-				bgClientList_.erase(bgClient->iter);
 				BgPlayer* player = bgClient->player;
 				if (player != NULL)
 				{
@@ -305,14 +304,16 @@ void LoongBgSrv::onKaBuMessage(mysdk::net::TcpConnection* pCon, PacketBase& pb, 
 	{
 		LOG_WARN << " LoongBgSrv::onKaBuMessage - packet too much, so overlook "
 								<< " lastSecondsPackets: " << bgClient->lastSecondsPackets
-								<< " address: "<< pCon->peerAddress().toHostPort();
+								<< " address: "<< pCon->peerAddress().toHostPort()
+								<< " packeInfo: " << pb.getHeadInfo();
 
 		// 玩家作弊了！？
 		if (bgClient->lastSecondsPackets > maxLimitPacketPerClient)
 		{
 			LOG_WARN << " LoongBgSrv::onKaBuMessage - packet too much, so  close "
 									<< " lastSecondsPackets: " << bgClient->lastSecondsPackets
-									<< " address: "<< pCon->peerAddress().toHostPort();
+									<< " address: "<< pCon->peerAddress().toHostPort()
+									<< " packeInfo: " << pb.getHeadInfo();
 			pCon->close();
 		}
 		return;
@@ -503,21 +504,22 @@ void LoongBgSrv::tickMe()
 
 void LoongBgSrv::onTimer()
 {
+	// 改这段代码的时候要知道改动的原因， 不然最好不要改动这段代码
 	Timestamp now = Timestamp::now();
 	std::list<BgClient* >::iterator itList;
-	for (itList = bgClientList_.begin(); itList != bgClientList_.end(); ++itList)
+	for (itList = bgClientList_.begin(); itList != bgClientList_.end(); )
 	{
 		BgClient* bgClient = *itList;
 		if (timeDifference(now, bgClient->lastRecvTimestamp) > 30.0)
 		{
 			mysdk::net::TcpConnection* pCon = bgClient->pCon;
-			if (pCon)
-			{
-				LOG_TRACE << pCon->peerAddress().toHostPort() << " -> "
-						<< pCon->localAddress().toHostPort() << " recover!!";
+			assert(pCon);
 
-				pCon->close();
-			}
+			bgClientList_.erase(itList++);
+
+			LOG_TRACE << pCon->peerAddress().toHostPort() << " -> "
+						<< pCon->localAddress().toHostPort() << " recover!!";
+			pCon->close();
 		}
 		else
 		{
@@ -549,7 +551,7 @@ void LoongBgSrv::sendToHotel(PacketBase& pb)
 void LoongBgSrv::send(mysdk::net::TcpConnection* pCon, PacketBase& pb)
 {
 	tmpTransferred_ += pb.getContentLen() + sizeof(PacketBase::KaBuHead);
-	LOG_TRACE << "LoongBgSrv::send - tmpTransferred:" << tmpTransferred_;
+	//LOG_TRACE << "LoongBgSrv::send - tmpTransferred:" << tmpTransferred_;
 	codec_.send(pCon, pb);
 }
 

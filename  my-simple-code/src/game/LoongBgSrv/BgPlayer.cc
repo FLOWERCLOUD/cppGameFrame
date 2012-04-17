@@ -70,7 +70,8 @@ BgPlayer::BgPlayer(int32 playerId, char* playerName, int32 roleType, int32 joinT
 			pCon_(pCon),
 			pSrv_(pSrv)
 {
-	LOG_DEBUG << "+++++BgPlayer::BgPlayer - playerId: " << playerId << name_;
+	LOG_DEBUG << "+++++BgPlayer::BgPlayer - playerId: " << playerId
+							<< " name: " <<name_;
 }
 
 BgPlayer::~BgPlayer()
@@ -78,7 +79,8 @@ BgPlayer::~BgPlayer()
 	removeAllBuf();
 	bufList_.clear();
 	useSkillMap_.clear();
-	LOG_DEBUG << "---------BgPlayer::~BgPlayer - playerId: " << this->getId() << name_;
+	LOG_DEBUG << "---------BgPlayer::~BgPlayer - playerId: " << this->getId()
+							<< " name: " << name_;
 }
 
 void BgPlayer::setScene(Scene* scene)
