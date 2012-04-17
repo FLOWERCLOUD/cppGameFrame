@@ -177,7 +177,7 @@ void TcpConnection::connectEstablished()
 
 void TcpConnection::connectDestroyed()
 {
-	/*
+
 	if (state_ == kConnected  || state_ == kDisconnecting)
 	{
 		setState(kDisconnected);
@@ -185,10 +185,9 @@ void TcpConnection::connectDestroyed()
 
 		connectionCallback_(this);
 	}
-	*/
 
-	setState(kDisconnected);
-	connectionCallback_(this);
+	//setState(kDisconnected);
+	//connectionCallback_(this);
 
 	LOG_TRACE << "TcpConnection::connectDestroyed  " << name_;
 	// must be the last line
@@ -261,7 +260,7 @@ void TcpConnection::handleClose()
 			setState(kDisconnected);
 			session_.disableAll();
 
-			//connectionCallback_(this);
+			connectionCallback_(this);
 	  }
 
 	  loop_->queueInLoop(std::tr1::bind(&TcpConnection::connectDestroyed, this));
