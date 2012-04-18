@@ -363,4 +363,6 @@ void Battleground::closeBattleground()
 
 	// 重新初始化一下战场哦
 	init();
+
+	TellPhpBattleInfo();
 }
