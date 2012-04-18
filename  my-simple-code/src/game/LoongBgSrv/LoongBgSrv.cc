@@ -494,10 +494,11 @@ bool LoongBgSrv::login(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::T
 
 void LoongBgSrv::tickMe()
 {
+	static double tickMeWarn = static_cast<double>(sConfigMgr.MainConfig.GetFloatDefault("packet", "tickMeTimeWarn", 0.005f));
 	if (!shutdown_loongBgSrv)
 	{
 		uint32 curTime = getCurTime();
-		TIME_FUNCTION_CALL(battlegroundMgr_.run(curTime), 10);
+		TIME_FUNCTION_CALL(battlegroundMgr_.run(curTime), tickMeWarn);
 	}
 	else
 	{
