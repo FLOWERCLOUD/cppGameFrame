@@ -57,7 +57,7 @@ public:
 	BgUnit* getTargetUnit(int32 playerId, int32 uintType);
 
 	// 告诉客户端 敌方人数不足 战场关闭
-	void TellClientCloseBg();
+	void TellClientCloseBg(int32 state);
 //
 public:
 	// 战场释放结束啦

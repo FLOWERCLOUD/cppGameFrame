@@ -24,7 +24,7 @@ void StateBattlegroundStart::run(uint32 curTime)
 
 	if (curTime - startTime_ >= getStateTimeLimit())
 	{
-		pBattleground_->TellClientCloseBg();
+		pBattleground_->TellClientCloseBg(1);
 		pBattleground_->switchExitState();
 	}
 	else if (! pBattleground_->haveOtherTeamEmpty())

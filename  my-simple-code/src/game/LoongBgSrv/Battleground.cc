@@ -196,9 +196,9 @@ bool Battleground::isEmpty()
 	return false;
 }
 
-void Battleground::TellClientCloseBg()
+void Battleground::TellClientCloseBg(int32 state)
 {
-	PacketBase op(client::OP_MEMBER_INSUFFICIENT, 0);
+	PacketBase op(client::OP_MEMBER_INSUFFICIENT, state); // state 0 代表正常退出战场  1 代表敌方人数不足退出战场
 	scene_.broadMsg(op);
 }
 
