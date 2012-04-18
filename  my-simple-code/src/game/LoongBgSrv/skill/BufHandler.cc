@@ -64,7 +64,7 @@ static bool hunXuanBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUnit
 	uint32 curTime = getCurTime();
 	uint32 bufferTime = curTime + seconds;
 	Buf* buf = target->getBuf(bufId);
-	if (buf)
+	if (!buf)
 	{
 		Buf* hunXuanBuf = new HunXuanBuf(bufId, curTime, bufferTime);
 		if (hunXuanBuf)
@@ -90,13 +90,12 @@ static bool zhouShangBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUn
 	uint32 bufferTime = curTime + seconds;
 	// 以前他就中了这个buff的话 就替换原来的那个buff 如果没有中过 就加一个buff
 	Buf* buf = target->getBuf(bufId);
-	if (buf)
+	if (!buf)
 	{
 		target->addBuf(new ZhouShangBuf(bufId, curTime, bufferTime) );
 	}
 	else
 	{
-
 		buf->setLastTime(curTime);
 		buf->setBufferTime(bufferTime);
 	}
