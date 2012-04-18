@@ -196,6 +196,12 @@ bool Battleground::isEmpty()
 	return false;
 }
 
+void Battleground::TellClientCloseBg()
+{
+	PacketBase op(client::OP_MEMBER_INSUFFICIENT, 0);
+	scene_.broadMsg(op);
+}
+
 bool Battleground::isGameOver()
 {
 	if (blackBuildings_.isDead() && whiteBuildings_.isDead())

@@ -20,7 +20,7 @@ public:
 
 	virtual void run(uint32 curTime);
 
-	virtual BgStateE getState() { return BGSTATE_WAIT; }
+	virtual BgStateE getState() { return BGSTATE_START; }
 	virtual uint32	getStateTimeLimit() { return 10000; }
 	virtual std::string getStateName() { return "开始阶段"; }
 };

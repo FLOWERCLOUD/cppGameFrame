@@ -259,3 +259,7 @@ for (var i = 0; i < param; i++)
 	itemNum:int32 勋章数量
 }
 
+========= 敌方人数不足 =============
+s->c
+cmd 0x14001A
+param 

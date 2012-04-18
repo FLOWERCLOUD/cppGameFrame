@@ -63,7 +63,7 @@ namespace client
 	static const uint32 OP_ADD_HP		 		 	 = 0x00140017; // 英雄加血
 	static const uint32 OP_PING							 = 0x00140018; // 应用程序心跳
 	static const uint32 OP_SETTLEMENT			 = 0x00140019; //战场结果
-
+	static const uint32 OP_MEMBER_INSUFFICIENT		 = 0x0014001A; //敌方人数不足
 }
 
 namespace hotel

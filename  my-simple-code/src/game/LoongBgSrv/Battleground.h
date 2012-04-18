@@ -55,6 +55,9 @@ public:
 	uint32 getLeftTime();
 
 	BgUnit* getTargetUnit(int32 playerId, int32 uintType);
+
+	// 告诉客户端 敌方人数不足 战场关闭
+	void TellClientCloseBg();
 //
 public:
 	// 战场释放结束啦
