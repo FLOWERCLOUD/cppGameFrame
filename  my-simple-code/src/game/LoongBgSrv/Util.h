@@ -78,7 +78,7 @@ static inline int32 MakeInt32(const int16 height, const int16 low)
         Timestamp newTimeStamp = Timestamp::now(); \
         double diff = timeDifference(newTimeStamp, oldTimeStamp); \
         if (diff > t)\
-        LOG_WARN << "call function: " << #p << " , time[us] = " << diff; \
+        LOG_WARN << "[YOUHUA] call function: " << #p << " , time[s] = " << diff; \
 }
 
 

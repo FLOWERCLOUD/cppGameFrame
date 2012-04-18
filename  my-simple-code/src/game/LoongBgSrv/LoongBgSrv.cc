@@ -189,7 +189,7 @@ LoongBgSrv::LoongBgSrv(EventLoop* loop, InetAddress& serverAddr, InetAddress& ho
 	server_.setWriteCompleteCallback(
 			std::tr1::bind(&LoongBgSrv::onWriteComplete, this, std::tr1::placeholders::_1));
 
-    loop->runEvery(0.2, std::tr1::bind(&LoongBgSrv::tickMe, this));
+    loop->runEvery(0.1, std::tr1::bind(&LoongBgSrv::tickMe, this));
     loop->runEvery(30.0, std::tr1::bind(&LoongBgSrv::onTimer, this));
     loop->runEvery(3.0, std::tr1::bind(&LoongBgSrv::printThroughput, this));
 	LOG_DEBUG << "============ LoongBgSrv::LoongBgSrv serverAddr: "<<  server_.hostport()
@@ -329,10 +329,11 @@ void LoongBgSrv::onKaBuMessage(mysdk::net::TcpConnection* pCon, PacketBase& pb, 
 		return;
 	}
 
+	static double timeWarn = static_cast<double>(sConfigMgr.MainConfig.GetFloatDefault("packet", "timeWarn", 0.005f));
 	if (op == game::OP_LOGIN)
 	{
 		bool flag;
-		TIME_FUNCTION_CALL( flag = login(pCon, pb, timestamp), 10);
+		TIME_FUNCTION_CALL( flag = login(pCon, pb, timestamp), timeWarn);
 		if (!flag)
 		{
 			pCon->close();
@@ -343,7 +344,7 @@ void LoongBgSrv::onKaBuMessage(mysdk::net::TcpConnection* pCon, PacketBase& pb, 
 		BgPlayer* player = bgClient->player;
 		if (player)
 		{
-			TIME_FUNCTION_CALL(player->onMsgHandler(pb), 10);
+			TIME_FUNCTION_CALL(player->onMsgHandler(pb), timeWarn);
 		}
 	}
 }
