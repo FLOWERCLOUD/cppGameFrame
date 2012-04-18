@@ -226,6 +226,9 @@ bool BgPlayer::serialize(PacketBase& op)
 	op.putInt32(title_);
 	op.putInt32(x_);
 	op.putInt32(y_);
+	LOG_TRACE << " BgPlayer::serialize -- unitId: " << unittId_
+							<< " x: " << x_
+							<< " y: " << y_;
 	return true;
 }
 
