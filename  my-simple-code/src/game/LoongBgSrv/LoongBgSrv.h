@@ -88,8 +88,8 @@ private:
 	BlockingQueue<ThreadParam> queue_;
 
 	// @start 统计相关
-	int64 tmpTransferred_;
-	int64 transferred_;
+	uint64 tmpTransferred_;
+	uint64 transferred_;
 	Timestamp startTime_;
 	PerformanceCounter performanceCounter_;
 	// @end 统计相关

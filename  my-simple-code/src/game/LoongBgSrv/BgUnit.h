@@ -41,6 +41,8 @@ public:
 	virtual bool canSkillHurt();
 	// 是否可以受到buf 伤害
 	virtual bool canBufHurt();
+	// 他已经中了这种buff
+	virtual Buf* getBuf(int16 bufId);
 	// 添加buf
 	virtual bool addBuf(Buf* buf);
 	virtual bool hasSkill(int16 skillId);

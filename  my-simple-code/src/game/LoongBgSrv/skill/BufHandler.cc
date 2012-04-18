@@ -63,9 +63,21 @@ static bool hunXuanBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUnit
 	int16 seconds = bufbase.paramList_[0];
 	uint32 curTime = getCurTime();
 	uint32 bufferTime = curTime + seconds;
-	Buf* buf = new HunXuanBuf(bufId, curTime, bufferTime);
-	buf->onCacl(target);
-	target->addBuf(buf);
+	Buf* buf = target->getBuf(bufId);
+	if (buf)
+	{
+		Buf* hunXuanBuf = new HunXuanBuf(bufId, curTime, bufferTime);
+		if (hunXuanBuf)
+		{
+			hunXuanBuf->onCacl(target);
+			target->addBuf(hunXuanBuf );
+		}
+	}
+	else
+	{
+		buf->setLastTime(curTime);
+		buf->setBufferTime(bufferTime);
+	}
 	return true;
 }
 // 灼烧buff
@@ -76,8 +88,16 @@ static bool zhouShangBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUn
 	int16 seconds = bufbase.paramList_[1];
 	uint32 curTime = getCurTime();
 	uint32 bufferTime = curTime + seconds;
-	Buf* buf = new ZhouShangBuf(bufId, curTime, bufferTime);
-	target->addBuf(buf);
+	Buf* buf = target->getBuf(bufId);
+	if (buf)
+	{
+		target->addBuf(new ZhouShangBuf(bufId, curTime, bufferTime) );
+	}
+	else
+	{
+		buf->setLastTime(curTime);
+		buf->setBufferTime(bufferTime);
+	}
 	return true;
 }
 

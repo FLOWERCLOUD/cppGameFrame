@@ -242,6 +242,20 @@ bool BgPlayer::canBufHurt()
 	return true;
 }
 
+Buf* BgPlayer::getBuf(int16 bufId)
+{
+	std::list<Buf*>::iterator itList;
+	for (itList = bufList_.begin(); itList != bufList_.end(); ++itList)
+	{
+		Buf* buf = *itList;
+		if (buf && buf->getId() == bufId)
+		{
+			return buf;
+		}
+	}
+	return NULL;
+}
+
 bool BgPlayer::addBuf(Buf* buf)
 {
 	LOG_TRACE << "BgPlayer::addBuf - playerId: " << this->getId()
@@ -253,6 +267,8 @@ bool BgPlayer::addBuf(Buf* buf)
 	//  告诉客户端 xx 人中了buf
 	PacketBase pb(client::OP_ADD_BUF, this->getId());
 	pb.putInt32(buf->getId());
+	pb.putInt32(x_);
+	pb.putInt32(y_);
 	broadMsg(pb);
 	return true;
 }

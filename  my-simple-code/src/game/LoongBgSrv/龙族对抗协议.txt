@@ -147,6 +147,8 @@ s->c (广播协议)
 cmd 0x14000C
 param  卡布号
 bufId:int 
+x:int
+y:int
 
 ========= 移除buf =============
 s->c (广播协议)

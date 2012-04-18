@@ -98,6 +98,11 @@ bool BgUnit::addBuf(Buf* buf)
 	return false;
 }
 
+Buf* BgUnit::getBuf(int16 bufId)
+{
+	return NULL;
+}
+
 bool BgUnit::isDead()
 {
 	return hp_ <= 0;

@@ -32,6 +32,15 @@ public:
 	void setName(std::string& name);
 
 	bool waitDel();
+
+	void setLastTime(uint32 lastTime)
+	{
+		lastTime_ = lastTime;
+	}
+	void setBufferTime(uint32 bufferTime)
+	{
+		bufferTime_ = bufferTime;
+	}
 public:
 	virtual void onDelete(BgUnit* me);
 	virtual void onTick(BgUnit* me);

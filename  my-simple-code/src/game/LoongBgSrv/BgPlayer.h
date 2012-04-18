@@ -63,6 +63,7 @@ public:
 	virtual bool serialize(PacketBase& op);
 	virtual bool canSkillHurt();
 	virtual bool canBufHurt();
+	virtual Buf* getBuf(int16 bufId);
 	virtual bool addBuf(Buf* buf);
 	virtual bool hasSkill(int16 skillId);
 	virtual bool canUseSkill(int16 skillId, int32 cooldownTime);
