@@ -23,7 +23,7 @@ void StateBattlegroundExit::run(uint32 curTime)
 
 	if (curTime - startTime_ >= getStateTimeLimit())
 	{
-		pBattleground_->closeBattleground();
 		pBattleground_->TellClientCloseBg(0);
+		pBattleground_->closeBattleground();
 	}
 }
