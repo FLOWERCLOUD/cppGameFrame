@@ -573,6 +573,11 @@ void BgPlayer::onChat(PacketBase& pb)
 void BgPlayer::onReqBattleInfo(PacketBase& pb)
 {
 	int16 bgId = this->battlegroundId_;
+	if (! sBattlegroundMgr.checkBattlegroundId(bgId))
+	{
+		return;
+	}
+
 	Battleground& bg = sBattlegroundMgr.getBattleground(bgId);
 	pb.setOP(client::OP_REQ_BATTLE_INFO);
 	if(bg.getBgInfo(pb))
