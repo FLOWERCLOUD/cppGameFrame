@@ -88,6 +88,7 @@ static bool zhouShangBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUn
 	int16 seconds = bufbase.paramList_[1];
 	uint32 curTime = getCurTime();
 	uint32 bufferTime = curTime + seconds;
+	// 以前他就中了这个buff的话 就替换原来的那个buff 如果没有中过 就加一个buff
 	Buf* buf = target->getBuf(bufId);
 	if (buf)
 	{
@@ -95,6 +96,7 @@ static bool zhouShangBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUn
 	}
 	else
 	{
+
 		buf->setLastTime(curTime);
 		buf->setBufferTime(bufferTime);
 	}
