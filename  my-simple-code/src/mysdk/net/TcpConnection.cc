@@ -196,7 +196,9 @@ void TcpConnection::connectDestroyed()
 
 void TcpConnection::handleRead(Timestamp receiveTime)
 {
-	LOG_DEBUG << "TcpConnection::handleRead "  << this << " fd=" << session_.fd();
+	LOG_DEBUG << "TcpConnection::handleRead "  << this
+						<< " fd=" << session_.fd()
+						<< " state= " << state_;
 
 	int savedErrno;
 	ssize_t n = inputBuffer_.readFd(session_.fd(), &savedErrno);

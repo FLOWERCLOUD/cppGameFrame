@@ -67,9 +67,11 @@ bool Session::isWriting() const
 
 void Session::handleEvent(Timestamp receiveTime)
 {
-	  if ((fireEvents_ & Session::kHupEvent) && !(fireEvents_ & Session::kReadEvent))
+	  if ((fireEvents_ & Session::kHupEvent) &&
+			  !(fireEvents_ & Session::kReadEvent) &&
+			  !(fireEvents_ & Session::kErrorEvent ) )
 	  {
-		  LOG_WARN << "Session::handle_event() HUP" << fd();
+		  LOG_WARN << "Session::handle_event() HUP " << fd() << " fireEvent: " << fireEvents_;
 		  if (closeCallback_) closeCallback_();
 	  }
 	  else

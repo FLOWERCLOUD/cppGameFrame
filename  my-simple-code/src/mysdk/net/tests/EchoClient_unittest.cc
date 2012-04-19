@@ -36,6 +36,7 @@ public:
 
 	void connect()
 	{
+		client_.enableRetry();
 		client_.connect();
 	}
 

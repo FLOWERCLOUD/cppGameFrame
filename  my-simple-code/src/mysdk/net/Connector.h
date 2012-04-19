@@ -45,6 +45,7 @@ namespace net
 
 		void connecting(int sockfd);
 		void handleWrite();
+		void handleError();
 
 		void retry(int sockfd);
 		int removeAddResetSession();

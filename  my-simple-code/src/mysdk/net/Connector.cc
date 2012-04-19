@@ -33,6 +33,12 @@ Connector::~Connector()
 		delete pSession_;
 	}
 }
+#include <string.h>
+__thread char t_errnobuf[512];
+const char* strerror_tl(int savedErrno)
+{
+	return strerror_r(savedErrno, t_errnobuf, sizeof(t_errnobuf));
+}
 
 void Connector::start()
 {
@@ -40,6 +46,7 @@ void Connector::start()
 	int sockfd = sockets::createNonblockingOrDie();
 	int ret = sockets::connect(sockfd, serverAddr_.getSockAddrInet());
 	int savedErrno = ( ret == 0) ? 0 : errno;
+	LOG_TRACE << "connect error in Connector::start --- savedErrno: " << savedErrno << " desc: " << strerror_tl(savedErrno) ;
 	switch (savedErrno)
 	{
 		case 0:
@@ -84,6 +91,7 @@ void Connector::restart()
 
 void Connector::connecting(int sockfd)
 {
+	LOG_TRACE << "Connector::connecting -- sockfd: " << sockfd;
 	setState(kConnecting);
 	if (pSession_)
 	{
@@ -92,6 +100,7 @@ void Connector::connecting(int sockfd)
 	pSession_ = new Session(loop_, sockfd);
 	assert(pSession_ != NULL);
 	pSession_->setWriteCallback(std::tr1::bind(&Connector::handleWrite, this));
+	pSession_->setErrorCallback(std::tr1::bind(&Connector::handleError, this));
 	pSession_->enableWriting();
 }
 
@@ -156,4 +165,15 @@ void Connector::retry(int sockfd)
 	           << " in " << retryDelayMs_ << " milliseconds. ";
 	loop_->runAfter(retryDelayMs_ / 1000.0, std::tr1::bind(&Connector::start, this));
 	retryDelayMs_ = std::min(retryDelayMs_ * 2, kMaxRetryDelayMs);
+}
+
+void Connector::handleError()
+{
+	LOG_ERROR << "Connector::handleError";
+	assert(state_ == kConnecting);
+
+	int sockfd = removeAddResetSession();
+	int err = sockets::getSocketError(sockfd);
+	LOG_TRACE << "SO_ERROR = " << err << " " << strerror_tl(err);
+	retry(sockfd);
 }
