@@ -10,7 +10,6 @@
 #include <game/LoongBgSrv/protocol/GameProtocol.h>
 
 Hotel::Hotel(EventLoop* loop, const InetAddress& listenAddr) :
-	pCon_(NULL),
 	loop_(loop),
     client_(loop, listenAddr, "Hotel"),
     codec_(
@@ -41,9 +40,10 @@ Hotel::~Hotel()
 
 void Hotel::send(PacketBase& pb)
 {
-	if (pCon_)
+	TcpConnection* pCon = client_.getConnection();
+	if (pCon)
 	{
-		codec_.send(pCon_, pb);
+		codec_.send(pCon, pb);
 	}
 }
 
@@ -57,13 +57,4 @@ void Hotel::onConnection(TcpConnection* pCon)
 	LOG_INFO << pCon->localAddress().toHostPort() << " -> "
 			<< pCon->peerAddress().toHostPort() << " is "
 			<< (pCon->connected() ? "UP" : "DOWN");
-
-	if (pCon->connected())
-	{
-		pCon_ = pCon;
-	}
-	else
-	{
-		pCon_ = NULL;
-	}
 }

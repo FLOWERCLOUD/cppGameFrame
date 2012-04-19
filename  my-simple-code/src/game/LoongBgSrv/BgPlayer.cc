@@ -226,9 +226,9 @@ bool BgPlayer::serialize(PacketBase& op)
 	op.putInt32(title_);
 	op.putInt32(x_);
 	op.putInt32(y_);
-	LOG_TRACE << " BgPlayer::serialize -- unitId: " << unittId_
-							<< " x: " << x_
-							<< " y: " << y_;
+	//LOG_TRACE << " BgPlayer::serialize -- unitId: " << unittId_
+	//						<< " x: " << x_
+	//						<< " y: " << y_;
 	return true;
 }
 
@@ -347,6 +347,8 @@ void BgPlayer::onHurt(BgUnit* attacker, int32 damage, const SkillBase& skill)
 	pb.putInt32(skill.skillId_);
 	pb.putInt32(skill.type_);
 	pb.putInt32(damage);
+	// 攻击者
+	pb.putInt32(attacker->getId());
 	broadMsg(pb);
 }
 

@@ -34,7 +34,6 @@ private:
 	void onConnection(TcpConnection* pCon);
 	void onKaBuMessage(TcpConnection* pCon, PacketBase& pb, Timestamp timestamp);
 
-	TcpConnection* pCon_;
 	EventLoop* loop_;
 	TcpClient client_;
 	KaBuCodec codec_;
