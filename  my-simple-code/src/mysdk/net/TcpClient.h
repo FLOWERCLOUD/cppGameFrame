@@ -37,6 +37,10 @@ namespace net
 		void setWriteCompleteCallback(const WriteCompleteCallback& cb)
 		{ writeCompleteCallback_ = cb; }
 
+		TcpConnection* getConnection()
+		{
+			return pConnection_;
+		}
 	private:
 		void newConnection(int sockfd);
 		void removeConnection(TcpConnection* con);
