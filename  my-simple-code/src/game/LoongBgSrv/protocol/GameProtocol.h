@@ -35,6 +35,8 @@ namespace game
 	// 0x00120016
 	// 0x00120017
 	static const uint32 OP_PING				= 0x00120018; // 应用程序心跳
+	// 0x00120019
+	// 0x0012001A
 }
 
 namespace client

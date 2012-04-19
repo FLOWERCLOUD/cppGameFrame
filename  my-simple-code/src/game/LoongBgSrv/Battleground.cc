@@ -218,7 +218,7 @@ bool Battleground::isGameOver()
 
 	if (whiteBuildings_.isDead())
 	{
-		bgResult_ = KDRAW_BGRESULT;
+		bgResult_ = KBLACK_BGRESULT;
 		return true;
 	}
 	return false;
