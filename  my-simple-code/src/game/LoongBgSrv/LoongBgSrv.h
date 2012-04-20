@@ -92,6 +92,7 @@ private:
 	uint64 transferred_;
 	Timestamp startTime_;
 	PerformanceCounter performanceCounter_;
+	uint64 packetNum_; //请求数
 	// @end 统计相关
 	Hotel hotel_;
 

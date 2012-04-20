@@ -147,27 +147,38 @@ void LoongBgClient::onAIHandler()
 {
 	if (state_ == SELECT_STATE)
 	{
-		PacketBase op(game::OP_SELCET_PET, petId_);
-		sendPacket(op);
+		randSelectHero();
 	}
 	else if (state_ == MOVE_STATE)
 	{
-		if (x_ > maxPos[0])
+		int32 head = getRandomBetween(0, 4);
+		if (head == 0)
 		{
-			x_ -=  heroIdSpeed[petId_];
+			if (x_ < maxPos[0] - 2)
+			{
+				x_ += heroIdSpeed[petId_];
+			}
+		}
+		else if (head == 1)
+		{
+			if (y_ < maxPos[1] - 2 )
+			{
+				y_ += heroIdSpeed[petId_];
+			}
+		}
+		else if (head == 2)
+		{
+			if (x_ < 2)
+			{
+				x_  -= heroIdSpeed[petId_];
+			}
 		}
 		else
 		{
-			x_ += heroIdSpeed[petId_];
-		}
-
-		if (y_ > maxPos[1])
-		{
-			y_ -= heroIdSpeed[petId_];
-		}
-		else
-		{
-			y_ += heroIdSpeed[petId_];
+			if (y_ <  2 )
+			{
+				y_ -= heroIdSpeed[petId_];
+			}
 		}
 
 		//// 在一定范围的敌人 攻击他一下吧
@@ -175,15 +186,20 @@ void LoongBgClient::onAIHandler()
 	}
 	else if (state_ == RESELECT_STATE)
 	{
-		int32 heroNum = sizeof(heroIdList) / sizeof(int32);
-		int32 petId = getRandomBetween(0, heroNum);
-		PacketBase op(game::OP_SELCET_PET, petId);
-		sendPacket(op);
+		randSelectHero();
 	}
 	else if (state_ == ATTACK_STATE)
 	{
 		useSkill();
 	}
+}
+
+void LoongBgClient::randSelectHero()
+{
+	int32 heroNum = sizeof(heroIdList) / sizeof(int32);
+	int32 petId = getRandomBetween(0, heroNum);
+	PacketBase op(game::OP_SELCET_PET, petId);
+	sendPacket(op);
 }
 
 void LoongBgClient::onAttack()
@@ -193,16 +209,19 @@ void LoongBgClient::onAttack()
 	for(iter = clientMapsBg.begin(); iter != clientMapsBg.end(); iter++)
 	{
 		BgClientData* client = iter->second;
-		int32 x = client->x;
-		int32 y = client->y;
-
-		int32 deltax = x - x_;
-		int32 deltay = y - y_;
-		if ( deltax * deltax + deltay * deltay <= 1600)
+		if (team_ != client->team)
 		{
-			attacker_= client->playerId;
-			useSkill();
-			break;
+			int32 x = client->x;
+			int32 y = client->y;
+
+			int32 deltax = x - x_;
+			int32 deltay = y - y_;
+			if ( deltax * deltax + deltay * deltay <= 1600)
+			{
+				attacker_= client->playerId;
+				useSkill();
+				break;
+			}
 		}
 	}
 }
@@ -327,7 +346,7 @@ void LoongBgClient::onSelect(mysdk::net::TcpConnection* pCon, PacketBase& pb)
 	{
 		petId_= petId;
 		hp_ = hp;
-		LOG_INFO << "LoongBgClient::onSelect -- " << " playerId: " << playerId << " petid: " << petId_ << " hp:" << hp_;
+		LOG_INFO << "LoongBgClient::onSelect 选英雄-- " << " playerId: " << playerId << " petid: " << petId_ << " hp:" << hp_;
 		//skillList_.clear();
 		//int32 count = pb.getInt32();
 		//for (int32 i = 0; i < count; i++)
@@ -480,9 +499,10 @@ void LoongBgClient::onReqPlayerList(mysdk::net::TcpConnection* pCon, PacketBase&
 
 void LoongBgClient::onPing(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::Timestamp timestamp)
 {
-	double delayTime = timeDifference(timestamp, sTimestamp_);
+	Timestamp now = Timestamp::now();
+	double delayTime = timeDifference(now, sTimestamp_);
 	LOG_INFO << "[DELAYTIME] " << delayTime << " (s)";
-	sTimestamp_ = timestamp;
+	sTimestamp_ = now;
 	sendPingPacket = true;
 }
 

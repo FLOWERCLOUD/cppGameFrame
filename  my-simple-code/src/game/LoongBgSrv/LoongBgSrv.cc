@@ -172,6 +172,7 @@ LoongBgSrv::LoongBgSrv(EventLoop* loop, InetAddress& serverAddr, InetAddress& ho
 	tmpTransferred_(0),
     transferred_(0),
     startTime_(Timestamp::now()),
+    packetNum_(0),
     hotel_(loop, hotelAddr),
 	loop_(loop),
 	server_(loop, serverAddr, "LoongBgSrv")
@@ -289,6 +290,7 @@ void LoongBgSrv::onKaBuMessage(mysdk::net::TcpConnection* pCon, PacketBase& pb, 
 	bgClientList_.push_back(bgClient);
 	bgClient->iter = --bgClientList_.end();
 	bgClient->lastRecvTimestamp = timestamp;
+	packetNum_++;
 
 	if (timeDifference(timestamp, bgClient->lastSecPacketsTimestamp) < 1.0)
 	{
@@ -360,8 +362,9 @@ void LoongBgSrv::printThroughput()
 	Timestamp endTime = Timestamp::now();
 	double time = timeDifference(endTime, startTime_);
 	char srvInfo[1024];
-	snprintf(srvInfo, sizeof(srvInfo), "%4.3f KiB/s--transferred: %4" MYSDK_LL_FORMAT "d B--ConnectionNum: %4u--Cpu: %f%%--RAM: %f M ",
+	snprintf(srvInfo, sizeof(srvInfo), "%4.3f KiB/s--packetNum: %.3f 次/s--transferred: %4" MYSDK_LL_FORMAT "d B--ConnectionNum: %4u--Cpu: %f%%--RAM: %f M ",
 			static_cast<double>(transferred_)/time/1024,
+			static_cast<double>(packetNum_)/time,
 			transferred_,
 			server_.getConnectionNum(),
 			performanceCounter_.GetCurrentCPUUsage(),
@@ -371,6 +374,7 @@ void LoongBgSrv::printThroughput()
 
 	transferred_ = 0;
 	startTime_ = endTime;
+	packetNum_ = 0;
 }
 
 

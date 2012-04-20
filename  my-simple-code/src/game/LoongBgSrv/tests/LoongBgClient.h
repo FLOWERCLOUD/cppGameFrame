@@ -65,6 +65,7 @@ private:
 	void onStandHandler();
 
 	void useSkill();
+	void randSelectHero();
 private:
 	void sendPacket(PacketBase& pb);
 private:
