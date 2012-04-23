@@ -282,7 +282,7 @@ y:int32
 s->c
 cmd 0x14001B
 param 0 种植成功 （广播协议） -1 战场上已经有5个食人花啦 不能种植
-if ( param == 0)
+if ( param == 0 )
 {
 x:int32
 y:int32
@@ -292,3 +292,13 @@ y:int32
 s->c (广播协议)
 cmd 0x14001C
 param 称号id（称号是按策划文档的顺序 从1开始）
+uid:int32
+name:utf
+
+=========   食人花消失 =============
+s->c (广播协议)
+cmd 0x14001D
+param 
+x:int
+y:int
+

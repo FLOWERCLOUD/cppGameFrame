@@ -39,6 +39,7 @@ public:
 	void clear();
 
 	bool serialize(PacketBase& op);
+	bool isFull();
 private:
 	int16 curItemNum_;
 	Item itemList_[sMaxItemNum];

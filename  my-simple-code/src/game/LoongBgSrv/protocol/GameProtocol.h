@@ -38,6 +38,8 @@ namespace game
 	// 0x00120019
 	// 0x0012001A
 	static const uint32 OP_PLANT_FLOWER				= 0x0012001B; // 种植食人花
+	// 0x0012001C
+	// 0x0012001D
 }
 
 namespace client

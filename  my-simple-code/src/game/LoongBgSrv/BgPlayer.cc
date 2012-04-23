@@ -16,6 +16,7 @@
 #include <game/LoongBgSrv/skill/SkillHandler.h>
 #include <game/LoongBgSrv/LoongBgSrv.h>
 #include <game/LoongBgSrv/BattlegroundMgr.h>
+#include <game/LoongBgSrv/ErrorCode.h>
 #include <game/LoongBgSrv/Util.h>
 
 #include <mysdk/net/TcpConnection.h>
@@ -480,6 +481,8 @@ void BgPlayer::setTitle(int16 title)
 	}
 	title_ = title;
 	PacketBase op(client::OP_GET_TITLE, title);
+	op.putInt32(this->getId());
+	op.putUTF(name_);
 	this->broadMsg(op);
 }
 
@@ -808,6 +811,11 @@ void BgPlayer::onPickUpItem(PacketBase& pb)
 {
 	if (!pScene) return;
 
+	if (package_.isFull())
+	{
+		alert(BgUnit::FLOW_ALERTCODETYPE, ErrorCode::BG_PACKAGE_ISFULL);
+		return;
+	}
 	int16 x = static_cast<int16>(pb.getInt32());
 	int16 y = static_cast<int16>(pb.getInt32());
 	pScene->pickUpItem(this, x, y);

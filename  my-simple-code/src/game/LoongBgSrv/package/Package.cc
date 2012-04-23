@@ -90,3 +90,12 @@ bool Package::serialize(PacketBase& op)
 	}
 	return true;
 }
+
+bool Package::isFull()
+{
+	if (curItemNum_ >= sMaxItemNum )
+	{
+		return true;
+	}
+	return false;
+}
