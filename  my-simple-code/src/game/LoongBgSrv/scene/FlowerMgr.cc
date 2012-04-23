@@ -25,6 +25,12 @@ static uint32 sStartId ; //食人花的唯一id
 bool FlowerMgr::init()
 {
 	sStartId = 1;
+	std::list<BgFlower*>::iterator itList;
+	for (itList = flowerList_.begin(); itList != flowerList_.end(); ++itList)
+	{
+		BgFlower* flower = *itList;
+		delete flower;
+	}
 	flowerList_.clear();
 	return true;
 }

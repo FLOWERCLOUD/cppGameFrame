@@ -35,9 +35,10 @@ bool DropItemMgr::init()
 
 	randomItemList_.resize(sRandomItemNum);
 	int32 num = static_cast<int32>(randomItemList_.size());
+	randomItemList_.clear();
 	for (int32 i = 0; i < num; i++)
 	{
-		randomItemList_[i] = i;
+		randomItemList_.push_back(i);
 	}
 
 	static std::string pointListStr = sConfigMgr.MainConfig.GetStringDefault("areas", "toolArea", "0:");
