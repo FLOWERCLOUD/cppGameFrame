@@ -12,16 +12,11 @@
 #include <mysdk/base/Timestamp.h>
 #include <mysdk/protocol/kabu/codec/PacketBase.h>
 
+#include <game/LoongBgSrv/BgFlower.h>
+
 #include <list>
 
 using namespace mysdk;
-
-struct Flower
-{
-	int16 x;
-	int16 y;
-	uint32 plantTimes;
-};
 
 class Scene;
 class BgPlayer;
@@ -40,9 +35,11 @@ public:
 
 	bool plantFlower(BgPlayer* player, int16 x, int16 y);
 	bool serialize(PacketBase& op);
+
+	BgFlower* getFlower(int32 flowerId);
 private:
 	Scene* pScene_;
-	std::list<struct Flower> flowerList_;
+	std::list<BgFlower*> flowerList_;
 private:
 	DISALLOW_COPY_AND_ASSIGN(FlowerMgr);
 };

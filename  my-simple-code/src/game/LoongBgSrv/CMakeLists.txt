@@ -30,6 +30,7 @@ set(LoongBgSrv_SRCS
   BattlegroundMgr.cc
   BattlegroundState.cc
   BgBuilding.cc
+  BgFlower.cc
   StateBattlegroundCountDown.cc
   StateBattlegroundExit.cc
   StateBattlegroundRun.cc

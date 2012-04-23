@@ -24,9 +24,7 @@ Battleground::Battleground():
 	id_(0),
 	bFirst_(true),
 	bgResult_(KNONE_BGRESULT),
-	pState_(NULL),
-	blackBuildings_(1, KFOUR_UNITTYPE, BgUnit::kBlack_TEAM, &scene_),
-	whiteBuildings_(2, KFOUR_UNITTYPE, BgUnit::kWhite_TEAM, &scene_)
+	pState_(NULL)
 {
 	init();
 }
@@ -53,8 +51,6 @@ void Battleground::init()
 	}
 	teamNum_[0] = 99;
 
-	blackBuildings_.init();
-	whiteBuildings_.init();
 	scene_.init();
 }
 
@@ -133,8 +129,6 @@ bool Battleground::getBgInfo(PacketBase& op)
 	op.putInt32(teamNum_[BgUnit::kWhite_TEAM]);
 	op.putInt32(getState());
 	op.putInt32(getLeftTime());
-	op.putInt32(blackBuildings_.getHp());
-	op.putInt32(whiteBuildings_.getHp());
 	scene_.serialize(op);
 	//
 	return true;
@@ -165,6 +159,7 @@ BgUnit* Battleground::getTargetUnit(int32 playerId, int32 uintType)
 		PLAYER_UNITTYPE	= 	0,
 		BLACK_BUILDING_UNITTYPE = 1,
 		WHITE_BUILDING_UNITTYPE = 2,
+		FLOWER_UNITTYPE = 3,
 	};
 
 	BgUnit* target = NULL;
@@ -174,11 +169,15 @@ BgUnit* Battleground::getTargetUnit(int32 playerId, int32 uintType)
 	}
 	else if (uintType == BLACK_BUILDING_UNITTYPE)
 	{
-		return &blackBuildings_;
+		return &scene_.getBlackBuilding();
 	}
 	else if (uintType == WHITE_BUILDING_UNITTYPE)
 	{
-		return &whiteBuildings_;
+		return &scene_.getWhiteBuilding();
+	}
+	else if (uintType == FLOWER_UNITTYPE)
+	{
+		target = scene_.getFlower(playerId);
 	}
 	return target;
 }
@@ -209,19 +208,19 @@ void Battleground::TellClientCloseBg(int32 state)
 
 bool Battleground::isGameOver()
 {
-	if (blackBuildings_.isDead() && whiteBuildings_.isDead())
+	if (scene_.getBlackBuilding().isDead() && scene_.getWhiteBuilding().isDead())
 	{
 		bgResult_ = KDRAW_BGRESULT;
 		return true;
 	}
 
-	if (blackBuildings_.isDead())
+	if (scene_.getBlackBuilding().isDead())
 	{
 		bgResult_ = KWHITE_BGRESULT;
 		return true;
 	}
 
-	if (whiteBuildings_.isDead())
+	if (scene_.getWhiteBuilding().isDead())
 	{
 		bgResult_ = KBLACK_BGRESULT;
 		return true;

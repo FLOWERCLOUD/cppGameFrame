@@ -15,9 +15,15 @@
 Scene::Scene():
 	sceneId_(0),
 	dropItemMgr_(this),
-	flowerMgr_(this)
+	flowerMgr_(this),
+	blackBuildings_(1, KFOUR_UNITTYPE, BgUnit::kBlack_TEAM,  this),
+	whiteBuildings_(2, KFOUR_UNITTYPE, BgUnit::kWhite_TEAM, this)
 {
+	blackBuildings_.setX(2773);
+	blackBuildings_.setY(258);
 
+	whiteBuildings_.setX(129);
+	whiteBuildings_.setY(209);
 }
 
 Scene::~Scene()
@@ -64,6 +70,9 @@ void Scene::broadMsg(PacketBase& op)
 
 bool Scene::init()
 {
+	blackBuildings_.init();
+	whiteBuildings_.init();
+
 	dropItemMgr_.init();
 	playerMgr_.clear();
 	flowerMgr_.init();
@@ -102,6 +111,11 @@ BgPlayer* Scene::getPlayer(int playerId)
 	return NULL;
 }
 
+BgFlower* Scene::getFlower(int32 flowerId)
+{
+	return flowerMgr_.getFlower(flowerId);
+}
+
 bool Scene::hasItem(int16 x, int16 y)
 {
 	return false;
@@ -114,6 +128,8 @@ bool Scene::pickUpItem(BgPlayer* player, int16 x, int16 y)
 
 bool Scene::serialize(PacketBase& op)
 {
+	op.putInt32(blackBuildings_.getHp());
+	op.putInt32(whiteBuildings_.getHp());
 	serializeItem(op);
 	serializeFlower(op);
 	return true;
@@ -138,3 +154,4 @@ bool Scene::serializeFlower(PacketBase& op)
 {
 	return flowerMgr_.serialize(op);
 }
+

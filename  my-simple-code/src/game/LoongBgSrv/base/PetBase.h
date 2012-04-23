@@ -22,7 +22,7 @@ typedef enum tagUnitTypeE
 	KSECOND_UNITTYPE = 2,  //黑石大炮
 	KTHREE_UNITTYPE	= 3, //地裂兽
 	KFOUR_UNITTYPE = 4, //王座
-
+	KFIFTH_UNITTYPE = 5, //食人花
 	KCOUNT_UNITTYPE,
 } UnitTypeE;
 

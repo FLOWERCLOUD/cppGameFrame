@@ -6,7 +6,6 @@
 
 #include <game/LoongBgSrv/scene/Scene.h>
 #include <game/LoongBgSrv/BattlegroundState.h>
-#include <game/LoongBgSrv/BgBuilding.h>
 #include <game/LoongBgSrv/BgUnit.h>
 
 typedef enum tagBgResultE
@@ -93,8 +92,6 @@ private:
 	BattlegroundState* pState_;
 	Scene scene_; //战场所在场景 目前只支持一个战场地图哦
 
-	BgBuilding blackBuildings_; //暗黑军王座
-	BgBuilding whiteBuildings_;// 烈阳军王座
 	LoongBgSrv* pSrv_;
 private:
 	DISALLOW_COPY_AND_ASSIGN(Battleground);

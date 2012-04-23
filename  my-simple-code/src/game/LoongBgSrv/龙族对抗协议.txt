@@ -78,8 +78,12 @@ itemId:int32 战场物品ID
 }
 flowerList:array 食人花列表
 {
-x:int32
-y:int32
+id:int32 食人花id
+team:int32 食人花队伍
+uintType:int32 客户端可以无视
+x:int32 x坐标
+y:int32 y坐标
+hp:int32 食人花血量
 }
 
 ========= 上报坐标点  =============
@@ -140,19 +144,21 @@ hp:int 英雄血量
 c->s
 cmd 0x12000B
 param  技能ID
-uintType:int 目标单元 (0 玩家 1 暗黑军王座 2 烈阳军王座)
+uintType:int 目标单元 (0 玩家 1 暗黑军王座 2 烈阳军王座 3 食人花)
 target:int 目标
 
 s->c (广播协议)
 cmd 0x14000B
 param  技能ID
-uintType:int 目标单元 (0 玩家 1 暗黑军王座 2 烈阳军王座)
+uintType:int 目标单元 (0 玩家 1 暗黑军王座 2 烈阳军王座 3 食人花)
 target:int 目标
 
 ========= 添加buf =============
 s->c (广播协议)
 cmd 0x14000C
 param  卡布号
+uid:int 卡布号
+unitType:int 单元类型 (0 玩家 1 暗黑军王座 2 烈阳军王座 3 食人花)
 bufId:int 
 x:int
 y:int
@@ -161,13 +167,15 @@ y:int
 s->c (广播协议)
 cmd 0x14000D
 param  卡布号
+uid:int 卡布号
+unitType:int 单元类型(0 玩家 1 暗黑军王座 2 烈阳军王座 3 食人花)
 bufId:int 
 
 ========= 伤害 =============
 s->c (广播协议)
 cmd 0x14000E
 param  卡布号
-unitType:int 单元类型 0 玩家 1 暗黑军王座 2 烈阳军王座
+unitType:int 单元类型 0 玩家 1 暗黑军王座 2 烈阳军王座 3 食人花
 damageType:int 伤害类型 0 技能伤害 1 buf 伤害
 if(damageType == 0)
 {
@@ -284,8 +292,12 @@ cmd 0x14001B
 param 0 种植成功 （广播协议） -1 战场上已经有5个食人花啦 不能种植
 if ( param == 0 )
 {
-x:int32
-y:int32
+id:int32 食人花id
+team:int32 食人花队伍
+uintType:int32 客户端可以无视
+x:int32 x坐标
+y:int32 y坐标
+hp:int32 食人花血量
 }
 
 =========  获得称号 =============
@@ -299,6 +311,10 @@ name:utf
 s->c (广播协议)
 cmd 0x14001D
 param 
-x:int
-y:int
+id:int32 食人花id
+team:int32 食人花队伍
+uintType:int32 客户端可以无视
+x:int32 x坐标
+y:int32 y坐标
+hp:int32 食人花血量
 
