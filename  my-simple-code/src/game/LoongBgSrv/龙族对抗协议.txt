@@ -152,6 +152,9 @@ cmd 0x14000B
 param  技能ID
 uintType:int 目标单元 (0 玩家 1 暗黑军王座 2 烈阳军王座 3 食人花)
 target:int 目标
+useUnitType:int 使用者单元 (0 玩家 1 暗黑军王座 2 烈阳军王座 3 食人花)
+useplayerId:int 使用者id
+
 
 ========= 添加buf =============
 s->c (广播协议)

@@ -767,15 +767,13 @@ void BgPlayer::onUseSkill(PacketBase& pb)
 	int32 uintType = pb.getInt32();
 	int32 playerId = pb.getInt32();
 	int32 usePlayerId = pb.getInt32();
-	int32 x = pb.getInt32();
-	int32 y = pb.getInt32();
+
 
 	PacketBase sendPb(client::OP_USE_SKILL, skillId);
 	sendPb.putInt32(uintType);
 	sendPb.putInt32(playerId);
+	sendPb.putInt32(0);
 	sendPb.putInt32(usePlayerId);
-	sendPb.putInt32(x);
-	sendPb.putInt32(y);
 	broadMsg(sendPb);
 
 	LOG_TRACE << "BgPlayer::onUseSkill  -  skillID: " << skillId

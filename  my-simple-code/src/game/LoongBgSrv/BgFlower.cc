@@ -158,6 +158,7 @@ void BgFlower::onAIHandle(uint32 curTime)
 {
 	static int16 skillId = 7; //食人花技能
 	static int32 maxDistance = 120 * 120; // 120 像素
+
 	if (curTime - useSkillTimes_ > sUseSkillTimes)
 	{
 		bool flag = false; //是否已经使用了技能了
@@ -177,7 +178,14 @@ void BgFlower::onAIHandle(uint32 curTime)
 			int32 distance = getDistance(this, player);
 			if (distance <= maxDistance)
 			{
-				//
+				// 告诉客户端 食人花 使用了xx 技能
+				PacketBase sendPb(client::OP_USE_SKILL, skillId);
+				sendPb.putInt32(0);
+				sendPb.putInt32(player->getId());
+				sendPb.putInt32(3);
+				sendPb.putInt32(this->getId());
+				broadMsg(sendPb);
+
 				SkillHandler::onEmitSkill(skillId, this, player, pScene_);
 				flag = true;
 				break;
@@ -191,6 +199,14 @@ void BgFlower::onAIHandle(uint32 curTime)
 				int32 distance = getDistance(this, &pScene_->getWhiteBuilding());
 				if (distance <= maxDistance) // 120 像素
 				{
+					// 告诉客户端 食人花 使用了xx 技能
+					PacketBase sendPb(client::OP_USE_SKILL, skillId);
+					sendPb.putInt32(2);
+					sendPb.putInt32(0);
+					sendPb.putInt32(3);
+					sendPb.putInt32(this->getId());
+					broadMsg(sendPb);
+
 					SkillHandler::onEmitSkill(skillId, this, &pScene_->getWhiteBuilding(), pScene_);
 					flag = true;
 				}
@@ -200,6 +216,14 @@ void BgFlower::onAIHandle(uint32 curTime)
 				int32 distance = getDistance(this, &pScene_->getBlackBuilding());
 				if (distance <= maxDistance) // 120 像素
 				{
+					// 告诉客户端 食人花 使用了xx 技能
+					PacketBase sendPb(client::OP_USE_SKILL, skillId);
+					sendPb.putInt32(1);
+					sendPb.putInt32(0);
+					sendPb.putInt32(3);
+					sendPb.putInt32(this->getId());
+					broadMsg(sendPb);
+
 					SkillHandler::onEmitSkill(skillId, this, &pScene_->getBlackBuilding(), pScene_);
 					flag = true;
 				}
