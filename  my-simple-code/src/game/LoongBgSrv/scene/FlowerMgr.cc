@@ -87,7 +87,7 @@ bool FlowerMgr::plantFlower(BgPlayer* player, int16 x, int16 y)
 
 bool FlowerMgr::serialize(PacketBase& op)
 {
-	size_t itemNum = flowerList_.size();
+	int32 itemNum = static_cast<int32>(flowerList_.size());
 	op.putInt32(itemNum);
 	std::list<struct Flower>::iterator itList;
 	for (itList = flowerList_.begin(); itList != flowerList_.end(); ++itList)
