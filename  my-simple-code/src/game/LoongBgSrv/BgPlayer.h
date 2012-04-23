@@ -93,9 +93,14 @@ private:
 	void onPickUpItem(PacketBase& pb);
 	void onUseItem(PacketBase& pb);
 	void onPlantFlower(PacketBase& pb);
+
+private:
+	void onTitleHandle();
+	void setTitle(int16 title);
 private:
 	std::string name_; //玩家的名字
 	int16 killEnemyTimes_;
+	int16 lastKillEnemyTimes_; //最近杀敌数
 	int16 petId_;
 	int16 battlegroundId_; //当然玩家所在的战场ID
 	int32 roleType_;

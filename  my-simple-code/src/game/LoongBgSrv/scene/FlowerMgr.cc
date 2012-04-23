@@ -34,6 +34,11 @@ void FlowerMgr::run(uint32 curTime)
 		uint32 plantTime = (*itList).plantTimes;
 		if (curTime - plantTime > sDisappearTime)
 		{
+			// 告诉客户端知道 这个食人花要消失啦
+			PacketBase op(client::OP_DISAPPEAR_FLOWER, 0);
+			op.putInt32((*itList).x);
+			op.putInt32((*itList).y);
+
 			itList = flowerList_.erase(itList);
 		}
 		else

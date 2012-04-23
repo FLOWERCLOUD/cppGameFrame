@@ -68,6 +68,8 @@ namespace client
 	static const uint32 OP_SETTLEMENT			 = 0x00140019; //战场结果
 	static const uint32 OP_MEMBER_INSUFFICIENT		 = 0x0014001A; //敌方人数不足
 	static const uint32 OP_PLANT_FLOWER				= 0x0014001B; // 种植食人花
+	static const uint32 OP_GET_TITLE						= 0x0014001C; //获得称号
+	static const uint32 OP_DISAPPEAR_FLOWER		= 0x0014001D; //食人花消失
 }
 
 namespace hotel

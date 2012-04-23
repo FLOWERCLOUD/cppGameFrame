@@ -26,6 +26,7 @@ BgPlayer::BgPlayer(int32 playerId, std::string& playerName, mysdk::net::TcpConne
 	BgUnit(playerId, KNONE_UNITTYPE),
 	name_(playerName),
 	killEnemyTimes_(0),
+	lastKillEnemyTimes_(0),
 	petId_(0),
 	battlegroundId_(0),
 	roleType_(0),
@@ -43,6 +44,7 @@ BgPlayer::BgPlayer(int32 playerId, char* playerName, mysdk::net::TcpConnection* 
 	BgUnit(playerId, KNONE_UNITTYPE),
 	name_(playerName),
 	killEnemyTimes_(0),
+	lastKillEnemyTimes_(0),
 	petId_(0),
 	battlegroundId_(0),
 	roleType_(0),
@@ -60,6 +62,7 @@ BgPlayer::BgPlayer(int32 playerId, char* playerName, int32 roleType, int32 joinT
 			BgUnit(playerId, KNONE_UNITTYPE),
 			name_(playerName),
 			killEnemyTimes_(0),
+			lastKillEnemyTimes_(0),
 			petId_(0),
 			battlegroundId_(0),
 			roleType_(roleType),
@@ -398,7 +401,9 @@ void BgPlayer::onBufHurt(BgUnit* me, int32 damage, const BufBase& buf)
 
 void BgPlayer::incKillEnemyTime()
 {
-	this->killEnemyTimes_++;
+	killEnemyTimes_++;
+	lastKillEnemyTimes_++;
+	onTitleHandle();
 }
 
 void BgPlayer::fullHp()
@@ -465,6 +470,48 @@ void BgPlayer::removeAllBuf()
 		delete buf;
 	}
 	bufList_.clear();
+}
+
+void BgPlayer::setTitle(int16 title)
+{
+	if (title_ > title)
+	{
+		return;
+	}
+	title_ = title;
+	PacketBase op(client::OP_GET_TITLE, title);
+	this->broadMsg(op);
+}
+
+void BgPlayer::onTitleHandle()
+{
+	switch(lastKillEnemyTimes_)
+	{
+	case 1:  // 第一滴血
+		setTitle(1);
+		break;
+	case 3: // 三连斩
+		setTitle(2);
+		break;
+	case 5: // 主宰比赛
+		setTitle(3);
+		break;
+	case 7: // 无人能当
+		setTitle(4);
+		break;
+	case 9: // 鬼怪附体
+		setTitle(5);
+		break;
+	case 11: // 神灵附体
+		setTitle(6);
+		break;
+	case 13:   // 众生膜拜
+		setTitle(7);
+		break;
+	case 15: // 鬼哭神嚎
+		setTitle(8);
+		break;
+	}
 }
 
 void onEnter(PacketBase& pb)
@@ -678,6 +725,7 @@ void BgPlayer::onSelectPet(PacketBase& pb)
 	setMaxHp(petbase.hp_);
 	setUnitType(petbase.type_);
 	init();
+	lastKillEnemyTimes_ = 0; //清掉最近杀敌数
 
 	pb.setOP(client::OP_SELCET_PET);
 	pb.setParam(getId());
