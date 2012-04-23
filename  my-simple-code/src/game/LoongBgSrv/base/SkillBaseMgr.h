@@ -17,7 +17,7 @@
 class SkillBaseMgr
 {
 public:
-	static const int sMaxSkillNum = 6;
+	static const int sMaxSkillNum = 10;
 public:
 	SkillBaseMgr();
 	~SkillBaseMgr();
