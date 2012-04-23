@@ -81,7 +81,7 @@ bool SkillHandler::onEmitSkill(int16 skillId, BgUnit* me, BgUnit* target, Scene*
 	}
 	*/
 	// 随机一个攻击值出来
-	int32 maxAttackValue =  skillbase.maxAttackValue_ + 1;
+	int32 maxAttackValue =  skillbase.maxAttackValue_;
 	int32 minAttackValue = skillbase.minAttackValue_;
 	int16 attackValue = static_cast<int16>(getRandomBetween(minAttackValue, maxAttackValue));
 

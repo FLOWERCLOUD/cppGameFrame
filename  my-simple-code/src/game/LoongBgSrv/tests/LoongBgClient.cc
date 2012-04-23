@@ -151,7 +151,7 @@ void LoongBgClient::onAIHandler()
 	}
 	else if (state_ == MOVE_STATE)
 	{
-		int32 head = getRandomBetween(0, 4);
+		int32 head = getRandomBetween(0, 3);
 		if (head == 0)
 		{
 			if (x_ < maxPos[0] - 2)
@@ -196,7 +196,7 @@ void LoongBgClient::onAIHandler()
 
 void LoongBgClient::randSelectHero()
 {
-	int32 heroNum = sizeof(heroIdList) / sizeof(int32);
+	int32 heroNum = sizeof(heroIdList) / sizeof(int32) - 1;
 	int32 petId = getRandomBetween(0, heroNum);
 	PacketBase op(game::OP_SELCET_PET, petId);
 	sendPacket(op);
@@ -245,7 +245,7 @@ void LoongBgClient::useSkill()
 	//uintType:int 目标单元 (0 玩家 1 暗黑军王座 2 烈阳军王座)
 	//target:int 目标
 
-	int32 skillId = skillList[petId_][getRandomBetween(0, 2)];
+	int32 skillId = skillList[petId_][getRandomBetween(0, 1)];
 	PacketBase op(game::OP_USE_SKILL, skillId);
 	op.putInt32(0);
 	op.putInt32(attacker_);

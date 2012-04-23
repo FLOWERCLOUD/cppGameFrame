@@ -98,7 +98,7 @@ private:
 
 			int32 playerId = getPlayerId();//getRandomBetween(1, 100000);
 
-			int32 roleType = getRandomBetween(1, 5);
+			int32 roleType = getRandomBetween(1, 4);
 			int32 times = 0;
 			//char token[128];
 			char key[] = "9B1492CF6AAE903F63FB7759D3565CD7";

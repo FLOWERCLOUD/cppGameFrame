@@ -80,7 +80,7 @@ void DropItemMgr::run(uint32 curTime)
 		size_t pointNum = pointList_.size();
 		if (pointNum == 0) return;
 
-		int32  pointIndex = getRandomBetween(0, static_cast<int32>(pointNum));
+		int32  pointIndex = getRandomBetween(0, static_cast<int32>(pointNum - 1));
 		int16 x = pointList_[pointIndex].x;
 		int16 y = pointList_[pointIndex].y;
 		int32  pointKey = MakeInt32(x, y);
@@ -101,7 +101,7 @@ void DropItemMgr::run(uint32 curTime)
 		// 食人花种子
 		//static const int32 itemList[] = {1, 2, 3, 4};
 		//int32 itemIdIndex = getRandomBetween(0, sizeof(itemList) / sizeof(int32));
-		int32 index = getRandomBetween(0, static_cast<int32>(randomItemList_.size()));
+		int32 index = getRandomBetween(0, static_cast<int32>(randomItemList_.size() - 1));
 		int32 itemId = randomItemList_[index] % sItemNum + 1;
 		randomItemList_.erase(randomItemList_.begin()+index);
 
