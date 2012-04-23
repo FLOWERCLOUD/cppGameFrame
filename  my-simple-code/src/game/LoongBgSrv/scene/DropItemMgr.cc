@@ -34,7 +34,8 @@ bool DropItemMgr::init()
 	lastTime_ = getCurTime();
 
 	randomItemList_.resize(sRandomItemNum);
-	for (size_t i = 0; i < randomItemList_.size(); i++)
+	int32 num = static_cast<int32>(randomItemList_.size());
+	for (int32 i = 0; i < num; i++)
 	{
 		randomItemList_[i] = i;
 	}
@@ -78,12 +79,12 @@ void DropItemMgr::run(uint32 curTime)
 		size_t pointNum = pointList_.size();
 		if (pointNum == 0) return;
 
-		int32  pointIndex = getRandomBetween(0, pointNum);
+		int32  pointIndex = getRandomBetween(0, static_cast<int32>(pointNum));
 		int16 x = pointList_[pointIndex].x;
 		int16 y = pointList_[pointIndex].y;
 		int32  pointKey = MakeInt32(x, y);
 		// 移除这个坐标点
-		int32 lastIndex = pointNum - 1;
+		int32 lastIndex = static_cast<int32>(pointNum - 1);
 		if (pointIndex != lastIndex)
 		{
 			pointList_[pointIndex].x = pointList_[lastIndex].x;
@@ -99,7 +100,7 @@ void DropItemMgr::run(uint32 curTime)
 		// 食人花种子
 		//static const int32 itemList[] = {1, 2, 3, 4};
 		//int32 itemIdIndex = getRandomBetween(0, sizeof(itemList) / sizeof(int32));
-		int32 index = getRandomBetween(0, randomItemList_.size());
+		int32 index = getRandomBetween(0, static_cast<int32>(randomItemList_.size()));
 		int32 itemId = randomItemList_[index] % sItemNum + 1;
 		randomItemList_.erase(randomItemList_.begin()+index);
 
