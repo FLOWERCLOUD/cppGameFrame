@@ -11,6 +11,7 @@
 #include <mysdk/base/Common.h>
 #include <mysdk/protocol/kabu/codec/PacketBase.h>
 #include <game/LoongBgSrv/scene/DropItemMgr.h>
+#include <game/LoongBgSrv/scene/FlowerMgr.h>
 #include <map>
 
 class BgPlayer;
@@ -37,13 +38,17 @@ public:
 
 	bool hasItem(int16 x, int16 y);
 	bool pickUpItem(BgPlayer* player, int16 x, int16 y);
+	bool plantFlower(BgPlayer* player, int16 x, int16 y);
 
+	bool serialize(PacketBase& op);
 	bool serializeItem(PacketBase& op);
 	bool serializePlayer(PacketBase& op);
+	bool serializeFlower(PacketBase& op);
 private:
 	int32 sceneId_;
 	std::map<int32, BgPlayer*> playerMgr_;
 	DropItemMgr dropItemMgr_;
+	FlowerMgr flowerMgr_;
 private:
 	DISALLOW_COPY_AND_ASSIGN(Scene);
 };

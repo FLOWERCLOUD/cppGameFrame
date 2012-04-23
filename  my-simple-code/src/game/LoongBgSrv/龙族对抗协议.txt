@@ -72,7 +72,14 @@ blackhp:int32 暗黑军王座血量
 whitehp:int32 烈阳军血量
 itemList:array 战场物品列表
 {
+x:int32
+y:int32
 itemId:int32 战场物品ID
+}
+flowerList:array 食人花列表
+{
+x:int32
+y:int32
 }
 
 ========= 上报坐标点  =============
@@ -265,3 +272,18 @@ for (var i = 0; i < param; i++)
 s->c
 cmd 0x14001A
 param 0 代表正常退出战场  1 代表敌方人数不足退出战场
+
+========= 种植食人花种子 =============
+c -> s
+cmd 0x12001B
+x:int32
+y:int32
+
+s->c
+cmd 0x14001B
+param 0 种植成功 （广播协议） -1 战场上已经有5个食人花啦 不能种植
+if ( param == 0)
+{
+x:int32
+y:int32
+}

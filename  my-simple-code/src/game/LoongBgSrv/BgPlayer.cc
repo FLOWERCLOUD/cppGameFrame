@@ -213,6 +213,16 @@ void BgPlayer::run(uint32 curTime)
 	runBuf(curTime);
 }
 
+bool BgPlayer::hasItem(int16 itemId)
+{
+	return package_.hasItem(itemId);
+}
+
+void BgPlayer::delItem(int16 itemId)
+{
+	package_.delItem(itemId);
+}
+
 bool BgPlayer::serialize(PacketBase& op)
 {
 	op.putInt32(unittId_);
@@ -234,12 +244,18 @@ bool BgPlayer::serialize(PacketBase& op)
 
 bool BgPlayer::canSkillHurt()
 {
-	return true;
+	return canSkillHurt_;
+	//return true;
 }
 
 bool BgPlayer::canBufHurt()
 {
-	return true;
+	if (this->isDead())
+	{
+		return false;
+	}
+	return canBufHurt_;
+	//return true;
 }
 
 Buf* BgPlayer::getBuf(int16 bufId)
@@ -387,7 +403,7 @@ void BgPlayer::incKillEnemyTime()
 
 void BgPlayer::fullHp()
 {
-	if (petId_ > 0)
+	if (petId_ > 0 && pScene)
 	{
 		if (!sPetBaseMgr.checkPetId(petId_))
 		{
@@ -395,17 +411,14 @@ void BgPlayer::fullHp()
 		}
 
 		int lastHp = hp_;
-		PetBase petbase = sPetBaseMgr.getPetBaseInfo(petId_);
+		const PetBase& petbase = sPetBaseMgr.getPetBaseInfo(petId_);
 		setPetId(petId_);
 		setHp(petbase.hp_);
 
-		if (pScene)
-		{
-			PacketBase op(client::OP_ADD_HP, this->getId());
-			op.putInt32(hp_);
-			op.putInt32(hp_ - lastHp);
-			pScene->broadMsg(op);
-		}
+		PacketBase op(client::OP_ADD_HP, this->getId());
+		op.putInt32(hp_);
+		op.putInt32(hp_ - lastHp);
+		pScene->broadMsg(op);
 	}
 }
 
@@ -520,6 +533,9 @@ bool BgPlayer::onMsgHandler(PacketBase& pb)
 		break;
 	case game::OP_USE_ITEM:
 		onUseItem(pb);
+		break;
+	case game::OP_PLANT_FLOWER:
+		onPlantFlower(pb);
 		break;
 	default:
 		break;
@@ -753,12 +769,39 @@ void BgPlayer::onPickUpItem(PacketBase& pb)
 void BgPlayer::onUseItem(PacketBase& pb)
 {
 	int16 itemId = static_cast<int16>(pb.getInt32());
-	if (package_.hasItem(itemId))
+	if (hasItem(itemId))
 	{
-		package_.delItem(itemId);
+		if (!useItemTimestamp_.valid())
+		{
+			// 使用物品的冷却时间还没有到 不能使用物品
+			if (timeDifference(Timestamp::now(), useItemTimestamp_) < 10000) // 10s
+			{
+				LOG_INFO << "BgPlayer::onUseItem -- you can't use item for cooldown,  playerId:  " << this->getId()
+						<< " name: " << name_;
+				return;
+			}
+		}
+		useItemTimestamp_ = Timestamp::now();
+
+		delItem(itemId);
 		ItemHandler::onUseItem(itemId, this, NULL, pScene);
 		//
 		pb.setOP(client::OP_USE_ITEM);
 		this->sendPacket(pb);
 	}
+	else
+	{
+		LOG_TRACE << "BgPlayer::onUseItem -- playerId:  " << this->getId()
+				<< " name: " << name_
+				<< " no have this item, itemId: "  << itemId;
+	}
+}
+
+void BgPlayer::onPlantFlower(PacketBase& pb)
+{
+	if (!pScene) return;
+
+	int16 x = static_cast<int16>(pb.getInt32());
+	int16 y = static_cast<int16>(pb.getInt32());
+	pScene->plantFlower(this, x, y);
 }

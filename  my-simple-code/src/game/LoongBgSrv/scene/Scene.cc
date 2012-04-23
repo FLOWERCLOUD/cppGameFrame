@@ -14,7 +14,8 @@
 
 Scene::Scene():
 	sceneId_(0),
-	dropItemMgr_(this)
+	dropItemMgr_(this),
+	flowerMgr_(this)
 {
 
 }
@@ -65,12 +66,14 @@ bool Scene::init()
 {
 	dropItemMgr_.init();
 	playerMgr_.clear();
+	flowerMgr_.init();
 	return true;
 }
 
 void Scene::shutdown()
 {
 	dropItemMgr_.shutdown();
+	flowerMgr_.shutdown();
 }
 
 void Scene::run(uint32 curTime)
@@ -85,6 +88,7 @@ void Scene::run(uint32 curTime)
 		}
 	}
 	dropItemMgr_.run(curTime);
+	flowerMgr_.run(curTime);
 }
 
 BgPlayer* Scene::getPlayer(int playerId)
@@ -108,6 +112,13 @@ bool Scene::pickUpItem(BgPlayer* player, int16 x, int16 y)
 	return dropItemMgr_.pickUpItem(player, x, y);
 }
 
+bool Scene::serialize(PacketBase& op)
+{
+	serializeItem(op);
+	serializeFlower(op);
+	return true;
+}
+
 bool Scene::serializeItem(PacketBase& op)
 {
 	return dropItemMgr_.serialize(op);
@@ -116,4 +127,14 @@ bool Scene::serializeItem(PacketBase& op)
 bool Scene::serializePlayer(PacketBase& op)
 {
 	return true;
+}
+
+bool Scene::plantFlower(BgPlayer* player, int16 x, int16 y)
+{
+	return flowerMgr_.plantFlower(player, x, y);
+}
+
+bool Scene::serializeFlower(PacketBase& op)
+{
+	return flowerMgr_.serialize(op);
 }

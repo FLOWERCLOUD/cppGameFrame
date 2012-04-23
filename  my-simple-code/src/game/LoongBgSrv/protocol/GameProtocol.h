@@ -37,6 +37,7 @@ namespace game
 	static const uint32 OP_PING				= 0x00120018; // 应用程序心跳
 	// 0x00120019
 	// 0x0012001A
+	static const uint32 OP_PLANT_FLOWER				= 0x0012001B; // 种植食人花
 }
 
 namespace client
@@ -66,6 +67,7 @@ namespace client
 	static const uint32 OP_PING							 = 0x00140018; // 应用程序心跳
 	static const uint32 OP_SETTLEMENT			 = 0x00140019; //战场结果
 	static const uint32 OP_MEMBER_INSUFFICIENT		 = 0x0014001A; //敌方人数不足
+	static const uint32 OP_PLANT_FLOWER				= 0x0014001B; // 种植食人花
 }
 
 namespace hotel

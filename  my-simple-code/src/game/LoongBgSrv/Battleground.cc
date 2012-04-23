@@ -96,6 +96,11 @@ bool Battleground::addBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 	player->setBgId(getId());
 	player->setTeam(team);
 
+	// 在激战中算一个次 参加了战场
+	if (this->getState() == BattlegroundState::BGSTATE_RUN)
+	{
+		sJoinTimesMgr.incJoinTimes(player->getId());
+	}
 	return scene_.addPlayer(player);
 }
 
@@ -130,7 +135,7 @@ bool Battleground::getBgInfo(PacketBase& op)
 	op.putInt32(getLeftTime());
 	op.putInt32(blackBuildings_.getHp());
 	op.putInt32(whiteBuildings_.getHp());
-	scene_.serializeItem(op);
+	scene_.serialize(op);
 	//
 	return true;
 }

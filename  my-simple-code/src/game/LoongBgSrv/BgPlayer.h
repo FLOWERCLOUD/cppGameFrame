@@ -58,6 +58,9 @@ public:
 	}
 
 	void serializeResult(PacketBase& op, BgResultE bgResult, PacketBase& hotelop);
+
+	bool hasItem(int16 itemId);
+	void delItem(int16 itemId);
 public:
 	// 父类的东东
 	virtual bool serialize(PacketBase& op);
@@ -89,6 +92,7 @@ private:
 	void onExitBattle(PacketBase& pb);
 	void onPickUpItem(PacketBase& pb);
 	void onUseItem(PacketBase& pb);
+	void onPlantFlower(PacketBase& pb);
 private:
 	std::string name_; //玩家的名字
 	int16 killEnemyTimes_;
@@ -101,6 +105,7 @@ private:
 	std::map<int16, int32> useSkillMap_;
 	bool bWaitClose_;
 	Package package_;
+	Timestamp useItemTimestamp_;
 	Scene* pScene;
 	TcpConnection* pCon_;
 	LoongBgSrv* pSrv_;

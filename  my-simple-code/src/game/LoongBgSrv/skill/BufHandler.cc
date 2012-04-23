@@ -9,8 +9,10 @@
 
 #include <game/LoongBgSrv/base/BufBaseMgr.h>
 #include <game/LoongBgSrv/skill/Buf.h>
+#include <game/LoongBgSrv/skill/AddSpeedBuf.h>
 #include <game/LoongBgSrv/skill/HunXuanBuf.h>
 #include <game/LoongBgSrv/skill/ZhouShangBuf.h>
+#include <game/LoongBgSrv/skill/MianYiBuf.h>
 #include <game/LoongBgSrv/scene/Scene.h>
 #include <game/LoongBgSrv/BgPlayer.h>
 #include <game/LoongBgSrv/Util.h>
@@ -102,12 +104,58 @@ static bool zhouShangBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUn
 	return true;
 }
 
+// 免疫buff
+static bool mianYiBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUnit* target, Scene* scene)
+{
+	const BufBase& bufbase = sBufBaseMgr.getBufBaseInfo(bufId);
+
+	int16 seconds = bufbase.paramList_[1];
+	uint32 curTime = getCurTime();
+	uint32 bufferTime = curTime + seconds;
+	// 以前他就中了这个buff的话 就替换原来的那个buff 如果没有中过 就加一个buff
+	Buf* buf = me->getBuf(bufId);
+	if (!buf)
+	{
+		me->addBuf(new MianYiBuf(bufId, curTime, bufferTime) );
+	}
+	else
+	{
+		buf->setLastTime(curTime);
+		buf->setBufferTime(bufferTime);
+	}
+	return true;
+}
+
+// 提速buff
+static bool addSpeedBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUnit* target, Scene* scene)
+{
+	const BufBase& bufbase = sBufBaseMgr.getBufBaseInfo(bufId);
+
+	int16 seconds = bufbase.paramList_[1];
+	uint32 curTime = getCurTime();
+	uint32 bufferTime = curTime + seconds;
+	// 以前他就中了这个buff的话 就替换原来的那个buff 如果没有中过 就加一个buff
+	Buf* buf = me->getBuf(bufId);
+	if (!buf)
+	{
+		me->addBuf(new AddSpeedBuf(bufId, curTime, bufferTime) );
+	}
+	else
+	{
+		buf->setLastTime(curTime);
+		buf->setBufferTime(bufferTime);
+	}
+	return true;
+}
+
 BufHandler::bufHandler BufHandler::bufHandlers[] =
 {
 		defaultBufHandler,
 		hunXuanBufHandler,
 		zhouShangBufHandler,
 		JianSheBufHandler,
+		mianYiBufHandler,
+		addSpeedBufHandler,
 		defaultBufHandler
 };
 

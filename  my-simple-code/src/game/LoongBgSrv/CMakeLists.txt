@@ -15,9 +15,12 @@ set(LoongBgSrv_SRCS
   php/util/bytesbuffer.cpp
   php/htmlclient.cpp
   scene/DropItemMgr.cc
+  scene/FlowerMgr.cc
   scene/Scene.cc
   skill/Buf.cc
   skill/BufHandler.cc
+  skill/AddSpeedBuf.cc
+  skill/MianYiBuf.cc
   skill/HunXuanBuf.cc
   skill/SkillHandler.cc
   skill/ItemHandler.cc
