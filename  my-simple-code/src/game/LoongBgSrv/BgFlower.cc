@@ -107,7 +107,7 @@ void BgFlower::onHurt(BgUnit* attacker, int32 damage, const SkillBase& skill)
 	decHp(damage);
 
 	// 告诉客户端 食人花受什么伤害 伤害是多少
-	PacketBase pb(client::OP_ON_HURT, 0);
+	PacketBase pb(client::OP_ON_HURT, this->getId());
 	pb.putInt32(3); //单元类型
 	pb.putInt32(0); //技能伤害
 	pb.putInt32(skill.skillId_);
