@@ -36,9 +36,11 @@ void BgFlower::init()
 void BgFlower::run(uint32 curTime)
 {
 	if (isDead()) return;
-
 	runBuf(curTime);
-	onAIHandle(curTime);
+	if (operation_)
+	{
+		onAIHandle(curTime);
+	}
 }
 
 void BgFlower::shutdown()

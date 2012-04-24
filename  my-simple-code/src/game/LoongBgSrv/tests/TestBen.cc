@@ -8,14 +8,14 @@ using namespace mysdk;
 int main(int argc, char* argv[])
 {
 	  LOG_INFO << "pid = " << getpid();
-	  if (argc > 3)
+	  if (argc > 4)
 	  {
 		  char* ip = argv[1];
 		  int16 port = static_cast<int16>(atoi(argv[2]));
 		  int num = atoi(argv[3]);
 		  char cmd[1024];
 		  char exe[] = "./bin/LoongBgSrvBenchmark";
-		  int bgId = 1;
+		  int bgId = argv[4];
 		  for (int i = 1; i <= num; i++)
 		  {
 			  //char* ip = argv[1];
