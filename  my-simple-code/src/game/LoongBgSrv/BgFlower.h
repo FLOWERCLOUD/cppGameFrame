@@ -45,7 +45,7 @@ public:
 	virtual bool addBuf(Buf* buf);
 	virtual void onHurt(BgUnit* attacker, int32 damage, const SkillBase& skill);
 	virtual void onBufHurt(BgUnit* me, int32 damage, const BufBase& buf);
-
+	virtual bool canUseSkill(int16 skillId, int32 cooldownTime);
 private:
 	void runBuf(uint32 curTime);
 	void removeAllBuf();

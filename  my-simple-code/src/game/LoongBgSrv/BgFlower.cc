@@ -137,6 +137,11 @@ void BgFlower::onBufHurt(BgUnit* me, int32 damage, const BufBase& buf)
 	broadMsg(pb);
 }
 
+bool BgFlower::canUseSkill(int16 skillId, int32 cooldownTime)
+{
+	return true;
+}
+
 void BgFlower::removeAllBuf()
 {
 	std::list<Buf*>::iterator itList;
