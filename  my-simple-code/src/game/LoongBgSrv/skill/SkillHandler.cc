@@ -21,7 +21,7 @@ bool SkillHandler::onEmitSkill(int16 skillId, BgUnit* me, BgUnit* target, Scene*
 	LOG_TRACE << "SkillHandler::onEmitSkill - skilld: " << skillId
 							<< " me: " << me->getId()
 							<< " target: " << target->getId()
-							<< "teamType: " << target->getTeam()
+							<< " teamType: " << target->getTeam()
 							<< " unitType: " << target->getUnitType();
 
 	// 技能id 是否是正确的

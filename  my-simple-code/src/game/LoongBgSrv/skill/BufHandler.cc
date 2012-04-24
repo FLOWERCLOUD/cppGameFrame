@@ -116,7 +116,12 @@ static bool mianYiBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUnit*
 	Buf* buf = me->getBuf(bufId);
 	if (!buf)
 	{
-		me->addBuf(new MianYiBuf(bufId, curTime, bufferTime) );
+		Buf* mianYiBuf = new MianYiBuf(bufId, curTime, bufferTime);
+		if (mianYiBuf)
+		{
+			mianYiBuf->onCacl(me);
+			me->addBuf( mianYiBuf );
+		}
 	}
 	else
 	{
