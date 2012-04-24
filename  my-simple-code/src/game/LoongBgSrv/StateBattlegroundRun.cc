@@ -59,7 +59,7 @@ void StateBattlegroundRun::run(uint32 curTime)
 	else if (pBattleground_->haveOtherTeamEmpty())
 	{
 		PacketBase op(client::OP_TELLCLIENT_STATE, 0);
-		op.putInt32(2);
+		op.putInt32(3);
 		op.putInt32(getLeftTime());
 		pBattleground_->broadMsg(op);
 
