@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
 		  int num = atoi(argv[3]);
 		  char cmd[1024];
 		  char exe[] = "./bin/LoongBgSrvBenchmark";
-		  int bgId = argv[4];
+		  int bgId = atoi(argv[4]);
 		  for (int i = 1; i <= num; i++)
 		  {
 			  //char* ip = argv[1];
