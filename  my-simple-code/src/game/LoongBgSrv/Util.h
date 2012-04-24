@@ -29,7 +29,8 @@ static inline int32 getDistance(BgUnit* me, BgUnit* target)
 // return [nBegin, nEnd]
 static inline int32 getRandomBetween(int32 nBegin, int32 nEnd)
 {
-	return nBegin + static_cast<int32>(static_cast<long long>(rand()) * (nEnd - nBegin) / RAND_MAX + 1);
+	return nBegin + static_cast<int32>(rand() % (nEnd - nBegin + 1) );
+	//return nBegin + static_cast<int32>(static_cast<long long>(rand()) * (nEnd - nBegin) / (RAND_MAX + 1) );
 	//return 0;
 }
 
