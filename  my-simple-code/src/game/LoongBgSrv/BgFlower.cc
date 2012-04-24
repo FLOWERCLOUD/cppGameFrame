@@ -142,6 +142,11 @@ bool BgFlower::canUseSkill(int16 skillId, int32 cooldownTime)
 	return true;
 }
 
+bool BgFlower::hasSkill(int16 skillId)
+{
+	return true;
+}
+
 void BgFlower::removeAllBuf()
 {
 	std::list<Buf*>::iterator itList;
