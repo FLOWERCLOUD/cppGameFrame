@@ -34,9 +34,9 @@ class DropItemMgr
 public:
 	static const uint32 sTenseconds = 30000; //30s 单位是ms
 	static const uint32 sMaxItemNum = 20; // 一场战场中 最多有20个
-	static const uint32 sPerItemNum = 5; // 每个物品最多5个
-	static const uint32 sItemNum = 4; //现在只有4种物品哦
-	static const uint32 sRandomItemNum = sPerItemNum * sItemNum;
+	static const int32 sPerItemNum = 5; // 每个物品最多5个
+	static const int32 sItemNum = 4; //现在只有4种物品哦
+	static const int32 sRandomItemNum = sPerItemNum * sItemNum;
 public:
 	DropItemMgr(Scene* pScene);
 	~DropItemMgr();

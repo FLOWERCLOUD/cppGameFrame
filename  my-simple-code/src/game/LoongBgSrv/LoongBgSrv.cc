@@ -546,7 +546,14 @@ void LoongBgSrv::TellPhpBattleInfo(int32 battleId)
 		param.bgId = bgId;
 		param.blackNum = bg.getBlackNum();
 		param.whiteNum = bg.getWhiteNum();
-		param.bgState = bg.getState();
+		if (bg.getState() == 0)
+		{
+			param.bgState = 1;
+		}
+		else
+		{
+			param.bgState = bg.getState();
+		}
 		queue_.put(param);
 	}
 }

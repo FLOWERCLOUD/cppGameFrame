@@ -67,7 +67,7 @@ class TestLoongBgClient
 				std::tr1::placeholders::_2,
 				std::tr1::placeholders::_3));
 
-	   // loop->runEvery(1.0, std::tr1::bind(&TestLoongBgClient::onTimer, this));
+	    loop->runEvery(1.0, std::tr1::bind(&TestLoongBgClient::onTimer, this));
 	    //loop->runEvery(0.1, std::tr1::bind(&TestLoongBgClient::onTimer, this));
 	}
 

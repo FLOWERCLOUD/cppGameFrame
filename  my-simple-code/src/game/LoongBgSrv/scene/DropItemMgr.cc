@@ -20,6 +20,7 @@ DropItemMgr::DropItemMgr(Scene* pScene):
 	lastTime_(getCurTime()),
 	pScene_(pScene)
 {
+	randomItemList_.resize(sRandomItemNum);
 }
 
 DropItemMgr::~DropItemMgr()
@@ -33,10 +34,8 @@ bool DropItemMgr::init()
 	itemList_.clear();
 	lastTime_ = getCurTime();
 
-	randomItemList_.resize(sRandomItemNum);
-	int32 num = static_cast<int32>(randomItemList_.size());
 	randomItemList_.clear();
-	for (int32 i = 0; i < num; i++)
+	for (int32 i = 0; i < sRandomItemNum; i++)
 	{
 		randomItemList_.push_back(i);
 	}
@@ -69,7 +68,14 @@ void DropItemMgr::run(uint32 curTime)
 {
 	if (curTime - lastTime_ > sTenseconds)
 	{
-		if (itemList_.size() > sMaxItemNum) return;
+		if (itemList_.size() > sMaxItemNum)
+		{
+			LOG_TRACE << "DropItemMgr::run -- curTime: " << curTime
+										<< " lastTime: " << lastTime_
+										<< " leftTime: " << curTime - lastTime_
+										<< " itemList size:" << itemList_.size();
+			return;
+		}
 
 		if (randomItemList_.size() <= 0)
 		{
@@ -93,7 +99,6 @@ void DropItemMgr::run(uint32 curTime)
 		}
 		pointList_.pop_back();
 
-
 		// 生成一个物品
 		// 生命药水
 		// 无敌药水
@@ -104,6 +109,11 @@ void DropItemMgr::run(uint32 curTime)
 		int32 index = getRandomBetween(0, static_cast<int32>(randomItemList_.size() - 1));
 		int32 itemId = randomItemList_[index] % sItemNum + 1;
 		randomItemList_.erase(randomItemList_.begin()+index);
+
+		LOG_TRACE << "DropItemMgr::run -- x: " << x
+								<< " y: " << y
+								<< " itemId: " << itemId
+								<< " randomItem size: " << randomItemList_.size();
 
 		struct DropItem item;
 		item.itemId = itemId;

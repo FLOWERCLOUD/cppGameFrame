@@ -140,7 +140,7 @@ BattlegroundState::BgStateE Battleground::getState()
 	{
 		return pState_->getState();
 	}
-	return BattlegroundState::BGSTATE_WAIT;
+	return BattlegroundState::BGSTATE_NONE;
 }
 
 uint32 Battleground::getLeftTime()
