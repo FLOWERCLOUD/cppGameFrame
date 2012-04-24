@@ -21,6 +21,7 @@ BgFlower::BgFlower(int32 unitId, UnitTypeE unitType, TeamE team, Scene* pScene):
 		pScene_(pScene)
 {
 	setHp(sMaxHp);
+	setMaxHp(sMaxHp);
 }
 
 BgFlower::~BgFlower()
@@ -186,6 +187,8 @@ void BgFlower::onAIHandle(uint32 curTime)
 				sendPb.putInt32(player->getId());
 				sendPb.putInt32(3);
 				sendPb.putInt32(this->getId());
+				sendPb.putInt32(this->getX());
+				sendPb.putInt32(this->getY());
 				broadMsg(sendPb);
 
 				LOG_TRACE << "onAIHandle -- attackId: " << player->getId();
@@ -208,6 +211,8 @@ void BgFlower::onAIHandle(uint32 curTime)
 					sendPb.putInt32(0);
 					sendPb.putInt32(3);
 					sendPb.putInt32(this->getId());
+					sendPb.putInt32(this->getX());
+					sendPb.putInt32(this->getY());
 					broadMsg(sendPb);
 
 					SkillHandler::onEmitSkill(skillId, this, &pScene_->getWhiteBuilding(), pScene_);
@@ -225,6 +230,8 @@ void BgFlower::onAIHandle(uint32 curTime)
 					sendPb.putInt32(0);
 					sendPb.putInt32(3);
 					sendPb.putInt32(this->getId());
+					sendPb.putInt32(this->getX());
+					sendPb.putInt32(this->getY());
 					broadMsg(sendPb);
 
 					SkillHandler::onEmitSkill(skillId, this, &pScene_->getBlackBuilding(), pScene_);
