@@ -206,6 +206,11 @@ void Battleground::TellClientCloseBg(int32 state)
 	scene_.broadMsg(op);
 }
 
+void Battleground::broadMsg(PacketBase& op)
+{
+	scene_.broadMsg(op);
+}
+
 bool Battleground::isGameOver()
 {
 	if (scene_.getBlackBuilding().isDead() && scene_.getWhiteBuilding().isDead())

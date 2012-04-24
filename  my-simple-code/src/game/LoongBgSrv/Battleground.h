@@ -58,6 +58,8 @@ public:
 	// 告诉客户端 敌方人数不足 战场关闭
 	void TellClientCloseBg(int32 state);
 //
+
+	void broadMsg(PacketBase& op);
 public:
 	// 战场释放结束啦
 	bool isGameOver();

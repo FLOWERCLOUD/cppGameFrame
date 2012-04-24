@@ -7,6 +7,8 @@
 
 #include <game/LoongBgSrv/StateBattlegroundRun.h>
 #include <game/LoongBgSrv/Battleground.h>
+#include <game/LoongBgSrv/protocol/GameProtocol.h>
+
 StateBattlegroundRun::StateBattlegroundRun(Battleground* bg):
 	BattlegroundState(bg),
 	bWaitState_(false),
@@ -37,6 +39,10 @@ void StateBattlegroundRun::run(uint32 curTime)
 	{
 		if (!pBattleground_->haveOtherTeamEmpty())
 		{
+			PacketBase op(client::OP_TELLCLIENT_STATE, 0);
+			op.putInt32(getState());
+			op.putInt32(getLeftTime());
+			pBattleground_->broadMsg(op);
 			bWaitState_ = false;
 		}
 		else if (curTime - waitTimes_ > 10000)
@@ -55,7 +61,7 @@ void StateBattlegroundRun::run(uint32 curTime)
 		PacketBase op(client::OP_TELLCLIENT_STATE, 0);
 		op.putInt32(2);
 		op.putInt32(getLeftTime());
-		scene_.broadMsg(op);
+		pBattleground_->broadMsg(op);
 
 		bWaitState_ = true;
 		waitTimes_ = curTime;
