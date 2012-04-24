@@ -451,6 +451,8 @@ void BgPlayer::runBuf(uint32 curTime)
 
 			// 告诉客户端 要移除这个buf
 			PacketBase pb(client::OP_REMOVE_BUF, this->getId());
+			pb.putInt32(this->getId());
+			pb.putInt32(0);
 			pb.putInt32(buf->getId());
 			broadMsg(pb);
 
