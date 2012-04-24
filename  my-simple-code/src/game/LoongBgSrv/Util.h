@@ -37,7 +37,7 @@ static inline int32 getRandomBetween(int32 nBegin, int32 nEnd)
 //获得加成数值
 static inline int16 getBonusValue(BgUnit* me, BgUnit* target)
 {
-	static int16 bonusTable[4][4] = { {100, 100, 120, 100}, {120, 100, 100, 100}, {100, 120, 100, 100}, {0, 0, 0, 0}};
+	static int16 bonusTable[5][5] = { {100, 100, 120, 100, 100}, {120, 100, 100, 100, 100}, {100, 120, 100, 100, 100}, {100, 100, 100, 100, 100},  {0, 0, 0, 0, 0}};
 
 	int meUnitType = me->getUnitType() - 1;
 	int targetUnitType = target->getUnitType() - 1;
