@@ -46,10 +46,13 @@ void FlowerMgr::run(uint32 curTime)
 		if (curTime - plantTime > sDisappearTime || flower->isDead())
 		{
 			// 告诉客户端知道 这个食人花要消失啦
+			LOG_TRACE << "FlowerMgr::run -- flowerid: " << flower->getId();
+
 			PacketBase op(client::OP_DISAPPEAR_FLOWER, 0);
 			flower->serialize(op);
 			pScene_->broadMsg(op);
 			itList = flowerList_.erase(itList);
+
 
 			delete flower;
 		}
