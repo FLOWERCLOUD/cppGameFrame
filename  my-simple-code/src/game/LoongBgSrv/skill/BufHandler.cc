@@ -109,7 +109,7 @@ static bool mianYiBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUnit*
 {
 	const BufBase& bufbase = sBufBaseMgr.getBufBaseInfo(bufId);
 
-	int16 seconds = bufbase.paramList_[1];
+	int16 seconds = bufbase.paramList_[0];
 	uint32 curTime = getCurTime();
 	uint32 bufferTime = curTime + seconds;
 	// 以前他就中了这个buff的话 就替换原来的那个buff 如果没有中过 就加一个buff
@@ -131,7 +131,7 @@ static bool addSpeedBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUni
 {
 	const BufBase& bufbase = sBufBaseMgr.getBufBaseInfo(bufId);
 
-	int16 seconds = bufbase.paramList_[1];
+	int16 seconds = bufbase.paramList_[0];
 	uint32 curTime = getCurTime();
 	uint32 bufferTime = curTime + seconds;
 	// 以前他就中了这个buff的话 就替换原来的那个buff 如果没有中过 就加一个buff
