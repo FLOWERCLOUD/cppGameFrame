@@ -19,7 +19,7 @@ class BgFlower:public BgUnit
 {
 public:
 	static const int32 sMaxHp = 300;
-	static const uint32 sUseSkillTimes = 20000;
+	static const uint32 sUseSkillTimes = 2000; // 2s
 public:
 	BgFlower(int32 unitId, UnitTypeE unitType, TeamE team, Scene* pScene);
 	virtual ~BgFlower();

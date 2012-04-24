@@ -44,8 +44,6 @@ public:
 	void setWaitClose(bool flag);
 	bool getWaitClose();
 
-	bool addItem(int32 itemId);
-
 	void shutdown();
 
 	std::string getName()
@@ -59,6 +57,7 @@ public:
 
 	void serializeResult(PacketBase& op, BgResultE bgResult, PacketBase& hotelop);
 
+	bool addItem(int32 itemId);
 	bool hasItem(int16 itemId);
 	void delItem(int16 itemId);
 public:
@@ -93,7 +92,7 @@ private:
 	void onPickUpItem(PacketBase& pb);
 	void onUseItem(PacketBase& pb);
 	void onPlantFlower(PacketBase& pb);
-
+	void onGMCmd(PacketBase& pb);
 private:
 	void onTitleHandle();
 	void setTitle(int16 title);

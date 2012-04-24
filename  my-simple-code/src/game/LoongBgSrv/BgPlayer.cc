@@ -11,6 +11,7 @@
 #include <game/LoongBgSrv/base/SkillBaseMgr.h>
 #include <game/LoongBgSrv/pet/Pet.h>
 #include <game/LoongBgSrv/protocol/GameProtocol.h>
+#include <game/LoongBgSrv/protocol/GMProtocol.h>
 #include <game/LoongBgSrv/skill/Buf.h>
 #include <game/LoongBgSrv/skill/ItemHandler.h>
 #include <game/LoongBgSrv/skill/SkillHandler.h>
@@ -591,6 +592,9 @@ bool BgPlayer::onMsgHandler(PacketBase& pb)
 	case game::OP_PLANT_FLOWER:
 		onPlantFlower(pb);
 		break;
+	case gmgame::OP_GM_CMD:
+		onGMCmd(pb);
+		break;
 	default:
 		break;
 	}
@@ -635,7 +639,6 @@ void BgPlayer::onEnterBattle(PacketBase& pb)
 	}
 	else if(bg.addBgPlayer(this, team))
 	{
-		//setBgId(bgId);
 		op.setParam(0);
 	}
 	sendPacket(op);
@@ -866,4 +869,15 @@ void BgPlayer::onPlantFlower(PacketBase& pb)
 	int16 x = static_cast<int16>(pb.getInt32());
 	int16 y = static_cast<int16>(pb.getInt32());
 	pScene->plantFlower(this, x, y);
+}
+
+void BgPlayer::onGMCmd(PacketBase& pb)
+{
+	char cmd[512];
+	if (!pb.getUTF(cmd, sizeof(cmd)))
+	{
+		return;
+	}
+
+
 }

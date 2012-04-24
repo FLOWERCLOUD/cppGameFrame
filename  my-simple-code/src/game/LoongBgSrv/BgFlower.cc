@@ -188,6 +188,7 @@ void BgFlower::onAIHandle(uint32 curTime)
 				sendPb.putInt32(this->getId());
 				broadMsg(sendPb);
 
+				LOG_TRACE << "onAIHandle -- attackId: " << player->getId();
 				SkillHandler::onEmitSkill(skillId, this, player, pScene_);
 				flag = true;
 				break;
