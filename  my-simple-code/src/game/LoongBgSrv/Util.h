@@ -69,7 +69,7 @@ static inline uint16 GetLow16(const int32 t)
 
 static inline int32 MakeInt32(const int16 height, const int16 low)
 {
-	return ( (height << 16) & 0x0000FFFF ) & (low & 0x0000FFFF);
+	return ( (height << 16) & 0xFFFF0000 ) & (low & 0x0000FFFF);
 }
 
 #define TIME_FUNCTION_CALL(p, t) \

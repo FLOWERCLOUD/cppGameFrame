@@ -113,7 +113,8 @@ void DropItemMgr::run(uint32 curTime)
 		LOG_TRACE << "DropItemMgr::run -- x: " << x
 								<< " y: " << y
 								<< " itemId: " << itemId
-								<< " randomItem size: " << randomItemList_.size();
+								<< " randomItem size: " << randomItemList_.size()
+								<< " key: " << pointKey;
 
 		struct DropItem item;
 		item.itemId = itemId;
