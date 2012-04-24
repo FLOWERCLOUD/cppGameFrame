@@ -845,8 +845,9 @@ void BgPlayer::onUseItem(PacketBase& pb)
 		delItem(itemId);
 		ItemHandler::onUseItem(itemId, this, NULL, pScene);
 		//
-		pb.setOP(client::OP_USE_ITEM);
-		this->sendPacket(pb);
+		PacketBase op(client::OP_USE_ITEM, 0);
+		op.putInt32(itemId);
+		this->sendPacket(op);
 	}
 	else
 	{

@@ -8,7 +8,9 @@
 #include <game/LoongBgSrv/StateBattlegroundRun.h>
 #include <game/LoongBgSrv/Battleground.h>
 StateBattlegroundRun::StateBattlegroundRun(Battleground* bg):
-	BattlegroundState(bg)
+	BattlegroundState(bg),
+	bWaitState_(false),
+	waitTimes_(0)
 {
 
 }
@@ -31,13 +33,32 @@ void StateBattlegroundRun::run(uint32 curTime)
 {
 	if (!pBattleground_) return;
 
+	if (bWaitState_)
+	{
+		if (!pBattleground_->haveOtherTeamEmpty())
+		{
+			bWaitState_ = false;
+		}
+		else if (curTime - waitTimes_ > 10000)
+		{
+			pBattleground_->switchExitState();
+		}
+		return;
+	}
+
 	if (curTime - startTime_ >= getStateTimeLimit())
 	{
 		pBattleground_->switchExitState();
 	}
 	else if (pBattleground_->haveOtherTeamEmpty())
 	{
-		pBattleground_->switchStartState();
+		PacketBase op(client::OP_TELLCLIENT_STATE, 0);
+		op.putInt32(2);
+		op.putInt32(getLeftTime());
+		scene_.broadMsg(op);
+
+		bWaitState_ = true;
+		waitTimes_ = curTime;
 	}
 	else if (pBattleground_->isGameOver())
 	{

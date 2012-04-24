@@ -224,6 +224,7 @@ itemId:int32 物品ID
 s->c
 cmd 0x140012
 param 
+itemId:int32 物品ID
 
 ========= 战场状态 =============
 s->c
@@ -234,6 +235,7 @@ leftTime:int32 剩余时间 (单位毫秒)
 ========= 战场掉落了一个物品 =============
 s->c
 cmd 0x140014
+param
 itemId:int32 物品ID
 x:int32 x 坐标点
 y:int32 y 坐标点

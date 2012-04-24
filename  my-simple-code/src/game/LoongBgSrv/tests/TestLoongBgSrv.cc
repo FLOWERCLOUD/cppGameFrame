@@ -229,6 +229,23 @@ private:
 		}
 	}
 
+	void onDropItem(mysdk::net::TcpConnection* pCon, PacketBase& pb)
+	{
+		//s->c
+		//cmd 0x140014
+		//param
+		//itemId:int32 物品ID
+		//x:int32 x 坐标点
+		//y:int32 y 坐标点
+
+		int32 itemId = pb.getInt32();
+		int32 x = pb.getInt32();
+		int32 y = pb.getInt32();
+
+		LOG_TRACE << "onDropItem -- itemId: " << itemId
+				<< " x: " << x << " y: " << y;
+	}
+
 	void onMsgHandler(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::Timestamp timestamp)
 	{
 		uint32 op = pb.getOP();
@@ -245,6 +262,9 @@ private:
 			break;
 		case client::OP_ON_HURT:
 			onHurt(pCon, pb);
+			break;
+		case client::OP_DROP_ITEM:
+			onDropItem(pCon, pb);
 			break;
 		default:
 			LOG_INFO << getPlayerName() << " op no found, op:" << op;

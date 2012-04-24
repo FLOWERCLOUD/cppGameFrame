@@ -114,7 +114,8 @@ void DropItemMgr::run(uint32 curTime)
 								<< " y: " << y
 								<< " itemId: " << itemId
 								<< " randomItem size: " << randomItemList_.size()
-								<< " key: " << pointKey;
+								<< " key: " << pointKey
+								<< " pointList size: " << pointList_.size();
 
 		struct DropItem item;
 		item.itemId = itemId;

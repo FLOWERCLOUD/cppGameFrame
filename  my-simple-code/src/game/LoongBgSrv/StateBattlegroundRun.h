@@ -27,7 +27,8 @@ public:
 	virtual std::string getStateName() { return "激战中阶段"; }
 
 private:
-
+	bool bWaitState_; // 是否在等其他人进入战场
+	uint32 waitTimes_;
 };
 
 #endif /* STATEBATTLEGROUNDRUN_H_ */

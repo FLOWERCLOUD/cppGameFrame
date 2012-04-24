@@ -10,7 +10,8 @@
 #include <game/LoongBgSrv/BgPlayer.h>
 #include <game/LoongBgSrv/Util.h>
 
-FlowerMgr::FlowerMgr(Scene* pScene)
+FlowerMgr::FlowerMgr(Scene* pScene):
+	pScene_(pScene)
 {
 	init();
 }
