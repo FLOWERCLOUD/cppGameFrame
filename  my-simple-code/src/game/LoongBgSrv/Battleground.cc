@@ -50,7 +50,7 @@ void Battleground::init()
 		teamNum_[i] = 0;
 	}
 	teamNum_[0] = 99;
-
+	bgResult_ = KNONE_BGRESULT;
 	scene_.init();
 }
 
