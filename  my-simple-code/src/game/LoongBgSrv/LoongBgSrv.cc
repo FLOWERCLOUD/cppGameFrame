@@ -146,15 +146,15 @@ void LoongBgSrv::phpThreadHandler()
 			snprintf(buf, 1023, "%s?id=%d&type=3&black=%d&white=%d&states=%d",
 				phpAddr.c_str(),
 				param.bgId,
-				param.whiteNum,
 				param.blackNum,
+				param.whiteNum,
 				param.bgState);
 
 			htmlClient.loadUrl(buf);
 			//LOG_TRACE << " Test html: " << htmlClient.getHtmlData().getData();
 		}
 
-		LOG_TRACE << "phpThreadHandler - id: " << param.bgId;
+		LOG_TRACE << "phpThreadHandler - id: " << param.bgId << " buf: " << buf;
 	}
 	LOG_INFO << "======= phpThreadHandler END ";
 }
