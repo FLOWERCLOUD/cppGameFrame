@@ -16,7 +16,7 @@
 class HunXuanBuf:public Buf
 {
 public:
-	HunXuanBuf(int16 bufId, uint32 curTime, uint32 bufferTime);
+	HunXuanBuf(int16 bufId, int64 curTime, int64 bufferTime);
 	virtual ~HunXuanBuf();
 
 	virtual void onDelete(BgUnit* me);

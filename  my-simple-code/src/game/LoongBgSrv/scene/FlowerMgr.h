@@ -30,7 +30,7 @@ public:
 	~FlowerMgr();
 
 	bool init();
-	void run(uint32 curTime);
+	void run(int64 curTime);
 	void shutdown();
 
 	bool plantFlower(BgPlayer* player, int16 x, int16 y);

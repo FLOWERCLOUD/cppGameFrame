@@ -18,7 +18,7 @@ StateBattlegroundWait::~StateBattlegroundWait()
 
 }
 
-void StateBattlegroundWait::run(uint32 curTime)
+void StateBattlegroundWait::run(int64 curTime)
 {
 	if (!pBattleground_) return;
 

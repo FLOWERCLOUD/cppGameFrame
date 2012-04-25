@@ -17,7 +17,7 @@ StateBattlegroundExit::~StateBattlegroundExit()
 
 }
 
-void StateBattlegroundExit::run(uint32 curTime)
+void StateBattlegroundExit::run(int64 curTime)
 {
 	if (!pBattleground_) return;
 

@@ -23,7 +23,7 @@ public:
 	~BattlegroundMgr();
 
 	bool init();
-	void run(uint32 curTime);
+	void run(int64 curTime);
 	void shutdown();
 
 	bool checkBattlegroundId(int16 bgId) const;

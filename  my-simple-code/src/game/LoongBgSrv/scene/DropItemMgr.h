@@ -42,7 +42,7 @@ public:
 	~DropItemMgr();
 
 	bool init();
-	void run(uint32 curTime);
+	void run(int64 curTime);
 	void shutdown();
 	// 拾取物品
 	bool pickUpItem(BgPlayer* player, int16 x, int16 y);
@@ -52,7 +52,7 @@ private:
 	std::map<int32, struct DropItem> itemList_;
 	std::vector<int32> randomItemList_;
 
-	uint32 lastTime_;
+	int64 lastTime_;
 	Scene* pScene_;
 private:
 	DISALLOW_COPY_AND_ASSIGN(DropItemMgr);

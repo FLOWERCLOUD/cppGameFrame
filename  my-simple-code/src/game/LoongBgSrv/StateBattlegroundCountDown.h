@@ -18,7 +18,7 @@ public:
 	StateBattlegroundCountDown(Battleground* bg);
 	virtual ~StateBattlegroundCountDown();
 
-	virtual void run(uint32 curTime);
+	virtual void run(int64 curTime);
 
 	virtual BgStateE getState() { return BGSTATE_COUNTDOWN; }
 	virtual uint32	getStateTimeLimit() { return 5000; }

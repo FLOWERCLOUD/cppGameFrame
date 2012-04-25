@@ -16,7 +16,7 @@
 class MianYiBuf:public Buf
 {
 public:
-	MianYiBuf(int16 bufId, uint32 curTime, uint32 bufferTime);
+	MianYiBuf(int16 bufId, int64 curTime, int64 bufferTime);
 	virtual ~MianYiBuf();
 
 	virtual void onDelete(BgUnit* me);

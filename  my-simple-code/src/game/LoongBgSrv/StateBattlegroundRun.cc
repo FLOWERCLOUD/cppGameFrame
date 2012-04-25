@@ -31,7 +31,7 @@ void StateBattlegroundRun::start()
 	pBattleground_->incBgPlayerTimes();
 }
 
-void StateBattlegroundRun::run(uint32 curTime)
+void StateBattlegroundRun::run(int64 curTime)
 {
 	if (!pBattleground_) return;
 

@@ -16,7 +16,7 @@
 class AddSpeedBuf:public Buf
 {
 public:
-	AddSpeedBuf(int16 bufId, uint32 curTime, uint32 bufferTime);
+	AddSpeedBuf(int16 bufId, int64 curTime, int64 bufferTime);
 	virtual ~AddSpeedBuf();
 
 	virtual void onDelete(BgUnit* me);

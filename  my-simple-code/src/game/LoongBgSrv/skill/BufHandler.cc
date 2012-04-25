@@ -63,8 +63,8 @@ static bool hunXuanBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUnit
 {
 	const BufBase& bufbase = sBufBaseMgr.getBufBaseInfo(bufId);
 	int16 seconds = bufbase.paramList_[0];
-	uint32 curTime = getCurTime();
-	uint32 bufferTime = curTime + seconds;
+	int64 curTime = getCurTime();
+	int64 bufferTime = curTime + seconds;
 	Buf* buf = target->getBuf(bufId);
 	if (!buf)
 	{
@@ -88,8 +88,8 @@ static bool zhouShangBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUn
 	const BufBase& bufbase = sBufBaseMgr.getBufBaseInfo(bufId);
 
 	int16 seconds = bufbase.paramList_[1];
-	uint32 curTime = getCurTime();
-	uint32 bufferTime = curTime + seconds;
+	int64 curTime = getCurTime();
+	int64 bufferTime = curTime + seconds;
 	// 以前他就中了这个buff的话 就替换原来的那个buff 如果没有中过 就加一个buff
 	Buf* buf = target->getBuf(bufId);
 	if (!buf)
@@ -110,8 +110,8 @@ static bool mianYiBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUnit*
 	const BufBase& bufbase = sBufBaseMgr.getBufBaseInfo(bufId);
 
 	int16 seconds = bufbase.paramList_[0];
-	uint32 curTime = getCurTime();
-	uint32 bufferTime = curTime + seconds;
+	int64 curTime = getCurTime();
+	int64 bufferTime = curTime + seconds;
 	// 以前他就中了这个buff的话 就替换原来的那个buff 如果没有中过 就加一个buff
 	Buf* buf = me->getBuf(bufId);
 	if (!buf)
@@ -137,8 +137,8 @@ static bool addSpeedBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUni
 	const BufBase& bufbase = sBufBaseMgr.getBufBaseInfo(bufId);
 
 	int16 seconds = bufbase.paramList_[0];
-	uint32 curTime = getCurTime();
-	uint32 bufferTime = curTime + seconds;
+	int64 curTime = getCurTime();
+	int64 bufferTime = curTime + seconds;
 	// 以前他就中了这个buff的话 就替换原来的那个buff 如果没有中过 就加一个buff
 	Buf* buf = me->getBuf(bufId);
 	if (!buf)

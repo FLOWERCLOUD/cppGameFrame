@@ -34,7 +34,7 @@ void BgFlower::init()
 
 }
 
-void BgFlower::run(uint32 curTime)
+void BgFlower::run(int64 curTime)
 {
 	if (isDead()) return;
 	runBuf(curTime);
@@ -167,7 +167,7 @@ void BgFlower::broadMsg(PacketBase& op)
 	}
 }
 
-void BgFlower::onAIHandle(uint32 curTime)
+void BgFlower::onAIHandle(int64 curTime)
 {
 	static int16 skillId = 7; //食人花技能
 	static int32 maxDistance = 120 * 120; // 120 像素
@@ -257,7 +257,7 @@ void BgFlower::onAIHandle(uint32 curTime)
 	}
 }
 
-void BgFlower::runBuf(uint32 curTime)
+void BgFlower::runBuf(int64 curTime)
 {
 	std::list<Buf*>::iterator itList;
 	for (itList = bufList_.begin(); itList != bufList_.end(); )

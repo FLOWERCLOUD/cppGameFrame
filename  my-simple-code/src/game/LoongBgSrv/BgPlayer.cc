@@ -213,7 +213,7 @@ void BgPlayer::sendPacket(PacketBase& op)
 	}
 }
 
-void BgPlayer::run(uint32 curTime)
+void BgPlayer::run(int64 curTime)
 {
 	runBuf(curTime);
 }
@@ -313,12 +313,12 @@ bool BgPlayer::hasSkill(int16 skillId)
 
 bool BgPlayer::canUseSkill(int16 skillId, int32 cooldownTime)
 {
-	std::map<int16, int32>::iterator iter;
+	std::map<int16, int64>::iterator iter;
 	iter = useSkillMap_.find(skillId);
 	if (iter != useSkillMap_.end())
 	{
-		int32 lastUseTime = iter->second;
-		int32 curTime = getCurTime();
+		int64 lastUseTime = iter->second;
+		int64 curTime = getCurTime();
 		if (curTime - lastUseTime <= cooldownTime)
 		{
 			LOG_TRACE << "BgPlayer::canUseSkill, you can use skill - skillId: " << skillId
@@ -332,8 +332,8 @@ bool BgPlayer::canUseSkill(int16 skillId, int32 cooldownTime)
 
 bool BgPlayer::useSkill(int16 skillId)
 {
-	int32 curTime = getCurTime();
-	std::pair<std::map<int16, int32>::iterator,bool> res = useSkillMap_.insert(std::pair<int16, int32>(skillId, curTime));
+	int64 curTime = getCurTime();
+	std::pair<std::map<int16, int64>::iterator,bool> res = useSkillMap_.insert(std::pair<int16, int64>(skillId, curTime));
 	if (!res.second)
 	{
 		useSkillMap_[skillId] = curTime;
@@ -431,7 +431,7 @@ void BgPlayer::fullHp()
 	}
 }
 
-void BgPlayer::runBuf(uint32 curTime)
+void BgPlayer::runBuf(int64 curTime)
 {
 	if (isDead()) return;
 

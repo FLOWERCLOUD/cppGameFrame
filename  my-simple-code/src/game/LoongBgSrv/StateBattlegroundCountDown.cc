@@ -20,7 +20,7 @@ StateBattlegroundCountDown::~StateBattlegroundCountDown()
 
 }
 
-void StateBattlegroundCountDown::run(uint32 curTime)
+void StateBattlegroundCountDown::run(int64 curTime)
 {
 	if (!pBattleground_) return;
 

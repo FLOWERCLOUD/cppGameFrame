@@ -10,7 +10,7 @@
 #include <game/LoongBgSrv/base/BufBaseMgr.h>
 #include <mysdk/base/Logging.h>
 
-ZhouShangBuf::ZhouShangBuf(int16 bufId, uint32 curTime, uint32 bufferTime):
+ZhouShangBuf::ZhouShangBuf(int16 bufId, int64 curTime, int64 bufferTime):
 	Buf(bufId, "灼伤", curTime, 1000, bufferTime)
 {
 

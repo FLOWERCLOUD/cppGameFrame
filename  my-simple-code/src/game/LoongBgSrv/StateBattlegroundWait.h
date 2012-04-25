@@ -18,7 +18,7 @@ public:
 	StateBattlegroundWait(Battleground* bg);
 	virtual ~StateBattlegroundWait();
 
-	virtual void run(uint32 curTime);
+	virtual void run(int64 curTime);
 
 	virtual BgStateE getState() { return BGSTATE_WAIT; }
 	virtual uint32	getStateTimeLimit() { return 20000; } //55000; }

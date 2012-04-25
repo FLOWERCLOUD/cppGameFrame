@@ -20,11 +20,11 @@ class Buf
 public:
 	Buf();
 	Buf(int16 bufId, std::string& bufTypeName);
-	Buf(int16 bufId, std::string& bufTypeName, uint32 curTime, uint32 tickTime, uint32 bufferTime);
-	Buf(int16 bufId, const char* bufTypeName, uint32 curTime, uint32 tickTime, uint32 bufferTime);
+	Buf(int16 bufId, std::string& bufTypeName, int64 curTime, uint32 tickTime, int64 bufferTime);
+	Buf(int16 bufId, const char* bufTypeName, int64 curTime, uint32 tickTime, int64 bufferTime);
 	virtual ~Buf();
 
-	void run(BgUnit* me, uint32 curTime);
+	void run(BgUnit* me, int64 curTime);
 
 	int16 getId();
 	std::string getName();
@@ -33,11 +33,11 @@ public:
 
 	bool waitDel();
 
-	void setLastTime(uint32 lastTime)
+	void setLastTime(int64 lastTime)
 	{
 		lastTime_ = lastTime;
 	}
-	void setBufferTime(uint32 bufferTime)
+	void setBufferTime(int64 bufferTime)
 	{
 		bufferTime_ = bufferTime;
 	}
@@ -52,8 +52,8 @@ protected:
 
 	bool waitDel_; //等待被移除的buf
 	uint32 tickTime_;  // buf 多少秒tick 一下
-	uint32 lastTime_;
-	uint32 bufferTime_; // buf 持续时间
+	int64 lastTime_;
+	int64 bufferTime_; // buf 持续时间
 };
 
 #endif /* SKILL_H_ */

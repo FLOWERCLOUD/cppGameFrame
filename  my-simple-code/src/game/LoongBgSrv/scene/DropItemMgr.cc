@@ -64,7 +64,7 @@ bool DropItemMgr::init()
 	return true;
 }
 
-void DropItemMgr::run(uint32 curTime)
+void DropItemMgr::run(int64 curTime)
 {
 	if (curTime - lastTime_ > sTenseconds)
 	{

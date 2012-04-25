@@ -25,14 +25,14 @@ public:
 	virtual ~BgFlower();
 
 	void init();
-	void run(uint32 curTime);
+	void run(int64 curTime);
 	void shutdown();
 
-	void setPlantTimes(uint32 plantTime)
+	void setPlantTimes(int64 plantTime)
 	{
 		plantTimes_ = plantTime;
 	}
-	uint32 getPlantTimes()
+	int64 getPlantTimes()
 	{
 		return plantTimes_;
 	}
@@ -49,14 +49,14 @@ public:
 	virtual bool hasSkill(int16 skillId);
 
 private:
-	void runBuf(uint32 curTime);
+	void runBuf(int64 curTime);
 	void removeAllBuf();
 
 	void broadMsg(PacketBase& op);
-	void onAIHandle(uint32 curTime);
+	void onAIHandle(int64 curTime);
 private:
-	uint32 plantTimes_;
-	uint32 useSkillTimes_;
+	int64 plantTimes_;
+	int64 useSkillTimes_;
 	std::list<Buf*> bufList_; //食人花的buf 列表
 	Scene* pScene_;
 };

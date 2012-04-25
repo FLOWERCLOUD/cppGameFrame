@@ -36,13 +36,13 @@ bool FlowerMgr::init()
 	return true;
 }
 
-void FlowerMgr::run(uint32 curTime)
+void FlowerMgr::run(int64 curTime)
 {
 	std::list<BgFlower*>::iterator itList;
 	for (itList = flowerList_.begin(); itList != flowerList_.end(); )
 	{
 		BgFlower* flower = *itList;
-		uint32 plantTime = flower->getPlantTimes();
+		int64 plantTime = flower->getPlantTimes();
 		if (curTime - plantTime > sDisappearTime || flower->isDead())
 		{
 			// 告诉客户端知道 这个食人花要消失啦

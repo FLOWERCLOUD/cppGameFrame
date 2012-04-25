@@ -9,7 +9,7 @@
 
 #include <assert.h>
 
-MianYiBuf::MianYiBuf(int16 bufId, uint32 curTime, uint32 bufferTime):
+MianYiBuf::MianYiBuf(int16 bufId, int64 curTime, int64 bufferTime):
 	Buf(bufId, "免疫", curTime, 0, bufferTime)
 {
 

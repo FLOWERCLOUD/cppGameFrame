@@ -18,7 +18,7 @@ StateBattlegroundStart::~StateBattlegroundStart()
 
 }
 
-void StateBattlegroundStart::run(uint32 curTime)
+void StateBattlegroundStart::run(int64 curTime)
 {
 	if (!pBattleground_) return;
 

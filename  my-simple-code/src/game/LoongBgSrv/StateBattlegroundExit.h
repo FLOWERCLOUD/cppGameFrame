@@ -18,7 +18,7 @@ public:
 	StateBattlegroundExit(Battleground* bg);
 	virtual ~StateBattlegroundExit();
 
-	virtual void run(uint32 curTime);
+	virtual void run(int64 curTime);
 
 	virtual BgStateE getState() { return BGSTATE_EXIT; }
 	virtual uint32	getStateTimeLimit() { return 10000; }

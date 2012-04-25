@@ -50,11 +50,11 @@ static inline int16 getBonusValue(BgUnit* me, BgUnit* target)
 	return bonusTable[meUnitType][targetUnitType];
 }
 
-static inline uint32 getCurTime()
+static inline int64 getCurTime()
 {
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
-	uint32 seconds = tv.tv_sec;
+	int64 seconds = tv.tv_sec;
 	return seconds * 1000 + tv.tv_usec / 1000;
 }
 

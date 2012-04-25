@@ -32,7 +32,7 @@ bool BattlegroundMgr::init()
 	return true;
 }
 
-void BattlegroundMgr::run(uint32 curTime)
+void BattlegroundMgr::run(int64 curTime)
 {
 	static int sStartIndex = 0;
 	static const int sFragment = 3;

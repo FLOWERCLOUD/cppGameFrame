@@ -19,7 +19,7 @@ public:
 	virtual ~StateBattlegroundRun();
 
 	virtual void start();
-	virtual void run(uint32 curTime);
+	virtual void run(int64 curTime);
 	virtual void end();
 
 	virtual BgStateE getState() { return BGSTATE_RUN; }
@@ -28,7 +28,7 @@ public:
 
 private:
 	bool bWaitState_; // 是否在等其他人进入战场
-	uint32 waitTimes_;
+	int64 waitTimes_;
 };
 
 #endif /* STATEBATTLEGROUNDRUN_H_ */

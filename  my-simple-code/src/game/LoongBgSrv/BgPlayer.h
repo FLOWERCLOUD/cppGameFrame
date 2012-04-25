@@ -30,7 +30,7 @@ public:
 	void setPetId(int16 petId);
 	bool hasPet();
 
-	void run(uint32 curTime);
+	void run(int64 curTime);
 
 	bool onMsgHandler(PacketBase& op);
 
@@ -76,7 +76,7 @@ public:
 	virtual void fullHp();
 	virtual void sendPacket(PacketBase& op);
 private:
-	void runBuf(uint32 curTime);
+	void runBuf(int64 curTime);
 	void removeAllBuf();
 
 	// 消息处理函数
@@ -106,7 +106,7 @@ private:
 	int16 title_;
 	int32 joinTimes_; //该玩家已经玩了多少次了
 	std::list<Buf*> bufList_; //玩家中的buf 列表
-	std::map<int16, int32> useSkillMap_;
+	std::map<int16, int64> useSkillMap_;
 	bool bWaitClose_;
 	Package package_;
 	Timestamp useItemTimestamp_;

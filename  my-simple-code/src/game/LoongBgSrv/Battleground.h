@@ -45,7 +45,7 @@ public:
 	bool addBgPlayer(BgPlayer* player, BgUnit::TeamE team);
 	bool removeBgPlayer(BgPlayer* player, BgUnit::TeamE team);
 
-	void run(uint32 curTime);
+	void run(int64 curTime);
 	void shtudown();
 
 	bool getBgInfo(PacketBase& op);

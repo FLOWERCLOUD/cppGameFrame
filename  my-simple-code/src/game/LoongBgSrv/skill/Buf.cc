@@ -29,7 +29,7 @@ Buf::Buf(int16 bufId, std::string& bufTypeName):
 {
 }
 
-Buf::Buf(int16 bufId, std::string& bufTypeName, uint32 curTime, uint32 tickTime, uint32 bufferTime):
+Buf::Buf(int16 bufId, std::string& bufTypeName, int64 curTime, uint32 tickTime, int64 bufferTime):
 	bufId_(bufId),
 	bufName_(bufTypeName),
 	waitDel_(false),
@@ -40,7 +40,7 @@ Buf::Buf(int16 bufId, std::string& bufTypeName, uint32 curTime, uint32 tickTime,
 
 }
 
-Buf::Buf(int16 bufId, const char* bufTypeName, uint32 curTime, uint32 tickTime, uint32 bufferTime):
+Buf::Buf(int16 bufId, const char* bufTypeName, int64 curTime, uint32 tickTime, int64 bufferTime):
 	bufId_(bufId),
 	bufName_(bufTypeName),
 	waitDel_(false),
@@ -56,7 +56,7 @@ Buf::~Buf()
 {
 }
 
-void Buf::run(BgUnit* me, uint32 curTime)
+void Buf::run(BgUnit* me, int64 curTime)
 {
 	LOG_TRACE << " Buf::run - playerId: " << me->getId()
 							<< " curTime: " << curTime;

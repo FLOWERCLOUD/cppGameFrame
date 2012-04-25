@@ -34,7 +34,7 @@ void BattlegroundState::start()
 	}
 }
 
-void BattlegroundState::run(uint32 curTime)
+void BattlegroundState::run(int64 curTime)
 {
 
 }
@@ -46,7 +46,7 @@ void BattlegroundState::end()
 
 uint32 BattlegroundState::getLeftTime()
 {
-	uint32 curTime = getCurTime();
-	uint32 leftTime = getStateTimeLimit() - (curTime - startTime_);
+	int64 curTime = getCurTime();
+	uint32 leftTime = getStateTimeLimit() - static_cast<uint32>(curTime - startTime_);
 	return leftTime;
 }

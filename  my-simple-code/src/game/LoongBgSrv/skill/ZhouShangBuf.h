@@ -15,7 +15,7 @@
 class ZhouShangBuf:public Buf
 {
 public:
-	ZhouShangBuf(int16 bufId, uint32 curTime, uint32 bufferTime);
+	ZhouShangBuf(int16 bufId, int64 curTime, int64 bufferTime);
 	virtual ~ZhouShangBuf();
 
 	virtual void onDelete(BgUnit* me);

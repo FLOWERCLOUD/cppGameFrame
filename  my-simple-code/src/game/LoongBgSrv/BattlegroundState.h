@@ -33,7 +33,7 @@ public:
 	virtual ~BattlegroundState();
 
 	virtual void start();
-	virtual void run(uint32 curTime);
+	virtual void run(int64 curTime);
 	virtual void end();
 
 	virtual BgStateE getState() { return BGSTATE_NONE; }
@@ -43,7 +43,7 @@ public:
 	uint32 getLeftTime();
 protected:
 	Battleground* pBattleground_;
-	uint32 startTime_;
+	int64 startTime_;
 };
 
 #endif /* BATTLEGROUNDSTATE_H_ */

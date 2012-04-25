@@ -190,7 +190,7 @@ LoongBgSrv::LoongBgSrv(EventLoop* loop, InetAddress& serverAddr, InetAddress& ho
 	server_.setWriteCompleteCallback(
 			std::tr1::bind(&LoongBgSrv::onWriteComplete, this, std::tr1::placeholders::_1));
 
-    loop->runEvery(0.1, std::tr1::bind(&LoongBgSrv::tickMe, this));
+    loop->runEvery(0.2, std::tr1::bind(&LoongBgSrv::tickMe, this));
     loop->runEvery(30.0, std::tr1::bind(&LoongBgSrv::onTimer, this));
     loop->runEvery(3.0, std::tr1::bind(&LoongBgSrv::printThroughput, this));
 	LOG_DEBUG << "============ LoongBgSrv::LoongBgSrv serverAddr: "<<  server_.hostport()
@@ -501,7 +501,7 @@ void LoongBgSrv::tickMe()
 	static double tickMeWarn = static_cast<double>(sConfigMgr.MainConfig.GetFloatDefault("packet", "tickMeTimeWarn", 0.005f));
 	if (!shutdown_loongBgSrv)
 	{
-		uint32 curTime = getCurTime();
+		int64 curTime = getCurTime();
 		TIME_FUNCTION_CALL(battlegroundMgr_.run(curTime), tickMeWarn);
 	}
 	else

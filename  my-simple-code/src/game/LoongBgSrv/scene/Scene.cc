@@ -85,7 +85,7 @@ void Scene::shutdown()
 	flowerMgr_.shutdown();
 }
 
-void Scene::run(uint32 curTime)
+void Scene::run(int64 curTime)
 {
 	std::map<int32, BgPlayer*>::iterator iter;
 	for(iter = playerMgr_.begin(); iter != playerMgr_.end(); iter++)

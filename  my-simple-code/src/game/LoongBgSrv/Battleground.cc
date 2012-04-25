@@ -114,7 +114,7 @@ bool Battleground::removeBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 	return scene_.removePlayer(player);
 }
 
-void Battleground::run(uint32 curTime)
+void Battleground::run(int64 curTime)
 {
 	scene_.run(curTime);
 	if (pState_)
