@@ -427,7 +427,7 @@ bool LoongBgSrv::login(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::T
 	// 参加次数限制( 如果以后做成多进程，参战次数要保存在一个公共的地方中去)
 	static const int32 maxJoinTimes = 5;
 	int32 joinTimes = sJoinTimesMgr.getJoinTimes(playerId);
-	if ( joinTimes > maxJoinTimes)
+	if ( joinTimes >= maxJoinTimes)
 	{
 		LOG_ERROR << "LoongBgSrv::login (too much join Times) - playerId:"  << playerId
 								<< " playerName: " << playerName
