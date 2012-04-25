@@ -726,7 +726,7 @@ void BgPlayer::onSelectPet(PacketBase& pb)
 
 	if (!isDead()) return;
 
-	package_.clear();
+	//package_.clear();
 	removeAllBuf();
 
 	const PetBase& petbase = sPetBaseMgr.getPetBaseInfo(petId);
