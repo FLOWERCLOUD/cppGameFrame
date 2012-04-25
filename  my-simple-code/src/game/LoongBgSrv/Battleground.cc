@@ -241,6 +241,8 @@ void Battleground::settlement()
 
 	PacketBase op(client::OP_SETTLEMENT, playerMgr.size());
 	op.putInt32(bgResult_);
+	LOG_INFO << "[BattleResult] =========================== result: " << bgResult_
+						<< " id: " << id_;
 	PacketBase hotelop(hotel::OP_GET_BATTLEGROUND_AWARD, playerMgr.size());
 	for(iter = playerMgr.begin(); iter != playerMgr.end(); iter++)
 	{
@@ -252,6 +254,8 @@ void Battleground::settlement()
 				player->serializeResult(op, bgResult_, hotelop);
 			}
 	}
+	LOG_INFO << "[BattleResult] =========================== result: " << bgResult_
+						<< " id: " << id_;
 
 	scene_.broadMsg(op);
 	// 把战斗结果 通知给hotel 让hotel把相应的奖励加给玩家哦

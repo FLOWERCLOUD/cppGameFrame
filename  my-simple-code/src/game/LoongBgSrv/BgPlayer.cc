@@ -163,6 +163,10 @@ void BgPlayer::shutdown()
 
 void BgPlayer::serializeResult(PacketBase& op, BgResultE bgResult, PacketBase& hotelop)
 {
+	LOG_INFO << "[BattleResult] playerId: " << getId()
+						<< " name: " << name_
+						<< " team: " << team_;
+
 	hotelop.putInt32(getId());
 
 	op.putInt32(getId());

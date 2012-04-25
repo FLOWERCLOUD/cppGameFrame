@@ -146,8 +146,8 @@ void LoongBgSrv::phpThreadHandler()
 			snprintf(buf, 1023, "%s?id=%d&type=3&black=%d&white=%d&states=%d",
 				phpAddr.c_str(),
 				param.bgId,
-				param.blackNum,
-				param.whiteNum,
+				static_cast<int>(param.blackNum),
+				static_cast<int>(param.whiteNum),
 				param.bgState);
 
 			htmlClient.loadUrl(buf);
