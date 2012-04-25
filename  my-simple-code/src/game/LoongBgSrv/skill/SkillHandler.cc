@@ -45,7 +45,7 @@ bool SkillHandler::onEmitSkill(int16 skillId, BgUnit* me, BgUnit* target, Scene*
 								<< " me: " << me->getId()
 								<< " target: " << target->getId();
 
-		target->alert(BgUnit::FLOW_ALERTCODETYPE, ErrorCode::BG_CANNOT_HURT);
+		me->alert(BgUnit::FLOW_ALERTCODETYPE, ErrorCode::BG_CANNOT_HURT);
 		return false;
 	}
 	const SkillBase& skillbase = sSkillBaseMgr.getSkillBaseInfo(skillId);

@@ -42,7 +42,7 @@ void JoinTimesMgr::incJoinTimes(int32 playerId)
 	if (iter != playerMap_.end())
 	{
 		int32 joinTimes =  iter->second;
-		playerMap_[playerId] = joinTimes++;
+		playerMap_[playerId] = ++joinTimes;
 		LOG_INFO << "JoinTimesMgr::incJoinTimes - playerId: " << playerId
 							<< " joinTimes: " << joinTimes;
 		return;
