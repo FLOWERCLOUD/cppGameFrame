@@ -288,7 +288,7 @@ bool BgPlayer::addBuf(Buf* buf)
 	//  告诉客户端 xx 人中了buf
 	PacketBase pb(client::OP_ADD_BUF, this->getId());
 	pb.putInt32(this->getId());
-	pb.putInt32(this->getUnitType());
+	pb.putInt32(0);
 	pb.putInt32(buf->getId());
 	pb.putInt32(x_);
 	pb.putInt32(y_);

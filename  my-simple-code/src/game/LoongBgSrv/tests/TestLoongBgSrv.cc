@@ -206,8 +206,7 @@ private:
 		//}
 
 		int32 playerId = pb.getParam();
-		//int32 unitType =
-				pb.getInt32();
+		int32 unitType =pb.getInt32();
 		int32 damageType = pb.getInt32();
 		if (damageType == 0)
 		{
@@ -217,6 +216,7 @@ private:
 			int32 damage = pb.getInt32();
 			LOG_INFO << "onHurt - "<< " playerId: " << playerId
 								<< "  skillId: " << skillId
+								<< " unitType: " << unitType
 								<< " damage: " << damage;
 		}
 		else if (damageType == 1)
@@ -225,6 +225,7 @@ private:
 			int32 damage = pb.getInt32();
 			LOG_INFO << "onHurt - "<< " playerId: " << playerId
 								<< "  bufId: " << bufId
+								<< " unitType: " << unitType
 								<< " damage: " << damage;
 		}
 	}

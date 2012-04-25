@@ -547,7 +547,7 @@ void LoongBgClient::onHurt(mysdk::net::TcpConnection* pCon, PacketBase& pb)
 	int32 attacker;
 	int32 playerId = pb.getParam();
 	int32 unitType =pb.getInt32();
-	((void)unitType);
+
 	int32 damageType = pb.getInt32();
 	if (damageType == 0)
 	{
@@ -557,6 +557,7 @@ void LoongBgClient::onHurt(mysdk::net::TcpConnection* pCon, PacketBase& pb)
 		damage = pb.getInt32();
 		LOG_INFO << "onHurt - "<< " playerId: " << playerId
 							<< "  skillId: " << skillId
+							<< " unitType: " << unitType
 							<< " damage: " << damage;
 		attacker = pb.getInt32();
 	}
@@ -566,6 +567,7 @@ void LoongBgClient::onHurt(mysdk::net::TcpConnection* pCon, PacketBase& pb)
 		damage = pb.getInt32();
 		LOG_INFO << "onHurt - "<< " playerId: " << playerId
 							<< "  bufId: " << bufId
+							<< " unitType: " << unitType
 							<< " damage: " << damage;
 	}
 	if (playerId == playerId_)
