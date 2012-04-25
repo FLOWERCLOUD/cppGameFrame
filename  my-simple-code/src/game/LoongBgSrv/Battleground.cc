@@ -81,8 +81,6 @@ bool Battleground::addBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 		return false;
 	}
 
-	TellPhpBattleInfo();
-
 	if (bFirst_)
 	{
 		switchWaitState();
@@ -92,6 +90,7 @@ bool Battleground::addBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 	player->setBgId(getId());
 	player->setTeam(team);
 
+	TellPhpBattleInfo();
 	// 在激战中算一个次 参加了战场
 	if (this->getState() == BattlegroundState::BGSTATE_RUN)
 	{
@@ -106,11 +105,11 @@ bool Battleground::removeBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 							<< " team: " << team
 							<< " num: " << static_cast<int>(teamNum_[team]);
 
-	TellPhpBattleInfo();
-
 	teamNum_[team]--;
 	player->setBgId(0);
 	player->setTeam(BgUnit::kNONE_TEAM);
+
+	TellPhpBattleInfo();
 	return scene_.removePlayer(player);
 }
 
