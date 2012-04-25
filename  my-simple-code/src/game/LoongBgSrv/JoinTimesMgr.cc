@@ -37,6 +37,7 @@ void JoinTimesMgr::shutdown()
 
 void JoinTimesMgr::incJoinTimes(int32 playerId)
 {
+#ifndef TEST
 	PlayerMgrT::iterator iter;
 	iter = playerMap_.find(playerId);
 	if (iter != playerMap_.end())
@@ -51,10 +52,12 @@ void JoinTimesMgr::incJoinTimes(int32 playerId)
 	LOG_INFO << "JoinTimesMgr::incJoinTimes - playerId: " << playerId
 						<< " joinTimes: " << 0;
 	playerMap_.insert(std::pair<int32, int32>(playerId, 0));
+#endif
 }
 
 int32 JoinTimesMgr::getJoinTimes(int32 playerId)
 {
+#ifndef TEST
 	PlayerMgrT::iterator iter;
 	iter = playerMap_.find(playerId);
 	if (iter != playerMap_.end())
@@ -62,5 +65,6 @@ int32 JoinTimesMgr::getJoinTimes(int32 playerId)
 		int32 joinTimes =  iter->second;
 		return joinTimes;
 	}
+#endif
 	return 0;
 }
