@@ -44,12 +44,12 @@ static bool JianSheBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUnit
     	}
 
     	int32 distance = getDistance(target, player);
-    	if ( distance<= bufBase.paramList_[0])
+    	if ( distance<= bufBase.paramList_[0] * bufBase.paramList_[0])
     	{
     		int16 damage = static_cast<int16>(attackValue * bufBase.paramList_[1] / 100);
     		player->onBufHurt(player, damage, bufBase);
     	}
-    	else if (distance <= bufBase.paramList_[2])
+    	else if (distance <= bufBase.paramList_[2] * bufBase.paramList_[2])
     	{
     		int16 damage = static_cast<int16>(attackValue * bufBase.paramList_[3] / 100);
     		player->onBufHurt(player, damage, bufBase);
