@@ -866,9 +866,30 @@ void BgPlayer::onPlantFlower(PacketBase& pb)
 {
 	if (!pScene) return;
 
+	int16 itemId = 4; //食人花种子id
+	if (!hasItem(4)) //
+	{
+		return;
+	}
+
+	if (!useItemTimestamp_.valid())
+	{
+		// 使用物品的冷却时间还没有到 不能使用物品
+		if (timeDifference(Timestamp::now(), useItemTimestamp_) < 10000) // 10s
+		{
+			LOG_INFO << "BgPlayer::onUseItem -- you can't use item for cooldown,  playerId:  " << this->getId()
+					<< " name: " << name_;
+			return;
+		}
+	}
+	useItemTimestamp_ = Timestamp::now();
+
 	int16 x = static_cast<int16>(pb.getInt32());
 	int16 y = static_cast<int16>(pb.getInt32());
-	pScene->plantFlower(this, x, y);
+	if (pScene->plantFlower(this, x, y))
+	{
+		delItem(itemId);
+	}
 }
 
 void BgPlayer::onGMCmd(PacketBase& pb)

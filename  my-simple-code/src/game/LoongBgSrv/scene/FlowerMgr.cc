@@ -75,12 +75,6 @@ bool FlowerMgr::plantFlower(BgPlayer* player, int16 x, int16 y)
 {
 	assert(pScene_);
 
-	int16 itemId = 4; //食人花种子id
-	if (!player->hasItem(4)) //
-	{
-		return false;
-	}
-
 	if (flowerList_.size() > sMaxIFlowerNum)
 	{
 		// 告诉客户端 战场不能种植食人花啦
@@ -96,10 +90,10 @@ bool FlowerMgr::plantFlower(BgPlayer* player, int16 x, int16 y)
 	flower->setY(y);
 	flower->setPlantTimes(getCurTime());
 	flowerList_.push_back(flower);
-	player->delItem(itemId);
 
 	PacketBase op(client::OP_PLANT_FLOWER, 0);
 	flower->serialize(op);
+	op.putInt32(player->getId());
 	pScene_->broadMsg(op);
 	return true;
 }
