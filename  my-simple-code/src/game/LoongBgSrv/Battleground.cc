@@ -243,7 +243,8 @@ void Battleground::settlement()
 	op.putInt32(bgResult_);
 	LOG_INFO << "[BattleResult] =========================== result: " << bgResult_
 						<< " id: " << id_;
-	PacketBase hotelop(hotel::OP_GET_BATTLEGROUND_AWARD, playerMgr.size());
+	int32 size = static_cast<int32>(playerMgr.size());
+	PacketBase hotelop(hotel::OP_GET_BATTLEGROUND_AWARD, size);
 	for(iter = playerMgr.begin(); iter != playerMgr.end(); iter++)
 	{
 			BgPlayer* player = iter->second;
