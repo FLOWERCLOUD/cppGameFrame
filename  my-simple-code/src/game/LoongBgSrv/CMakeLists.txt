@@ -60,7 +60,7 @@ else (MYSQL_FOUND)
 message(FATAL_ERROR, "MySQL NOT FOUND!")
 endif (MYSQL_FOUND)
 
-add_executable(LoongBgSrv ${LoongBgSrv_SRCS})
-target_link_libraries(LoongBgSrv kabu_codec mysdk_exconfig mysdk_mysql mysdk_net curl)
+add_executable(longbg ${LoongBgSrv_SRCS})
+target_link_libraries(longbg kabu_codec mysdk_exconfig mysdk_mysql mysdk_net curl)
 
 add_subdirectory(tests)

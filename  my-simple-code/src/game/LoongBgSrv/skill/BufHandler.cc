@@ -43,6 +43,11 @@ static bool JianSheBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUnit
     		continue;
     	}
 
+    	if (player->getTeam() == me->getTeam())
+    	{
+    		continue;
+    	}
+
     	int32 distance = getDistance(target, player);
     	if ( distance<= bufBase.paramList_[0] * bufBase.paramList_[0])
     	{
