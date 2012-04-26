@@ -30,11 +30,19 @@ void ZhouShangBuf::onDelete(BgUnit* me)
 void ZhouShangBuf::onTick(BgUnit* me)
 {
 	LOG_TRACE << " ZhouShangBuf::onTick - playerId: " << me->getId();
+	if (me->canSkillHurt())
+	{
+		const BufBase& bufbase = sBufBaseMgr.getBufBaseInfo(bufId_);
+		int16 decHp = bufbase.paramList_[0];
 
-	const BufBase& bufbase = sBufBaseMgr.getBufBaseInfo(bufId_);
-	int16 decHp = bufbase.paramList_[0];
-
-	me->onBufHurt(me, decHp, bufbase);
+		me->onBufHurt(me, decHp, bufbase);
+	}
+	else
+	{
+		LOG_TRACE << " ZhouShangBuf::onTick - playerId: " << me->getId()
+								<< " can skill hurt!!";
+		waitDel_ = true;
+	}
 }
 
 void ZhouShangBuf::onCacl(BgUnit* me)
