@@ -21,7 +21,7 @@ public:
 	virtual void run(int64 curTime);
 
 	virtual BgStateE getState() { return BGSTATE_WAIT; }
-	virtual uint32	getStateTimeLimit() { return 20000; } //55000; }
+	virtual uint32	getStateTimeLimit() { return 55000; }
 	virtual std::string getStateName() { return "准备阶段"; }
 };
 
