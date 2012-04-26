@@ -60,6 +60,10 @@ public:
 //
 
 	void broadMsg(PacketBase& op);
+	void setResult(BgResultE bgResult)
+	{
+		bgResult_ = bgResult;
+	}
 public:
 	// 战场释放结束啦
 	bool isGameOver();

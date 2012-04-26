@@ -52,8 +52,14 @@ void StateBattlegroundRun::run(int64 curTime)
 		return;
 	}
 
-	if (curTime - startTime_ >= getStateTimeLimit())
+	if (pBattleground_->isGameOver())
 	{
+			pBattleground_->switchExitState();
+	}
+	else if (curTime - startTime_ >= getStateTimeLimit())
+	{
+		// 时间到了 算平局啦
+		pBattleground_->setResult(KDRAW_BGRESULT);
 		pBattleground_->switchExitState();
 	}
 	else if (pBattleground_->haveOtherTeamEmpty())
@@ -65,10 +71,6 @@ void StateBattlegroundRun::run(int64 curTime)
 
 		bWaitState_ = true;
 		waitTimes_ = curTime;
-	}
-	else if (pBattleground_->isGameOver())
-	{
-		pBattleground_->switchExitState();
 	}
 }
 

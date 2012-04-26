@@ -175,15 +175,15 @@ void BgPlayer::serializeResult(PacketBase& op, BgResultE bgResult, PacketBase& h
 	op.putInt32(killEnemyTimes_);
 	if (bgResult == KDRAW_BGRESULT)
 	{
-		op.putInt32(2);
+		op.putInt32(2);  // 2个勋章
 
-		hotelop.putInt32(3);
+		hotelop.putInt32(3);  // 3代表平局
 	}
 	else if (bgResult == KBLACK_BGRESULT && team_ == BgUnit::kBlack_TEAM)
 	{
-		op.putInt32(5);
+		op.putInt32(5); // 5个勋章
 
-		hotelop.putInt32(1);
+		hotelop.putInt32(1); // 1代表胜利
 	}
 	else if (bgResult == KWHITE_BGRESULT && team_ == BgUnit::kWhite_TEAM)
 	{
@@ -193,9 +193,9 @@ void BgPlayer::serializeResult(PacketBase& op, BgResultE bgResult, PacketBase& h
 	}
 	else
 	{
-		op.putInt32(1);
+		op.putInt32(1); // 1个勋章
 
-		hotelop.putInt32(2);
+		hotelop.putInt32(2); // 2代表失败
 	}
 }
 
