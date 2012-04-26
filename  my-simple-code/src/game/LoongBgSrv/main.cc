@@ -88,7 +88,7 @@ static void remove_pidfile(const char *pid_file)
 
 int main(int argc, char **argv)
 {
-	int defalutPort = 2007;  //默认端口
+	int defalutPort = 5007;  //默认端口
 	std::string configFile("config/def.conf");
 	int maxconns = 1024;
 
