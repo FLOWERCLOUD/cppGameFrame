@@ -58,6 +58,14 @@ static inline int64 getCurTime()
 	return seconds * 1000 + tv.tv_usec / 1000;
 }
 
+// 这个实现很那个... 谁能提供一个比较好的实现呢？
+static inline bool isSameDay(int64 day1, int64 day2)
+{
+    static const int kMilliSecondsPerDay = 24 * 60 * 60 * 1000;
+    static const int kUTFDifference = 8 * 60 * 60 * 1000; //utf 时间和北京时间的差（差8小时）
+    return (day1 + kUTFDifference)  / kMilliSecondsPerDay == (day2 + kUTFDifference) / kMilliSecondsPerDay;
+}
+
 static inline uint16 GetHeight16(const int32 t)
 {
 	return static_cast<uint16>((t >> 16) & 0x0000FFFF);

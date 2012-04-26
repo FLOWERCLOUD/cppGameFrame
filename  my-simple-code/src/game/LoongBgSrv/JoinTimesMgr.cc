@@ -7,9 +7,11 @@
 
 #include <game/LoongBgSrv/JoinTimesMgr.h>
 
+#include <game/LoongBgSrv/Util.h>
 #include <mysdk/base/Logging.h>
 
-JoinTimesMgr::JoinTimesMgr()
+JoinTimesMgr::JoinTimesMgr():
+	lastTimes_(getCurTime())
 {
 	init();
 }
@@ -38,20 +40,30 @@ void JoinTimesMgr::shutdown()
 void JoinTimesMgr::incJoinTimes(int32 playerId)
 {
 #ifndef TEST
+	int64 curTime = getCurTime();
+	if (!isSameDay(lastTimes_, curTime))
+	{
+		LOG_INFO << "JoinTimesMgr::incJoinTimes - second day!!! lastTimes_ " << lastTimes_
+						<< "  curTime: " << curTime;
+
+		lastTimes_ = curTime;
+		playerMap_.clear();
+	}
+
 	PlayerMgrT::iterator iter;
 	iter = playerMap_.find(playerId);
 	if (iter != playerMap_.end())
 	{
-		int32 joinTimes =  iter->second;
-		playerMap_[playerId] = ++joinTimes;
-		LOG_INFO << "JoinTimesMgr::incJoinTimes - playerId: " << playerId
+			int32 joinTimes =  iter->second;
+			playerMap_[playerId] = ++joinTimes;
+			LOG_INFO << "JoinTimesMgr::incJoinTimes - playerId: " << playerId
 							<< " joinTimes: " << joinTimes;
-		return;
+			return;
 	}
 
 	LOG_INFO << "JoinTimesMgr::incJoinTimes - playerId: " << playerId
-						<< " joinTimes: " << 0;
-	playerMap_.insert(std::pair<int32, int32>(playerId, 0));
+						<< " joinTimes: " << 1;
+	playerMap_.insert(std::pair<int32, int32>(playerId, 1));
 #endif
 }
 

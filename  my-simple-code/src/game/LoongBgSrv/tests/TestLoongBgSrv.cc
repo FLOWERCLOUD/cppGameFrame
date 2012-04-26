@@ -328,7 +328,7 @@ int main(int argc, char* argv[])
 	  if (argc > 2)
 	  {
 		  EventLoop loop;
-		  InetAddress serverAddr(argv[1], 2007);
+		  InetAddress serverAddr(argv[1], 5700);
 
 		  if (atoi(argv[2]) == 1)
 		  {

@@ -29,6 +29,7 @@ public:
 	int32 getJoinTimes(int32 playerId);
 private:
 	PlayerMgrT playerMap_;
+	int64 lastTimes_;
 private:
 	DISALLOW_COPY_AND_ASSIGN(JoinTimesMgr);
 };
