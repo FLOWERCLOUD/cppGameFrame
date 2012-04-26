@@ -438,7 +438,7 @@ bool LoongBgSrv::login(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::T
 		op.putInt32(-2); // 已经玩5次啦 不能再玩啦
 		send(pCon, op);
 
-		pCon->shutdown();
+		//pCon->shutdown();
 		return true;
 	}
 
