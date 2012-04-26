@@ -54,7 +54,7 @@ void StateBattlegroundRun::run(int64 curTime)
 
 	if (pBattleground_->isGameOver())
 	{
-			pBattleground_->switchExitState();
+		pBattleground_->switchExitState();
 	}
 	else if (curTime - startTime_ >= getStateTimeLimit())
 	{
