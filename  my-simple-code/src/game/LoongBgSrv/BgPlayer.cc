@@ -484,7 +484,7 @@ void BgPlayer::removeAllBuf()
 
 void BgPlayer::setTitle(int16 title)
 {
-	if (title_ > title)
+	if (title_ >= title)
 	{
 		return;
 	}
