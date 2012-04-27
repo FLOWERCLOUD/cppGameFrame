@@ -487,7 +487,7 @@ bool LoongBgSrv::login(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::T
 	}
 
 	BgClient* bgClient = static_cast<BgClient*>(pCon->getContext());
-	assert(bgClient);
+	if (!bgClient) return false;
 	bgClient->player = player;
 
 	//  告诉客户端 登陆成功哦
