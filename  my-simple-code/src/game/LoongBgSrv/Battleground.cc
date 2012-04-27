@@ -244,12 +244,12 @@ void Battleground::settlement()
 	std::map<int32, BgPlayer*>& playerMgr = scene_.getPlayerMgr();
 	std::map<int32, BgPlayer*>::iterator iter;
 
-	PacketBase op(client::OP_SETTLEMENT, playerMgr.size());
+	PacketBase op(client::OP_SETTLEMENT, 0);
 	op.putInt32(bgResult_);
 	LOG_INFO << "[BattleResult] =========================== result: " << bgResult_
 						<< " id: " << id_;
-	int32 num = static_cast<int32>(playerMgr.size());
-	PacketBase hotelop(hotel::OP_GET_BATTLEGROUND_AWARD, num);
+	int32 num = 0;
+	PacketBase hotelop(hotel::OP_GET_BATTLEGROUND_AWARD, 0);
 	for(iter = playerMgr.begin(); iter != playerMgr.end(); iter++)
 	{
 			BgPlayer* player = iter->second;
@@ -258,11 +258,13 @@ void Battleground::settlement()
 				hotelop.putInt32(id_);
 				hotelop.putInt32(id_);
 				player->serializeResult(op, bgResult_, hotelop);
+				num++;
 			}
 	}
 	LOG_INFO << "[BattleResult] =========================== result: " << bgResult_
 						<< " id: " << id_;
-
+	hotelop.setParam(num);
+	op.setParam(num);
 	scene_.broadMsg(op);
 	// 把战斗结果 通知给hotel 让hotel把相应的奖励加给玩家哦
 	sendToHotel(hotelop);
