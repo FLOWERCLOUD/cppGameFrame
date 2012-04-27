@@ -34,6 +34,7 @@ public:
 
 	bool onMsgHandler(PacketBase& op);
 
+	bool isInBg();
 	void setScene(Scene* scene);
 	void setBgId(int16 bgId);
 	void setRoleType(int32 roletype);

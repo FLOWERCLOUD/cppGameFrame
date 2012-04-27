@@ -88,6 +88,11 @@ bool Battleground::addBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 		bFirst_ = false;
 	}
 	teamNum_[team]++;
+	// 如果他已经在莫个战场上了 就把他从莫个战场上移除
+	if (player->isInBg())
+	{
+		removeBgPlayer(player, player->getTeam());
+	}
 	player->setBgId(getId());
 	player->setTeam(team);
 

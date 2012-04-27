@@ -93,6 +93,11 @@ void BgPlayer::setScene(Scene* scene)
 	pScene = scene;
 }
 
+bool BgPlayer::isInBg()
+{
+	return sBattlegroundMgr.checkBattlegroundId(battlegroundId_);
+}
+
 void BgPlayer::setBgId(int16 bgId)
 {
 	battlegroundId_ = bgId;

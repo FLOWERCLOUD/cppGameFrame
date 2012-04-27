@@ -49,7 +49,7 @@ bool Scene::removePlayer(BgPlayer* player)
 	assert(player != NULL);
 
 	int32 playerId = player->getId();
-	playerMgr_[playerId] = NULL;
+	playerMgr_.erase(playerId);
 
 	PacketBase op(client::OP_REMOVE_PLAYER, playerId);
 	broadMsg(op);
