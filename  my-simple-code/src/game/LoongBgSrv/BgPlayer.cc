@@ -640,11 +640,19 @@ void BgPlayer::onEnterBattle(PacketBase& pb)
 		return;
 	}
 
+
 	BgUnit::TeamE team = (teamValue == BgUnit::kBlack_TEAM) ? BgUnit::kBlack_TEAM :BgUnit::kWhite_TEAM;
 
 	PacketBase op(client::OP_ENTER_BATTLE, -1); // -1 代表是这个战场已经满人了
 	op.putInt32(bgId);
 	op.putInt32(teamValue);
+
+	if (isInBg())
+	{
+		op.setParam(-3); //你已经在战场中了
+		sendPacket(op);
+		return;
+	}
 
 	Battleground& bg = sBattlegroundMgr.getBattleground(bgId);
 	if (bg.getState() == BattlegroundState::BGSTATE_EXIT )  // 战场在清理过程中, 不能进入这个战场哦
