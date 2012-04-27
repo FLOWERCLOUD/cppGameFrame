@@ -98,6 +98,11 @@ bool BgPlayer::isInBg()
 	return sBattlegroundMgr.checkBattlegroundId(battlegroundId_);
 }
 
+int16 BgPlayer::getBgId()
+{
+	return battlegroundId_;
+}
+
 void BgPlayer::setBgId(int16 bgId)
 {
 	battlegroundId_ = bgId;

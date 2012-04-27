@@ -71,9 +71,12 @@ int32 Battleground::getId()
 
 bool Battleground::addBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 {
+	if (!player) return false;
+
 	LOG_DEBUG << " Battleground::addBgPlayer - playerId: " << player->getId()
 							<< " team: " << team
 							<< " num: " << static_cast<int>(teamNum_[team])
+							<< " playerptr: " << player
 							<< " bgid: " << this->getId();
 
 	if (teamNum_[team] >= sMaxTeamNum)
@@ -111,9 +114,13 @@ bool Battleground::addBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 
 bool Battleground::removeBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 {
+	if (!player) return false;
+
 	LOG_DEBUG << " Battleground::removeBgPlayer - playerId: " << player->getId()
 							<< " team: " << team
 							<< " num: " << static_cast<int>(teamNum_[team])
+							<< " playerbgId: " << player->getBgId()
+							<< " playerptr: " << player
 							<< " bgid: " << this->getId();
 
 	teamNum_[team]--;

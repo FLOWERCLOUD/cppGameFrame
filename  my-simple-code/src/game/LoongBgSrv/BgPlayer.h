@@ -36,6 +36,7 @@ public:
 
 	bool isInBg();
 	void setScene(Scene* scene);
+	int16 getBgId();
 	void setBgId(int16 bgId);
 	void setRoleType(int32 roletype);
 	void setJoinTimes(int32 joinTimes);
