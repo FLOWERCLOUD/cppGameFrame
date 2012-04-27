@@ -33,6 +33,7 @@ static bool JianSheBufHandler(int16 bufId, int16 attackValue, BgUnit* me, BgUnit
     for (it = playerMgr.begin(); it != playerMgr.end(); ++it)
     {
     	BgPlayer* player = it->second;
+    	if (!player) continue;
     	// 自己不受溅射的伤害
     	if (player == me)
     	{

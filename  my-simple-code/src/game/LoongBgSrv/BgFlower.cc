@@ -180,6 +180,7 @@ void BgFlower::onAIHandle(int64 curTime)
 		for (it = playerMgr.begin(); it != playerMgr.end(); ++it)
 		{
 			BgPlayer* player = it->second;
+			if (!player) continue;
 			if (player->isDead())
 			{
 				continue;
