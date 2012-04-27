@@ -96,6 +96,10 @@ bool Battleground::addBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 	player->setBgId(getId());
 	player->setTeam(team);
 
+	LOG_INFO << "[DB]30191003:" << player->getId()
+					<< ":" << this->getId() << ":"
+					<< team;
+
 	TellPhpBattleInfo();
 	// 在激战中算一个次 参加了战场
 	if (this->getState() == BattlegroundState::BGSTATE_RUN)
@@ -251,6 +255,13 @@ void Battleground::settlement()
 
 	PacketBase op(client::OP_SETTLEMENT, 0);
 	op.putInt32(bgResult_);
+
+	if (pState_)
+	{
+			LOG_INFO << "[DB]30191004:" << this->getId()
+					<< ":" << bgResult_ << ":"
+					<< pState_->getStateTimeLimit() - pState_->getLeftTime();
+	}
 	LOG_INFO << "[BattleResult] =========================== result: " << bgResult_
 						<< " id: " << id_;
 	int32 num = 0;
