@@ -33,8 +33,9 @@ Scene::~Scene()
 bool Scene::addPlayer(BgPlayer* player)
 {
 	assert(player != NULL);
+
 	int32 playerId = player->getId();
-	playerMgr_.insert(std::pair<int32, BgPlayer*>(playerId, player));
+	playerMgr_[playerId] = player;
 	player->setScene(this);
 
 	PacketBase op(client::OP_ADD_PLAYER, 0);
@@ -48,7 +49,7 @@ bool Scene::removePlayer(BgPlayer* player)
 	assert(player != NULL);
 
 	int32 playerId = player->getId();
-	playerMgr_.erase(playerId);
+	playerMgr_[playerId] = NULL;
 
 	PacketBase op(client::OP_REMOVE_PLAYER, playerId);
 	broadMsg(op);

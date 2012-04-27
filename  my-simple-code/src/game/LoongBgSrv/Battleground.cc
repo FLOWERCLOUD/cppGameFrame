@@ -73,7 +73,8 @@ bool Battleground::addBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 {
 	LOG_DEBUG << " Battleground::addBgPlayer - playerId: " << player->getId()
 							<< " team: " << team
-							<< " num: " << static_cast<int>(teamNum_[team]);
+							<< " num: " << static_cast<int>(teamNum_[team])
+							<< " bgid: " << this->getId();
 
 	if (teamNum_[team] >= sMaxTeamNum)
 	{
@@ -103,14 +104,19 @@ bool Battleground::removeBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 {
 	LOG_DEBUG << " Battleground::removeBgPlayer - playerId: " << player->getId()
 							<< " team: " << team
-							<< " num: " << static_cast<int>(teamNum_[team]);
+							<< " num: " << static_cast<int>(teamNum_[team])
+							<< " bgid: " << this->getId();
 
 	teamNum_[team]--;
 	player->setBgId(0);
 	player->setTeam(BgUnit::kNONE_TEAM);
 
-	TellPhpBattleInfo();
-	return scene_.removePlayer(player);
+	bool res = scene_.removePlayer(player);
+	if (res)
+	{
+		TellPhpBattleInfo();
+	}
+	return res;
 }
 
 void Battleground::run(int64 curTime)

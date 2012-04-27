@@ -228,6 +228,10 @@ private:
 								<< " unitType: " << unitType
 								<< " damage: " << damage;
 		}
+
+
+		PacketBase op(game::OP_EXIT_BATTLE, 0);
+		codec_.send(pCon, op);
 	}
 
 	void onDropItem(mysdk::net::TcpConnection* pCon, PacketBase& pb)
@@ -267,6 +271,9 @@ private:
 		case client::OP_DROP_ITEM:
 			onDropItem(pCon, pb);
 			break;
+		case client::OP_EXIT_BATTLE:
+			LOG_INFO << getPlayerName() << " exit battle:" << op;
+			exit(1);
 		default:
 			LOG_INFO << getPlayerName() << " op no found, op:" << op;
 			break;
