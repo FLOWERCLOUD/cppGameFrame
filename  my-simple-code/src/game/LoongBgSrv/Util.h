@@ -90,5 +90,19 @@ static inline int32 MakeInt32(uint16 height, uint16 low)
         LOG_WARN << "[YOUHUA] call function: " << #p << " , time[s] = " << diff; \
 }
 
+static inline void Log(const char* content)
+{
+	char logbuf[256] = {0};
+	time_t seconds = static_cast<time_t>(Timestamp::now().microSecondsSinceEpoch() / Timestamp::kMicroSecondsPerSecond);
+	struct tm tm_time;
+	localtime_r(&seconds, &tm_time);
+
+	snprintf(logbuf, sizeof(logbuf) - 1, "[%4d-%02d-%02d-%02d-%02d-%02d][LOG] [DB]%s",
+			tm_time.tm_year + 1900, tm_time.tm_mon + 1, tm_time.tm_mday,
+			tm_time.tm_hour, tm_time.tm_min, tm_time.tm_sec,
+			content);
+
+	printf("%s\n", logbuf);
+}
 
 #endif /* UTIL_H_ */

@@ -17,7 +17,7 @@
 #include <game/LoongBgSrv/StateBattlegroundWait.h>
 #include <game/LoongBgSrv/JoinTimesMgr.h>
 #include <game/LoongBgSrv/base/PetBase.h>
-
+#include <game/LoongBgSrv/Util.h>
 #include <game/LoongBgSrv/protocol/GameProtocol.h>
 
 Battleground::Battleground():
@@ -96,9 +96,9 @@ bool Battleground::addBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 	player->setBgId(getId());
 	player->setTeam(team);
 
-	LOG_INFO << "[DB]30191003:" << player->getId()
-					<< ":" << this->getId() << ":"
-					<< team;
+	char logcontent[128];
+	snprintf(logcontent, sizeof(logcontent) - 1, "[30191003][%d][%d][%d]", player->getId(), this->getId(), team);
+	Log(logcontent);
 
 	TellPhpBattleInfo();
 	// 在激战中算一个次 参加了战场
@@ -258,9 +258,9 @@ void Battleground::settlement()
 
 	if (pState_)
 	{
-			LOG_INFO << "[DB]30191004:" << this->getId()
-					<< ":" << bgResult_ << ":"
-					<< pState_->getStateTimeLimit() - pState_->getLeftTime();
+		char logcontent[128];
+		snprintf(logcontent, sizeof(logcontent) - 1, "[30191004][%d][%d][%d]",this->getId(), bgResult_, pState_->getStateTimeLimit() - pState_->getLeftTime());
+		Log(logcontent);
 	}
 	LOG_INFO << "[BattleResult] =========================== result: " << bgResult_
 						<< " id: " << id_;
