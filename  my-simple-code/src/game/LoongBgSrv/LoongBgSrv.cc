@@ -362,7 +362,7 @@ void LoongBgSrv::printThroughput()
 	Timestamp endTime = Timestamp::now();
 	double time = timeDifference(endTime, startTime_);
 	char srvInfo[1024];
-	snprintf(srvInfo, sizeof(srvInfo), "%4.3f KiB/s--packetNum: %.3f 次/s--transferred: %4" MYSDK_LL_FORMAT "d B--ConnectionNum: %4u--Cpu: %f%%--RAM: %f M ",
+	snprintf(srvInfo, sizeof(srvInfo), "%4.3f KiB/s--packetNum: %.3f 次/s--transferred: %4" MYSDK_LL_FORMAT "d B--ConnectionNum: %4lu--Cpu: %f%%--RAM: %f M ",
 			static_cast<double>(transferred_)/time/1024,
 			static_cast<double>(packetNum_)/time,
 			transferred_,

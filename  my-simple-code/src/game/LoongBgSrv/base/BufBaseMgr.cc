@@ -10,7 +10,7 @@
 BufBaseMgr::BufBaseMgr():
 	curBufBaseNum_(0)
 {
-	//init();
+//	init();
 }
 
 BufBaseMgr::~BufBaseMgr()

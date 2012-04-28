@@ -10,7 +10,7 @@
 PetBaseMgr::PetBaseMgr():
 	curPetBaseNum_(0)
 {
-	//init();
+//	init();
 }
 
 PetBaseMgr::~PetBaseMgr()

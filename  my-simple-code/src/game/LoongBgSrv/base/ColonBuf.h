@@ -16,7 +16,7 @@ public:
         ColonBuf(const char *buf)
         {
                 m_buf = buf;
-                m_len = strlen(m_buf);
+                m_len = static_cast<int>(strlen(m_buf));
                 m_rindex = 0;
         }
         int GetInt(int &res)

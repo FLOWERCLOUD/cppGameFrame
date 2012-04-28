@@ -709,6 +709,9 @@ void BgPlayer::onStand(PacketBase& pb)
 
 	int16 x = static_cast<int16>(pb.getInt32());
 	int16 y = static_cast<int16>(pb.getInt32());
+	LOG_TRACE << "BgPlayer::onStand -- playerId: " << getId() 
+		  << " x: " << x
+		 << " y: " << y;
 	setX(x);
 	setY(y);
 }
@@ -719,7 +722,7 @@ void BgPlayer::onReqPlayerList(PacketBase& pb)
 
 	PacketBase op(client::OP_REQ_PLAYER_LIST, 0);
 	std::map<int32, BgPlayer*>& playerMgr = pScene->getPlayerMgr();
-	op.setParam(playerMgr.size());
+	op.setParam(static_cast<int>(playerMgr.size()));
 	std::map<int32, BgPlayer*>::iterator iter;
 	for(iter = playerMgr.begin(); iter != playerMgr.end(); iter++)
 	{

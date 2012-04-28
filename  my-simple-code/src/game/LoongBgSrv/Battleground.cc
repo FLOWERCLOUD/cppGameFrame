@@ -94,7 +94,7 @@ bool Battleground::addBgPlayer(BgPlayer* player, BgUnit::TeamE team)
 	// 如果他已经在莫个战场上了 就把他从莫个战场上移除
 	if (player->isInBg())
 	{
-		removeBgPlayer(player, player->getTeam());
+		player->close();
 	}
 	player->setBgId(getId());
 	player->setTeam(team);
@@ -266,7 +266,7 @@ void Battleground::settlement()
 	if (pState_)
 	{
 		char logcontent[128];
-		snprintf(logcontent, sizeof(logcontent) - 1, "[30191004][%d][%d][%d]",this->getId(), bgResult_, pState_->getStateTimeLimit() - pState_->getLeftTime());
+		snprintf(logcontent, sizeof(logcontent) - 1, "[30191004][%d][%d][%d]",this->getId(), static_cast<int>(bgResult_), pState_->getStateTimeLimit() - pState_->getLeftTime());
 		Log(logcontent);
 	}
 	LOG_INFO << "[BattleResult] =========================== result: " << bgResult_

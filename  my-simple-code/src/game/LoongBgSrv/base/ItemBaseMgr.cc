@@ -10,7 +10,7 @@
 ItemBaseMgr::ItemBaseMgr():
 	curItemBaseNum_(0)
 {
-	//init();
+//	init();
 }
 
 ItemBaseMgr::~ItemBaseMgr()

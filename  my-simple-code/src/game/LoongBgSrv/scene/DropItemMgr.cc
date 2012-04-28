@@ -179,7 +179,7 @@ bool DropItemMgr::pickUpItem(BgPlayer* player, int16 x, int16 y)
 
 bool DropItemMgr::serialize(PacketBase& op)
 {
-	size_t itemNum = itemList_.size();
+	int32 itemNum = static_cast<int32>(itemList_.size());
 	op.putInt32(itemNum);
 	std::map<int32, struct DropItem>::iterator iter;
 	for(iter = itemList_.begin(); iter != itemList_.end(); iter++)

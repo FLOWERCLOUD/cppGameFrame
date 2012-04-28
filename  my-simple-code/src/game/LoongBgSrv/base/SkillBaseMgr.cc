@@ -10,7 +10,7 @@
 SkillBaseMgr::SkillBaseMgr():
 	curSkillBaseNum_(0)
 {
-	//init();
+//	init();
 }
 
 SkillBaseMgr::~SkillBaseMgr()

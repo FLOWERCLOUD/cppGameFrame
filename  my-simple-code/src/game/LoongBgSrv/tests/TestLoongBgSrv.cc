@@ -82,6 +82,9 @@ class TestLoongBgClient
 		{
 			PacketBase op(game::OP_PING, 0);
 			codec_.send(pCon_, op);
+
+	                        PacketBase op1(game::OP_CHAT, 0);
+                        codec_.send(pCon_, op1);
 		}
 	}
 private:
@@ -129,7 +132,19 @@ private:
 
 			PacketBase op(game::OP_SELCET_PET, 2);
 			codec_.send(pCon, op);
+			if (black){
+			                                PacketBase pb1(game::OP_ENTER_BATTLE, 0);
+                                //bgid:int 战场ID
+                                //team:int 队伍 （1     为暗黑军 2 为烈阳军）
+                               	int32 bgid = 2;
+	
+                                                                                                 int32 team = black == true ? 1 : 2;
+                                                                                                                                                         pb1.putInt32(bgid);
+                                                                                                                                                                  pb1.putInt32(team);
+                                                                                                                                                                                                                             codec_.send(pCon, pb1);
+			}
 		}
+
 		else if (param == -1)
 		{
 			LOG_INFO << getPlayerName() << "满人 ";
@@ -230,8 +245,8 @@ private:
 		}
 
 
-		PacketBase op(game::OP_EXIT_BATTLE, 0);
-		codec_.send(pCon, op);
+		//PacketBase op(game::OP_EXIT_BATTLE, 0);
+		//codec_.send(pCon, op);
 	}
 
 	void onDropItem(mysdk::net::TcpConnection* pCon, PacketBase& pb)
@@ -273,7 +288,7 @@ private:
 			break;
 		case client::OP_EXIT_BATTLE:
 			LOG_INFO << getPlayerName() << " exit battle:" << op;
-			exit(1);
+			//exit(1);
 		default:
 			LOG_INFO << getPlayerName() << " op no found, op:" << op;
 			break;

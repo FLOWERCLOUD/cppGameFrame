@@ -102,7 +102,9 @@ static inline void Log(const char* content)
 			tm_time.tm_hour, tm_time.tm_min, tm_time.tm_sec,
 			content);
 
-	printf("%s\n", logbuf);
+	fprintf(stdout, "%s\n", logbuf);
+	fflush(stdout);
 }
+
 
 #endif /* UTIL_H_ */
