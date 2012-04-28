@@ -27,19 +27,19 @@ namespace mysdk
 
         }
 
-        inline void set_array_index (int index_)
+        inline void set_array_index (size_t index_)
         {
             array_index = index_;
         }
 
-        inline int get_array_index ()
+        inline size_t get_array_index ()
         {
             return array_index;
         }
 
     private:
 
-        int array_index;
+        size_t array_index;
 
         array_item_t (const array_item_t&);
         const array_item_t &operator = (const array_item_t&);
@@ -81,7 +81,7 @@ namespace mysdk
         inline void push_back (T *item_)
         {
             if (item_)
-                item_->set_array_index (items.size ());
+                item_->set_array_index ((items.size ()));
             items.push_back (item_);
         }
 

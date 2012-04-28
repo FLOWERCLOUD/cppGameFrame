@@ -74,14 +74,14 @@ bool DatabaseWorkerPool<T>::open(mysdk::net::EventLoop* loop, const MySQLConnect
 template <typename T>
 void DatabaseWorkerPool<T>::close()
 {
-	int syncConnNum = syncConns_.size();
+	int syncConnNum = static_cast<int> (syncConns_.size());
 	for (int i = 0; i < syncConnNum; i++)
 	{
 		syncConns_[i]->close();
 		delete syncConns_[i];
 	}
 
-	int async_threadsNum = asyncThreads_.size();
+	int async_threadsNum = static_cast<int> (asyncThreads_.size());
 	for (int j = 0; j < async_threadsNum; j++)
 	{
 		asyncThreads_[j]->quit();
@@ -93,7 +93,7 @@ void DatabaseWorkerPool<T>::close()
 		delete asyncThreads_[k];
 	}
 
-	int asynConnNum = asyncConns_.size();
+	int asynConnNum = static_cast<int>(asyncConns_.size());
 	for (int g = 0; g < asynConnNum; g++)
 	{
 		asyncConns_[g]->close();
@@ -262,7 +262,7 @@ DBWorkerThread* DatabaseWorkerPool<T>::getNextWorkThread()
 	DBWorkerThread* thread = NULL;
 
 	asyncMutex_.lock();
-	uint32 nextAsyncThread = nextAsyncThread_++ % asyncThreads_.size();
+	uint32 nextAsyncThread = static_cast<uint32>(nextAsyncThread_++ % asyncThreads_.size());
 	thread = asyncThreads_[nextAsyncThread];
 	nextAsyncThread_ = nextAsyncThread;
 	asyncMutex_.unlock();
@@ -276,7 +276,7 @@ T* DatabaseWorkerPool<T>::getNextMySQLConnection()
 	T* conn = NULL;
 
 	syncMutex_.lock();
-	int nextSync = nextSyncConn_++ % syncConns_.size();
+	int nextSync = static_cast<uint32>(nextSyncConn_++ % syncConns_.size());
 	conn = syncConns_[nextSync];
 	nextSyncConn_ = nextSync;
 	syncMutex_.unlock();

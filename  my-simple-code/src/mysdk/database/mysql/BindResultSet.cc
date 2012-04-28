@@ -82,7 +82,7 @@ BindResultSet::BindResultSet(MYSQL_STMT* stmt, MYSQL_RES *result, uint64 rowCoun
             	rows_[uint32(rowPosition_)][fIndex].setByteValue( rBind_[fIndex].buffer,
 																												rBind_[fIndex].buffer_length,
 																												rBind_[fIndex].buffer_type,
-																												*rBind_[fIndex].length );
+																												static_cast<uint32>(*rBind_[fIndex].length) );
 
             }
             else
@@ -98,13 +98,13 @@ BindResultSet::BindResultSet(MYSQL_STMT* stmt, MYSQL_RES *result, uint64 rowCoun
                     	rows_[uint32(rowPosition_)][fIndex].setByteValue( "",
 																		rBind_[fIndex].buffer_length,
 																		rBind_[fIndex].buffer_type,
-																		*rBind_[fIndex].length );
+																		static_cast<uint32>(*rBind_[fIndex].length) );
                     break;
                     default:
                     	rows_[uint32(rowPosition_)][fIndex].setByteValue( 0,
 															rBind_[fIndex].buffer_length,
 															rBind_[fIndex].buffer_type,
-                                                           *rBind_[fIndex].length );
+                                                           static_cast<uint32>(*rBind_[fIndex].length) );
 					}
 				}
         }

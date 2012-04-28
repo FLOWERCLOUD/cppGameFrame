@@ -84,7 +84,7 @@ void XmlSrv::onMessage(mysdk::net::TcpConnection* pCon,
 {
 	LOG_DEBUG << "XmlSrv::onMessage - bytes: " << buf->readableBytes();
     char data[200];
-    buf->get(data, buf->readableBytes());
+    buf->get(data, static_cast<int>(buf->readableBytes()));
     LOG_DEBUG << "XmlSrv::onMessage - data: " << data;
     static const char policy[] = "<policy-file-request/>";
     static const char cross[] ="<?xml version=\"1.0\"?> \

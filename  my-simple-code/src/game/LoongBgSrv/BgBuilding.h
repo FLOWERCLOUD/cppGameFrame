@@ -16,7 +16,7 @@ class Scene;
 class BgBuilding:public BgUnit
 {
 public:
-	static const int32 sMaxHp = 5000;
+	static const int32 sMaxHp = 15000;
 public:
 	BgBuilding(int32 unitId, UnitTypeE unitType, TeamE team, Scene* pScene);
 	virtual ~BgBuilding();

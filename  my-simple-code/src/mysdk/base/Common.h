@@ -36,7 +36,7 @@ typedef uint64_t uint64;
 
 #define MYSDK_LONGLONG(x) x##LL
 #define MYSDK_ULONGLONG(x) x##ULL
-#define MYSDK_LL_FORMAT "ll"  // As in "%lld". Note that "q" is poor form also.
+#define MYSDK_LL_FORMAT "l"  // As in "%lld". Note that "q" is poor form also.
 
 
 static const int32 kint32max = 0x7FFFFFFF;

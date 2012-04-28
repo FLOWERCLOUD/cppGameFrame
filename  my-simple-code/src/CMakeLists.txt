@@ -16,7 +16,8 @@ set(CXX_FLAGS
  -Wpointer-arith
  -Wshadow
  -Wwrite-strings
- -march=i686
+ #-march=i686
+  -march=x86-64
  # -MMD
  -std=c++0x
  -rdynamic
