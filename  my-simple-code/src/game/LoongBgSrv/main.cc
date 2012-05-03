@@ -88,6 +88,9 @@ static void remove_pidfile(const char *pid_file)
 
 int main(int argc, char **argv)
 {
+	// 设置要打印日志等级
+	Logger::setLogLevel(Logger::INFO);
+
 	int defalutPort = 5007;  //默认端口
 	std::string configFile("config/def.conf");
 	int maxconns = 1024;

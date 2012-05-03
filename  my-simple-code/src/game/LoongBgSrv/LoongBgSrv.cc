@@ -454,12 +454,15 @@ bool LoongBgSrv::login(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::T
 	bool bInBg = false;
 	if (hasBgPlayer(playerId))
 	{
-		LOG_DEBUG << "LoongBgSrv::login(in battle) - playerId:"  << playerId
+		LOG_ERROR << "LoongBgSrv::login(in battle) - playerId:"  << playerId
 								<< " playerName: " << playerName
 								<< " roleType: " << roleType
 								<< " jointimes: " << joinTimes
 								<< " address: "<< pCon->peerAddress().toHostPort();
 		bInBg = true;
+		// 他已经在战场上了  直接断开这个连接
+		return false;
+		/*
 		BgPlayer* bgPlayer = bgPlayerMap_[playerId];
 		if (bgPlayer)
 		{
@@ -469,8 +472,10 @@ bool LoongBgSrv::login(mysdk::net::TcpConnection* pCon, PacketBase& pb, mysdk::T
 			op.putInt32(-3); //异地登陆啦
 			bgPlayer->sendPacket(op);
 
-			bgPlayer->shutdown();
+			//bgPlayer->shutdown();
 		}
+		*/
+		
 	}
 
 	BgPlayer* player = new BgPlayer(playerId, playerName, roleType, joinTimes, pCon, this);

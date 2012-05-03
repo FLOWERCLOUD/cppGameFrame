@@ -152,6 +152,6 @@ size_t PacketBase::prependableBytes()
 std::string PacketBase::getHeadInfo()
 {
 	char headInfo[56];
-	snprintf(headInfo, sizeof(headInfo), "len: %d, param: %d, hexop: 0x%X", getContentLen(), head_.param, head_.len);
+	snprintf(headInfo, sizeof(headInfo), "len: %d, param: %d, hexop: 0x%X", getContentLen(), head_.param, head_.op);
 	return std::string(headInfo);
 }

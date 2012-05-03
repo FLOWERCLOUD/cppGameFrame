@@ -39,7 +39,7 @@ BgPlayer::BgPlayer(int32 playerId, std::string& playerName, mysdk::net::TcpConne
 	pCon_(pCon),
 	pSrv_(pSrv)
 {
-	LOG_DEBUG << "+++++BgPlayer::BgPlayer - playerId: " << playerId << name_;
+	LOG_INFO << "+++++BgPlayer::BgPlayer - playerId: " << playerId << name_;
 }
 
 BgPlayer::BgPlayer(int32 playerId, char* playerName, mysdk::net::TcpConnection* pCon, LoongBgSrv* pSrv):
@@ -57,7 +57,7 @@ BgPlayer::BgPlayer(int32 playerId, char* playerName, mysdk::net::TcpConnection* 
 	pCon_(pCon),
 	pSrv_(pSrv)
 {
-	LOG_DEBUG << "+++++BgPlayer::BgPlayer - playerId: " << playerId << name_;
+	LOG_INFO << "+++++BgPlayer::BgPlayer - playerId: " << playerId << name_;
 }
 
 BgPlayer::BgPlayer(int32 playerId, char* playerName, int32 roleType, int32 joinTimes, mysdk::net::TcpConnection* pCon, LoongBgSrv* pSrv):
@@ -75,7 +75,7 @@ BgPlayer::BgPlayer(int32 playerId, char* playerName, int32 roleType, int32 joinT
 			pCon_(pCon),
 			pSrv_(pSrv)
 {
-	LOG_DEBUG << "+++++BgPlayer::BgPlayer - playerId: " << playerId
+	LOG_INFO << "+++++BgPlayer::BgPlayer - playerId: " << playerId
 							<< " name: " <<name_;
 }
 
@@ -84,7 +84,7 @@ BgPlayer::~BgPlayer()
 	removeAllBuf();
 	bufList_.clear();
 	useSkillMap_.clear();
-	LOG_DEBUG << "---------BgPlayer::~BgPlayer - playerId: " << this->getId()
+	LOG_INFO << "---------BgPlayer::~BgPlayer - playerId: " << this->getId()
 							<< " name: " << name_;
 }
 
