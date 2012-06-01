@@ -1,0 +1,1 @@
+#define 	BOSSSRVVERSION	0.1
