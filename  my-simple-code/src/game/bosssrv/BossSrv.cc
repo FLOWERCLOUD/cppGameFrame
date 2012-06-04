@@ -374,7 +374,7 @@ void BossSrv::tellPhpActOver()
 	struct tm * tm = localtime(&tv.tv_sec);
 
 	char date[20];
-	snprintf(date, 20, "%4d.%02d.%02d", tm->tm_year + 1900 , tm->tm_mon, tm->tm_mday);
+	snprintf(date, 20, "%4d.%02d.%02d", tm->tm_year + 1900 , tm->tm_mon + 1, tm->tm_mday);
 
 	BossHurtMgr::TopPlayerVectorT& topPlayerVector = bossHurtMgr_.getTopPlayerVector();
 	size_t topNum = topPlayerVector.size();
