@@ -18,7 +18,15 @@ BossHurtMgr::BossHurtMgr(BossSrv* bossSrv):
 
 BossHurtMgr::~BossHurtMgr()
 {
-
+	size_t topNum = topPlayerVector_.size();
+	for (size_t i = 0; i < topNum; i++)
+	{
+		Player* player = topPlayerVector_[i];
+		if (player)
+		{
+			delete player;
+		}
+	}
 }
 
 void BossHurtMgr::addHurt(uint32 uid, uint32 hurtValue, char* username)
