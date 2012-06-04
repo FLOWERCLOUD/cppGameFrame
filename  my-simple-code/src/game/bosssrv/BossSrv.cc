@@ -191,10 +191,10 @@ void BossSrv::start()
 {
 	setupSignalHandlers();
 	phpThread_.start();
-	bossId_ = sConfigMgr.MainConfig.GetIntDefault("boss", "bossid", 10000);
-	initBossHp_ = bossHp_ = sConfigMgr.MainConfig.GetIntDefault("boss", "bosshp", 10000);
+	bossId_ = sConfigMgr.MainConfig.GetIntDefault("boss", "bossid", 10283);
+	initBossHp_ = bossHp_ = sConfigMgr.MainConfig.GetIntDefault("boss", "bosshp", 100000110);
 	assert(initBossHp_ > 0);
-	bossElem_ = getRandomBetween(0, 13);
+	bossElem_ = getRandomBetween(0, 12);
 	server_.start();
 }
 
@@ -359,15 +359,22 @@ void BossSrv::tellPhpActOver()
 
 	static const std::string mailcontent(sConfigMgr.MainConfig.GetStringDefault("mail",
 			"mailcontent",
-			"uid=10000&sname=叮叮博士&friends=%d&sysid=10000&adjunct=%s&isadjunct=0&background=1&time=%d&title=%s 讨伐令奖励&content=恭喜你 %s 对噬天大帝造成的伤害达到%.2f%%，超过1%%，获得以下奖励一份。&button=ok"));
+			"uid=10000&sname=叮叮博士&friends=%d&sysid=10000&adjunct=%s&isadjunct=0&background=1&time=%d&title=%s 讨伐令奖励&content=恭喜你 %s 对噬天大帝造成的伤害达到%.2f%%，超过0.05%%，获得以下奖励一份。&button=ok"));
 
-	static const std::string mailcontentaward(sConfigMgr.MainConfig.GetStringDefault("mail", "mailcontentaward", "3:20000:1"));
+	static const std::string mailcontentaward(sConfigMgr.MainConfig.GetStringDefault("mail", "mailcontentaward", "3:100013:1|3:100034:1"));
 
 	static const std::string topmailcontent(sConfigMgr.MainConfig.GetStringDefault("mail",
 			"topmailcontent",
 			"uid=10000&sname=叮叮博士&friends=%d&sysid=10000&adjunct=%s&isadjunct=0&background=1&time=%d&title=%s 讨伐令奖励&content=恭喜你 %s对噬天大帝造成的伤害值排名第%d，获得一下奖励一份。&button=ok"));
 
-	static const std::string topmailcontentaward(sConfigMgr.MainConfig.GetStringDefault("mail", "topmailcontentaward", "3:20000:1"));
+	//static const std::string topmailcontentaward(sConfigMgr.MainConfig.GetStringDefault("mail", "topmailcontentaward", "3:100013:1|3:103002:1"));
+
+	std::string topaward[5];
+	topaward[0] = "3:100151:1|3:103002:1";
+	topaward[1] = "3:100152:1|3:103002:1";
+	topaward[2] = "3:100153:1|3:103002:1";
+	topaward[3] = "3:100154:1|3:103002:1";
+	topaward[4] = "3:100155:1|3:103002:1";
 
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
@@ -383,10 +390,11 @@ void BossSrv::tellPhpActOver()
 		Player* player = topPlayerVector[i];
 		if (player)
 		{
+			int index = getRandomBetween(0, 4);
 			ThreadParam param;
 			param.cmd = 2;
 			char* buf = new char[1024];
-			snprintf(buf, 1023, topmailcontent.c_str(),  player->uid, topmailcontentaward.c_str(), tv.tv_sec, date, date, i + 1);
+			snprintf(buf, 1023, topmailcontent.c_str(),  player->uid, topaward[index].c_str(), tv.tv_sec, date, date, i + 1);
 			param.param = buf;
 			queue_.put(param);
 		}
@@ -402,7 +410,7 @@ void BossSrv::tellPhpActOver()
 
 		float per = hurtvalue / static_cast<float> (initBossHp_);
 		LOG_DEBUG << " uid: " << iter->first << " hurtvalue: " << hurtvalue << " per: " << per;
-		static float sAwardPer = sConfigMgr.MainConfig.GetFloatDefault("mail", "awardper", 1.0);
+		static float sAwardPer = sConfigMgr.MainConfig.GetFloatDefault("mail", "awardper", 0.05f);
 		if (per >= sAwardPer)
 		{
 			ThreadParam param;

@@ -34,7 +34,7 @@ static void show_help()
 
 static void show_version()
 {
-	printf("BossSrv vesion %.2f -- by zjx (zhanjunxiong@126.come) \n", BOSSSRVVERSION);
+	printf("BossSrv vesion %.2f -- by zjx (zhanjunxiong@126.com) \n", BOSSSRVVERSION);
 }
 
 void vperror(const char *fmt, ...)
