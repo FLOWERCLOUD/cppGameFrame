@@ -45,6 +45,10 @@ namespace net
 		{
 			return tcpConnectionArray_.size();
 		}
+		TcpConnectionArray& getTcpConnectionArray()
+		{
+			return tcpConnectionArray_;
+		}
 	private:
 		void newConnection(int sockfd, const InetAddress& peerAddr);
 		void removeConnection(TcpConnection* conn);

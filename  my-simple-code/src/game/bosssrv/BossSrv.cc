@@ -101,6 +101,17 @@ static void sigtermHandler(int sig)
     shutdown_bossSrv = true;
 }
 
+static void reReadConfHandler(int sig)
+{
+    LOG_WARN << "Received SIGUSR1, reReadConfHandler...";
+
+}
+
+static void openActHandler(int sig)
+{
+    LOG_WARN << "Received SIGUSR2, openActHandler...";
+}
+
 void setupSignalHandlers(void)
 {
     struct sigaction act;
@@ -121,6 +132,12 @@ void setupSignalHandlers(void)
     sigaction(SIGFPE, &act, NULL);
     sigaction(SIGILL, &act, NULL);
 #endif
+
+    act.sa_flags = 0;
+    act.sa_handler = reReadConfHandler;
+    sigaction(SIGUSR1,&act,NULL);
+    act.sa_handler = openActHandler;
+    sigaction(SIGUSR2,&act,NULL);
     return;
 }
 
@@ -236,9 +253,9 @@ void BossSrv::onKaBuMessage(mysdk::net::TcpConnection* pCon, PacketBase& pb, mys
 			if (!pb.getUTF(username, 512)) return;
 
 			uint32 hurtValue = pb.getInt32();
-
+			uint32 flag = pb.getInt32();
 			bossHurtMgr_.addHurt(uid, hurtValue, username);
-			tellPhpPlayerHurt(uid, hurtValue);
+			tellPhpPlayerHurt(uid, hurtValue, username, flag);
 
 			bossHp_ -= hurtValue;
 			PacketBase op(game::OP_BOSSSRV_UPDATEDATA, 2);
@@ -317,12 +334,18 @@ void BossSrv::phpThreadHandler()
 	LOG_INFO << "======= phpThreadHandler END ";
 }
 
-void BossSrv::tellPhpPlayerHurt(uint32 uid, uint32 hurtvalue)
+#include <game/bosssrv/php/urlEncode.h>
+
+void BossSrv::tellPhpPlayerHurt(uint32 uid, uint32 hurtvalue, char* username, uint32 flag)
 {
 	ThreadParam param;
 	param.cmd = 1;
+
+	char enName[128];
+	if (!ctool::URLEncode(username, enName, 128)) return;
+
 	char* buf = new char[1024];
-	snprintf(buf, 1023, "ex_name=jihad&uid=%d&hurt=%d", uid, hurtvalue);
+	snprintf(buf, 1023, "ex_name=jihad&uid=%d&hurt=%d&uname=%s&flag=%d", uid, hurtvalue, enName, flag);
 	param.param = buf;
 	queue_.put(param);
 }

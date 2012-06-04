@@ -365,8 +365,8 @@ void LoongBgSrv::printThroughput()
 	snprintf(srvInfo, sizeof(srvInfo), "%4.3f KiB/s--packetNum: %.3f 次/s--transferred: %4" MYSDK_LL_FORMAT "d B--ConnectionNum: %4lu--Cpu: %f%%--RAM: %f M ",
 			static_cast<double>(transferred_)/time/1024,
 			static_cast<double>(packetNum_)/time,
-			transferred_,
-			server_.getConnectionNum(),
+			(transferred_),
+			static_cast<long unsigned int>(server_.getConnectionNum()),
 			performanceCounter_.GetCurrentCPUUsage(),
 			performanceCounter_.GetCurrentRAMUsage());
 

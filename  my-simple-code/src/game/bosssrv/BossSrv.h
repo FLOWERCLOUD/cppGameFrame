@@ -41,7 +41,7 @@ public:
 	void send(mysdk::net::TcpConnection* pCon, PacketBase& pb);
 
 private:
-	void tellPhpPlayerHurt(uint32 uid, uint32 hurtvalue);
+	void tellPhpPlayerHurt(uint32 uid, uint32 hurtvalue, char* username, uint32 flag);
 	void tellPhpActOver();
 private:
 	void tickMe();
