@@ -403,7 +403,7 @@ void BossSrv::tellPhpActOver()
 		float per = hurtvalue / static_cast<float> (initBossHp_);
 		LOG_DEBUG << " uid: " << iter->first << " hurtvalue: " << hurtvalue << " per: " << per;
 		static float sAwardPer = sConfigMgr.MainConfig.GetFloatDefault("mail", "awardper", 1.0);
-		if (per > sAwardPer)
+		if (per >= sAwardPer)
 		{
 			ThreadParam param;
 			param.cmd = 2;
