@@ -260,7 +260,7 @@ void BossSrv::onKaBuMessage(mysdk::net::TcpConnection* pCon, PacketBase& pb, mys
 			bossHp_ -= hurtValue;
 			PacketBase op(game::OP_BOSSSRV_UPDATEDATA, 2);
 			op.putInt32(bossHp_ < 0 ? 0 : bossHp_);
-			send(pCon, op);
+			broadMsg(op);
 
 			if (bossHp_ <= 0)
 			{

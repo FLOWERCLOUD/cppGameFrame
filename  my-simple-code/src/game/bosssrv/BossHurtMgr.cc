@@ -88,7 +88,8 @@ void BossHurtMgr::addTop(uint32 uid, uint32 hurtValue, char* username)
 bool BossHurtMgr::serializeTop(PacketBase& op)
 {
 	size_t topNum = topPlayerVector_.size();
-	op.putInt32(topNum);
+	uint32_t num = static_cast<uint32_t>(topNum);
+	op.putInt32(num);
 	// 看看他是否在排行榜中
 	for (size_t i = 0; i < topNum; i++)
 	{

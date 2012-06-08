@@ -31,7 +31,7 @@ namespace ctool
     		return false;
     	}
 
-    	int len =  strlen(sIn);
+    	int len =  static_cast<int>(strlen(sIn));
     	if (sOutLen < len << 2)
     	{
     		printf("%s, %d sOutLen is less!!\n", __FUNCTION__, __LINE__);
@@ -61,7 +61,7 @@ namespace ctool
     			buf[2] = szHexChr[(int)(ch & 0x0f)];
     		}
 
-    		int bufLen = strlen(buf);
+    		int bufLen = static_cast<int>(strlen(buf));
     		for (int j = 0; j < bufLen; j++)
     		{
     			sOut[sOutIndex++] = buf[j];
