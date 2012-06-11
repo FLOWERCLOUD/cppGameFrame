@@ -345,7 +345,7 @@ void BossSrv::tellPhpPlayerHurt(uint32 uid, uint32 hurtvalue, char* username, ui
 	if (!ctool::URLEncode(username, enName, 128)) return;
 
 	char* buf = new char[1024];
-	snprintf(buf, 1023, "ex_name=jihad&uid=%d&hurt=%d&uname=%s&flag=%d", uid, hurtvalue, enName, flag);
+	snprintf(buf, 1023, "ex_name=jihad&uid=%d&hurt=%d&uname=%s&flag=%d&hp=%d", uid, hurtvalue, enName, flag, initBossHp_);
 	param.param = buf;
 	queue_.put(param);
 }
