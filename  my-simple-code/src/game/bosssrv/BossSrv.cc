@@ -194,7 +194,10 @@ void BossSrv::start()
 	bossId_ = sConfigMgr.MainConfig.GetIntDefault("boss", "bossid", 10283);
 	initBossHp_ = bossHp_ = sConfigMgr.MainConfig.GetIntDefault("boss", "bosshp", 100000110);
 	assert(initBossHp_ > 0);
+	srand(static_cast<uint32>(time(NULL)));
 	bossElem_ = getRandomBetween(0, 12);
+
+	tellPhpBossElem();
 	server_.start();
 }
 
@@ -233,6 +236,7 @@ void BossSrv::onConnectionCallback(mysdk::net::TcpConnection* pCon)
 			op.putInt32(bossId_);
 			op.putInt32(bossHp_);
 			op.putInt32(bossElem_);
+			op.putInt32(initBossHp_);
 			send(pCon, op);
 		}
 	}
@@ -336,6 +340,17 @@ void BossSrv::phpThreadHandler()
 
 #include <game/bosssrv/php/urlEncode.h>
 
+void BossSrv::tellPhpBossElem()
+{
+        ThreadParam param;
+        param.cmd = 1;
+
+        char* buf = new char[1024];
+        snprintf(buf, 1023, "ex_name=BossLog&bosstype=%d", bossElem_);
+        param.param = buf;
+        queue_.put(param);
+}
+
 void BossSrv::tellPhpPlayerHurt(uint32 uid, uint32 hurtvalue, char* username, uint32 flag)
 {
 	ThreadParam param;
@@ -350,12 +365,38 @@ void BossSrv::tellPhpPlayerHurt(uint32 uid, uint32 hurtvalue, char* username, ui
 	queue_.put(param);
 }
 
+void BossSrv::tellPhpTop()
+{
+	BossHurtMgr::TopPlayerVectorT& topPlayerVector = bossHurtMgr_.getTopPlayerVector();
+        size_t topNum = topPlayerVector.size();
+        for (size_t i = 0; i < topNum; i++)
+        {
+                Player* player = topPlayerVector[i];
+                if (player)
+                {
+
+                        ThreadParam param;
+                        param.cmd = 1;
+			char enName[128];
+        		if (!ctool::URLEncode(player->username.c_str(), enName, 128)) return;
+                        
+			char* buf = new char[1024];
+                      	snprintf(buf, 1023, "ex_name=jihadwin&uid=%d&uname=%s&hurt=%d&hp=%d",  
+					player->uid, enName, player->hurtvalue, initBossHp_);
+                        param.param = buf;
+                        queue_.put(param);
+                }
+        }
+}
+
 #include <sys/time.h>
 #include <time.h>
 
 void BossSrv::tellPhpActOver()
 {
 	if (haveAward_) return;
+
+	tellPhpTop();
 
 	static const std::string mailcontent(sConfigMgr.MainConfig.GetStringDefault("mail",
 			"mailcontent",
