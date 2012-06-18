@@ -396,26 +396,26 @@ void BossSrv::tellPhpActOver()
 {
 	if (haveAward_) return;
 
-	tellPhpTop();
+	//tellPhpTop();
 
 	static const std::string mailcontent(sConfigMgr.MainConfig.GetStringDefault("mail",
 			"mailcontent",
-			"uid=10000&sname=叮叮博士&friends=%d&sysid=10000&adjunct=%s&isadjunct=0&background=1&time=%d&title=%s 讨伐令奖励&content=恭喜你 %s 对噬天大帝造成的伤害达到%.2f%%，超过0.05%%，获得以下奖励一份。&button=ok"));
+			"uid=10000&sname=叮叮博士&friends=%d&sysid=10000&adjunct=%s&isadjunct=0&background=1&time=%d&title=%s讨伐令奖励&content=恭喜你%s对噬天大帝造成的伤害达到%.2f%%，超过0.05%%，获得以下奖励一份。&button=ok"));
 
-	static const std::string mailcontentaward(sConfigMgr.MainConfig.GetStringDefault("mail", "mailcontentaward", "3:100013:1|3:100034:1"));
+	static const std::string mailcontentaward(sConfigMgr.MainConfig.GetStringDefault("mail", "mailcontentaward", "1:100013:1|1:100034:1"));
 
 	static const std::string topmailcontent(sConfigMgr.MainConfig.GetStringDefault("mail",
 			"topmailcontent",
-			"uid=10000&sname=叮叮博士&friends=%d&sysid=10000&adjunct=%s&isadjunct=0&background=1&time=%d&title=%s 讨伐令奖励&content=恭喜你 %s对噬天大帝造成的伤害值排名第%d，获得一下奖励一份。&button=ok"));
+			"uid=10000&sname=叮叮博士&friends=%d&sysid=10000&adjunct=%s&isadjunct=0&background=1&time=%d&title=%s讨伐令奖励&content=恭喜你%s对噬天大帝造成的伤害值排名第%d，获得一下奖励一份。&button=ok"));
 
-	//static const std::string topmailcontentaward(sConfigMgr.MainConfig.GetStringDefault("mail", "topmailcontentaward", "3:100013:1|3:103002:1"));
+	//static const std::string topmailcontentaward(sConfigMgr.MainConfig.GetStringDefault("mail", "topmailcontentaward", "1:100013:1|1:103002:1"));
 
 	std::string topaward[5];
-	topaward[0] = "3:100151:1|3:103002:1";
-	topaward[1] = "3:100152:1|3:103002:1";
-	topaward[2] = "3:100153:1|3:103002:1";
-	topaward[3] = "3:100154:1|3:103002:1";
-	topaward[4] = "3:100155:1|3:103002:1";
+	topaward[0] = "1:100151:1|1:103002:1";
+	topaward[1] = "1:100152:1|1:103002:1";
+	topaward[2] = "1:100153:1|1:103002:1";
+	topaward[3] = "1:100154:1|1:103002:1";
+	topaward[4] = "1:100155:1|1:103002:1";
 
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
@@ -435,7 +435,8 @@ void BossSrv::tellPhpActOver()
 			ThreadParam param;
 			param.cmd = 2;
 			char* buf = new char[1024];
-			snprintf(buf, 1023, topmailcontent.c_str(),  player->uid, topaward[index].c_str(), tv.tv_sec, date, date, i + 1);
+			snprintf(buf, 1024, topmailcontent.c_str(),  player->uid, topaward[index].c_str(), tv.tv_sec, date, date, topNum - i);
+
 			param.param = buf;
 			queue_.put(param);
 		}
@@ -456,8 +457,11 @@ void BossSrv::tellPhpActOver()
 		{
 			ThreadParam param;
 			param.cmd = 2;
-			char* buf = new char[1024];
-			snprintf(buf, 1023, mailcontent.c_str(),  iter->first, mailcontentaward.c_str(), tv.tv_sec, date, date, per);
+			
+			char* buf = new char[1024];	
+			snprintf(buf, 1024, mailcontent.c_str(),  iter->first, mailcontentaward.c_str(), tv.tv_sec, date, date, per  * 100);
+
+
 			param.param = buf;
 			queue_.put(param);
 		}
@@ -465,4 +469,6 @@ void BossSrv::tellPhpActOver()
 
 	haveAward_ = true;
 	LOG_INFO << "============== SUM: " << num;
+	
+	tellPhpTop();
 }
