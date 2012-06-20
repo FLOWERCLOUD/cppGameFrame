@@ -89,6 +89,7 @@ static void remove_pidfile(const char *pid_file)
 
 int main(int argc, char **argv)
 {
+	
 	int defalutPort = 5007;  //默认端口
 	std::string configFile("config/def.conf");
 	int maxconns = 1024;
@@ -98,6 +99,7 @@ int main(int argc, char **argv)
 	char *username = NULL;
 	char *pid_file = NULL;
 	bool do_daemonize = false;
+	int loglevel = 0;
 	while(-1 != (o = getopt(argc, argv,
 			"h"
 			 "p:"  // TCP port number to listen on
@@ -107,6 +109,7 @@ int main(int argc, char **argv)
 			"c:" // max simultaneous connections
 			"d" //  run as a daemon
 			"P:"
+			"l:"
 			"v")))
 	{
 		switch(o)
@@ -138,12 +141,19 @@ int main(int argc, char **argv)
         case 'P':
             pid_file = optarg;
             break;
+	case 'l':
+	    loglevel = atoi(optarg);
+	    break;
 		default:
 			show_help();
 			return -1;
 		}
 	}
 
+        // 设置要打印日志等级
+        Logger::setLogLevel( loglevel == 0 ? Logger::DEBUG : Logger::INFO);
+       
+       
 	std::string fullConfigFile;
 	const char *configPath = getenv("BossSrv_ConfigPath");
 	if (!configPath)

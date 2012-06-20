@@ -49,6 +49,11 @@ uint32 BossHurtMgr::getHurtValue(uint32 uid)
 	return 0;
 }
 
+static bool cmp(Player* first, Player* second)
+{
+	return first->hurtvalue > second->hurtvalue;
+}
+
 void BossHurtMgr::addTop(uint32 uid, uint32 hurtValue, char* username)
 {
 	size_t topNum = topPlayerVector_.size();
@@ -61,8 +66,9 @@ void BossHurtMgr::addTop(uint32 uid, uint32 hurtValue, char* username)
 			if (player->uid == uid)
 			{
 				player->hurtvalue = hurtValue;
+				player->username = username;
 
-				sort(topPlayerVector_.begin(), topPlayerVector_.end());
+				sort(topPlayerVector_.begin(), topPlayerVector_.end(), cmp);
 				return;
 			}
 		}
@@ -76,7 +82,7 @@ void BossHurtMgr::addTop(uint32 uid, uint32 hurtValue, char* username)
 	newPlayer->username = username;
 	topPlayerVector_.push_back(newPlayer);
 
-	sort(topPlayerVector_.begin(), topPlayerVector_.end());
+	sort(topPlayerVector_.begin(), topPlayerVector_.end(), cmp);
 	if (topNum == sMaxTopNum)
 	{
 		Player* tmp = topPlayerVector_[topNum];

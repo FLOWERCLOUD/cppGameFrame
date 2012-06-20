@@ -435,7 +435,7 @@ void BossSrv::tellPhpActOver()
 			ThreadParam param;
 			param.cmd = 2;
 			char* buf = new char[1024];
-			snprintf(buf, 1024, topmailcontent.c_str(),  player->uid, topaward[index].c_str(), tv.tv_sec, date, date, topNum - i);
+			snprintf(buf, 1024, topmailcontent.c_str(),  player->uid, topaward[index].c_str(), tv.tv_sec, date, date, i + 1);
 
 			param.param = buf;
 			queue_.put(param);
@@ -451,8 +451,8 @@ void BossSrv::tellPhpActOver()
 		float hurtvalue =static_cast<float>(iter->second);
 
 		float per = hurtvalue / static_cast<float> (initBossHp_);
-		LOG_DEBUG << " uid: " << iter->first << " hurtvalue: " << hurtvalue << " per: " << per;
-		static float sAwardPer = sConfigMgr.MainConfig.GetFloatDefault("mail", "awardper", 0.05f);
+		LOG_INFO << " uid: " << iter->first << " hurtvalue: " << hurtvalue << " per: " << per;
+		static float sAwardPer = sConfigMgr.MainConfig.GetFloatDefault("mail", "awardper", 0.0005f);
 		if (per >= sAwardPer)
 		{
 			ThreadParam param;
