@@ -46,12 +46,16 @@ private:
 	void tellPhpActOver();
 	void tellPhpTop();
 private:
+	
+        void updateHp();
 	void tickMe();
 	void broadMsg(PacketBase& pb);
 	void phpThreadHandler();
+	void jiesuan();
 private:
 	bool open_; //是否开启了活动
 	bool haveAward_; //是否领取了奖励
+	bool bUpdateHp_; //是否跟新boss血量
 	uint32 bossId_;
 	int32 bossHp_;
 	uint32 bossElem_;

@@ -145,6 +145,7 @@ void setupSignalHandlers(void)
 BossSrv::BossSrv(EventLoop* loop, InetAddress& serverAddr):
 	open_(false),
 	haveAward_(false),
+	bUpdateHp_(false),
 	bossId_(0),
 	bossHp_(0),
 	bossElem_(0),
@@ -171,6 +172,9 @@ BossSrv::BossSrv(EventLoop* loop, InetAddress& serverAddr):
 														std::tr1::placeholders::_3));
 
     loop->runEvery(1.0, std::tr1::bind(&BossSrv::tickMe, this));
+    loop->runEvery(2.0, std::tr1::bind(&BossSrv::updateHp, this));
+    loop->runEvery(60.0, std::tr1::bind(&BossSrv::jiesuan, this));
+
 	LOG_DEBUG << "============ BossSrv::BossSrv serverAddr: "<<  server_.hostport()
 							<< " ================";
 }
@@ -187,15 +191,45 @@ static inline int32 getRandomBetween(int32 nBegin, int32 nEnd)
 	return nBegin + static_cast<int32>(random() % (nEnd - nBegin + 1) );
 }
 
+#include <sys/time.h>
+#include <time.h>
+
+static bool isJiesuan = false;
+
+void BossSrv::jiesuan()
+{
+
+	if (isJiesuan) return;
+
+	
+	struct timeval tv;
+        gettimeofday(&tv, NULL);
+        struct tm * tm = localtime(&tv.tv_sec);
+
+	int hour = sConfigMgr.MainConfig.GetIntDefault("jiesuan", "hour", 23);
+	int minutes = sConfigMgr.MainConfig.GetIntDefault("jiesuan", "min", 40);
+
+	if (tm->tm_hour == hour && tm->tm_min >= minutes)
+	{
+		LOG_INFO << " START JIESUAN";
+		tellPhpActOver();
+		isJiesuan = true;
+		LOG_INFO << " END JIESUAN";
+	}
+
+}
+
 void BossSrv::start()
 {
 	setupSignalHandlers();
 	phpThread_.start();
 	bossId_ = sConfigMgr.MainConfig.GetIntDefault("boss", "bossid", 10283);
-	initBossHp_ = bossHp_ = sConfigMgr.MainConfig.GetIntDefault("boss", "bosshp", 100000110);
-	assert(initBossHp_ > 0);
+	initBossHp_ = bossHp_ = sConfigMgr.MainConfig.GetIntDefault("boss", "bosshp", 80000000);
+	assert(initBossHp_ >= 0);
 	srand(static_cast<uint32>(time(NULL)));
-	bossElem_ = getRandomBetween(0, 12);
+	
+	int array[] = {0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13};
+	bossElem_ = array[getRandomBetween(0, 12)];
 
 	tellPhpBossElem();
 	server_.start();
@@ -219,6 +253,16 @@ void BossSrv::tickMe()
 	}
 }
 
+void BossSrv::updateHp()
+{
+	if (bUpdateHp_)
+	{
+		PacketBase op(game::OP_BOSSSRV_UPDATEDATA, 2);
+                op.putInt32(bossHp_ < 0 ? 0 : bossHp_);
+                broadMsg(op);
+		bUpdateHp_ = false;
+	}
+}
 
 void BossSrv::onConnectionCallback(mysdk::net::TcpConnection* pCon)
 {
@@ -262,12 +306,15 @@ void BossSrv::onKaBuMessage(mysdk::net::TcpConnection* pCon, PacketBase& pb, mys
 			tellPhpPlayerHurt(uid, hurtValue, username, flag);
 
 			bossHp_ -= hurtValue;
-			PacketBase op(game::OP_BOSSSRV_UPDATEDATA, 2);
-			op.putInt32(bossHp_ < 0 ? 0 : bossHp_);
-			broadMsg(op);
+			bUpdateHp_ = true;
+			
+			//PacketBase op(game::OP_BOSSSRV_UPDATEDATA, 2);
+			//op.putInt32(bossHp_ < 0 ? 0 : bossHp_);
+			//broadMsg(op);
 
 			if (bossHp_ <= 0)
 			{
+				updateHp();
 				bossHp_ = 0;
 				tellPhpActOver();
 			}
@@ -346,7 +393,7 @@ void BossSrv::tellPhpBossElem()
         param.cmd = 1;
 
         char* buf = new char[1024];
-        snprintf(buf, 1023, "ex_name=BossLog&bosstype=%d", bossElem_);
+        snprintf(buf, 1023, "ex_name=BossLog&bosstype=%d&hp=%d", bossElem_, initBossHp_);
         param.param = buf;
         queue_.put(param);
 }
@@ -389,8 +436,8 @@ void BossSrv::tellPhpTop()
         }
 }
 
-#include <sys/time.h>
-#include <time.h>
+//#include <sys/time.h>
+//#include <time.h>
 
 void BossSrv::tellPhpActOver()
 {
