@@ -1,9 +1,7 @@
 
-#include <game/LoongBgSrv/base/Base.h>
-#include <game/LoongBgSrv/config/ConfigMgr.h>
-#include <game/LoongBgSrv/php/htmlclient.h>
-#include <game/LoongBgSrv/LoongBgSrv.h>
-#include <game/LoongBgSrv/version.h>
+#include <game/dbsrv/config/ConfigMgr.h>
+#include <game/dbsrv/DBSrv.h>
+#include <game/dbsrv/version.h>
 
 #include <mysdk/base/Daemon.h>
 #include <mysdk/net/EventLoop.h>
@@ -11,14 +9,15 @@
 
 #include <sys/time.h>
 #include <sys/resource.h>
-
 #include <sys/types.h>
+
+#include <stdarg.h>
 #include <pwd.h>
 
 static void show_help()
 {
-    printf("LoongBgSrv vesion %.2f\n", LOONGBGSRVVERSION);
-    printf("-p <num>      TCP port number to listen on (default: 2007)\n"
+    printf("dbsrv vesion %.2f\n", DBSRVVERSION);
+    printf("-p <num>      TCP port number to listen on (default: 5007)\n"
            "-l <ip_addr>  interface to listen on (default: INADDR_ANY, all addresses)\n"
            "-d            run as a daemon\n"
     		"-f            config file path name\n"
@@ -33,7 +32,7 @@ static void show_help()
 
 static void show_version()
 {
-	printf("LoongBgSrv vesion %.2f -- by zjx (zhanjunxiong@126.com) \n", LOONGBGSRVVERSION);
+	printf("dbsrv vesion %.2f -- by zjx (zhanjunxiong@126.com) \n", DBSRVVERSION);
 }
 
 void vperror(const char *fmt, ...)
@@ -89,8 +88,9 @@ static void remove_pidfile(const char *pid_file)
 int main(int argc, char **argv)
 {
 	// 设置要打印日志等级
-	Logger::setLogLevel(Logger::INFO);
+	//Logger::setLogLevel(Logger::INFO);
 
+	GOOGLE_PROTOBUF_VERIFY_VERSION;
 	int defalutPort = 5007;  //默认端口
 	std::string configFile("config/def.conf");
 	int maxconns = 1024;
@@ -147,14 +147,14 @@ int main(int argc, char **argv)
 	}
 
 	std::string fullConfigFile;
-	const char *configPath = getenv("LoongBgSrv_ConfigPath");
+	const char *configPath = getenv("dbsrv_configpath");
 	if (!configPath)
 	{
 		char path[FILENAME_MAX];
 		if (!(getcwd(path,
 				FILENAME_MAX)))
 		{
-			printf("LoongBgSrv getcwd error! --- vesion: .%2f\n", LOONGBGSRVVERSION);
+			printf("dbsrv getcwd error! --- vesion: .%2f\n", DBSRVVERSION);
 			return -1;
 		}
 		std::string tmp(path);
@@ -166,7 +166,7 @@ int main(int argc, char **argv)
 		fullConfigFile =  tmp + "/" + configFile;
 	}
 
-	LOG_INFO << "============ Start LoongBgSrv ============ version "  << LOONGBGSRVVERSION;
+	LOG_INFO << "============ start dbsrv ============ version "  << DBSRVVERSION;
 	if(sConfigMgr.MainConfig.SetSource(fullConfigFile.c_str(), true))
 	{
 		LOG_INFO << "Config Passed without errors. --- fullConfigFile: " << fullConfigFile;
@@ -277,36 +277,22 @@ int main(int argc, char **argv)
     }
 
 	uint16 srvPort = static_cast<uint16>(sConfigMgr.MainConfig.GetIntDefault("net", "port", defalutPort));
-	std::string host = sConfigMgr.MainConfig.GetStringDefault("mysql", "host", "127.0.0.1");
-	std::string port_or_socket = sConfigMgr.MainConfig.GetStringDefault("mysql", "port_or_socket", "3306");
-	std::string user = sConfigMgr.MainConfig.GetStringDefault("mysql", "user", "root");
-	std::string password = sConfigMgr.MainConfig.GetStringDefault("mysql", "password", "4399mysql#CQPZM");
-	std::string database = sConfigMgr.MainConfig.GetStringDefault("mysql", "database", "kabu_loongBg");
-
-	if (!sBase.init(host, port_or_socket, user, password, database))
-	{
-		LOG_ERROR << " init data base error!!! ";
-		return -1;
-	}
-
-	std::string hotelHost = sConfigMgr.MainConfig.GetStringDefault("hotel", "host", "121.14.36.253");
-	uint16 hotelPort = static_cast<uint16>(sConfigMgr.MainConfig.GetIntDefault("hotel", "port", 22401));
-	InetAddress hotelAddr(hotelHost, hotelPort);
-
-	CHtmlClient::initialize();
+	LOG_INFO << "dbsrv listen port[" << srvPort << "]";
 	EventLoop loop;
 	InetAddress listenAddr(srvPort);
-	LoongBgSrv server(&loop, listenAddr, hotelAddr);
+	DBSrv server(&loop, listenAddr);
 	server.start();
 	loop.loop();
 	server.stop();
-	CHtmlClient::finalise();
-	LOG_INFO << "============  Stop LoongBgSrv ============ version "  << LOONGBGSRVVERSION;
+
+	LOG_INFO << "============  stop dbsrv ============ version "  << DBSRVVERSION;
 
     /* remove the PID file if we're a daemon */
     if (do_daemonize)
     {
     	remove_pidfile(pid_file);
     }
+
+	google::protobuf::ShutdownProtobufLibrary();
 	return 0;
 }

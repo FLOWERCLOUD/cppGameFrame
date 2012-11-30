@@ -3,6 +3,8 @@
 #define MYSDK_NET_EVENTLOOP_H
 
 #include <mysdk/base/Common.h>
+#include <mysdk/base/Mutex.h>
+#include <mysdk/base/Thread.h>
 
 #include <mysdk/net/Callbacks.h>
 #include <mysdk/net/TimerQueue.h>
@@ -40,6 +42,9 @@ namespace net
 		void wakeup();
 		void addEvent(Session* session, const int mask);
 		void delEvent(Session* session, const int delmask);
+
+	   pid_t threadId() const { return threadId_; }
+		bool isInLoopThread() const { return threadId_ == CurrentThread::tid(); }
 	private:
 		void handleRead();
 
@@ -62,6 +67,8 @@ namespace net
 
 		SessionList activeSessions_;
 
+		const pid_t threadId_;
+		MutexLock mutex_;
 		std::vector<Functor> pendingFunctors_;
 	private:
 		DISALLOW_COPY_AND_ASSIGN(EventLoop);

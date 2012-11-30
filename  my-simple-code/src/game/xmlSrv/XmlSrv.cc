@@ -103,7 +103,6 @@ void XmlSrv::onMessage(mysdk::net::TcpConnection* pCon,
     {
     	pCon->send(cross, strlen(cross));
     }
-    pCon->close();
 }
 
 void XmlSrv::tickMe()

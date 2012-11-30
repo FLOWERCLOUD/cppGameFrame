@@ -45,7 +45,8 @@ EventLoop::EventLoop():
 		quit_(false),
 		callingPendingFunctors_(false),
 		wakeupFd_(createEventfd()),
-		pPoller_(Poller::newDefaultPoller(this))
+		pPoller_(Poller::newDefaultPoller(this)),
+	    threadId_(CurrentThread::tid())
 {
 	pTimerQueue_ = new TimerQueue(this);
 
@@ -158,22 +159,31 @@ void EventLoop::handleRead()
 
 void EventLoop::doPendingFunctors()
 {
+	std::vector<Functor> functors;
 	callingPendingFunctors_ = true;
-	for (size_t i = 0; i < pendingFunctors_.size(); ++i)
 	{
-		pendingFunctors_[i]();
+	    MutexLockGuard lock(mutex_);
+	    functors.swap(pendingFunctors_);
 	}
-	pendingFunctors_.clear();
-	callingPendingFunctors_ = false;
+
+	  for (size_t i = 0; i < functors.size(); ++i)
+	  {
+	    functors[i]();
+	  }
+	  callingPendingFunctors_ = false;
 }
 
 void EventLoop::queueInLoop(const Functor& cb)
 {
-	pendingFunctors_.push_back(cb);
-	if (callingPendingFunctors_)
-	{
-		wakeup();
-	}
+	 {
+		 MutexLockGuard lock(mutex_);
+		 pendingFunctors_.push_back(cb);
+	 }
+
+	 if (isInLoopThread() && callingPendingFunctors_)
+	 {
+	    wakeup();
+	 }
 }
 
 void EventLoop::printActiveSessions() const
