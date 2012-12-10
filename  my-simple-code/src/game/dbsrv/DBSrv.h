@@ -15,6 +15,7 @@
 
 #include <game/dbsrv/codec/codec.h>
 #include <game/dbsrv/WorkerThreadPool.h>
+#include <game/dbsrv/WriterThreadPool.h>
 
 #include <google/protobuf/message.h>
 
@@ -41,18 +42,25 @@ public:
 			mysdk::Timestamp timestamp);
 
 	void sendReply(int conId, google::protobuf::Message* message);
+	void sendReplyEx(int conId, mysdk::net::Buffer* pBuf);
 	EventLoop* getEventLoop()
 	{
 		return loop_;
 	}
 
 	void tickMe();
+	void ping();
+	WriterThreadPool& getWriteThreadPool()
+	{
+		return writeThreadPool_;
+	}
 private:
 	KabuCodec codec_;
 	ConMapT conMap_;
 	EventLoop* loop_;
 	TcpServer server_;
 	WorkThreadPool threadPool_;
+	WriterThreadPool writeThreadPool_;
 private:
 	DISALLOW_COPY_AND_ASSIGN(DBSrv);
 };

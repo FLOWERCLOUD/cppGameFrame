@@ -16,6 +16,8 @@ public:
 	void stop();
 
 	void push(struct ThreadParam& param);
+
+	void ping();
 private:
 	std::vector<WorkerThread* > asyncThreads_;
 };

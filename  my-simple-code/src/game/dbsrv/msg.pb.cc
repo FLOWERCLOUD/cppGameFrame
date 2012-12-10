@@ -50,6 +50,9 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* mget_reply_user_table_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   mget_reply_user_table_reflection_ = NULL;
+const ::google::protobuf::Descriptor* lua_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  lua_reflection_ = NULL;
 
 }  // namespace
 
@@ -243,6 +246,22 @@ void protobuf_AssignDesc_msg_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(mget_reply_user_table));
+  lua_descriptor_ = file->message_type(6);
+  static const int lua_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(lua, uid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(lua, argback_),
+  };
+  lua_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      lua_descriptor_,
+      lua::default_instance_,
+      lua_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(lua, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(lua, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(lua));
 }
 
 namespace {
@@ -277,6 +296,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
     mget_reply_descriptor_, &mget_reply::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     mget_reply_user_table_descriptor_, &mget_reply_user_table::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    lua_descriptor_, &lua::default_instance());
 }
 
 }  // namespace
@@ -304,6 +325,8 @@ void protobuf_ShutdownFile_msg_2eproto() {
   delete mget_reply_reflection_;
   delete mget_reply_user_table::default_instance_;
   delete mget_reply_user_table_reflection_;
+  delete lua::default_instance_;
+  delete lua_reflection_;
 }
 
 void protobuf_AddDesc_msg_2eproto() {
@@ -332,7 +355,8 @@ void protobuf_AddDesc_msg_2eproto() {
     "\005\022\017\n\007argback\030\002 \002(\t\022-\n\006tables\030\003 \003(\0132\035.db_"
     "srv.mget_reply.user_table\032@\n\nuser_table\022"
     "\013\n\003uid\030\001 \002(\005\022\022\n\ntable_name\030\002 \002(\t\022\021\n\ttabl"
-    "e_bin\030\003 \002(\t", 771);
+    "e_bin\030\003 \002(\t\"#\n\003lua\022\013\n\003uid\030\001 \002(\005\022\017\n\007argba"
+    "ck\030\002 \002(\t", 808);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "msg.proto", &protobuf_RegisterTypes);
   set::default_instance_ = new set();
@@ -346,6 +370,7 @@ void protobuf_AddDesc_msg_2eproto() {
   mget_user_table::default_instance_ = new mget_user_table();
   mget_reply::default_instance_ = new mget_reply();
   mget_reply_user_table::default_instance_ = new mget_reply_user_table();
+  lua::default_instance_ = new lua();
   set::default_instance_->InitAsDefaultInstance();
   set_table::default_instance_->InitAsDefaultInstance();
   set_reply::default_instance_->InitAsDefaultInstance();
@@ -357,6 +382,7 @@ void protobuf_AddDesc_msg_2eproto() {
   mget_user_table::default_instance_->InitAsDefaultInstance();
   mget_reply::default_instance_->InitAsDefaultInstance();
   mget_reply_user_table::default_instance_->InitAsDefaultInstance();
+  lua::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_msg_2eproto);
 }
 
@@ -3649,6 +3675,271 @@ void mget_reply::Swap(mget_reply* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = mget_reply_descriptor_;
   metadata.reflection = mget_reply_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int lua::kUidFieldNumber;
+const int lua::kArgbackFieldNumber;
+#endif  // !_MSC_VER
+
+lua::lua()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void lua::InitAsDefaultInstance() {
+}
+
+lua::lua(const lua& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void lua::SharedCtor() {
+  _cached_size_ = 0;
+  uid_ = 0;
+  argback_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+lua::~lua() {
+  SharedDtor();
+}
+
+void lua::SharedDtor() {
+  if (argback_ != &::google::protobuf::internal::kEmptyString) {
+    delete argback_;
+  }
+  if (this != default_instance_) {
+  }
+}
+
+void lua::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* lua::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return lua_descriptor_;
+}
+
+const lua& lua::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_msg_2eproto();  return *default_instance_;
+}
+
+lua* lua::default_instance_ = NULL;
+
+lua* lua::New() const {
+  return new lua;
+}
+
+void lua::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    uid_ = 0;
+    if (has_argback()) {
+      if (argback_ != &::google::protobuf::internal::kEmptyString) {
+        argback_->clear();
+      }
+    }
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool lua::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required int32 uid = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &uid_)));
+          set_has_uid();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(18)) goto parse_argback;
+        break;
+      }
+      
+      // required string argback = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_argback:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_argback()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->argback().data(), this->argback().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+      
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void lua::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // required int32 uid = 1;
+  if (has_uid()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->uid(), output);
+  }
+  
+  // required string argback = 2;
+  if (has_argback()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->argback().data(), this->argback().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      2, this->argback(), output);
+  }
+  
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* lua::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // required int32 uid = 1;
+  if (has_uid()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->uid(), target);
+  }
+  
+  // required string argback = 2;
+  if (has_argback()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->argback().data(), this->argback().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->argback(), target);
+  }
+  
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int lua::ByteSize() const {
+  int total_size = 0;
+  
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required int32 uid = 1;
+    if (has_uid()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->uid());
+    }
+    
+    // required string argback = 2;
+    if (has_argback()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->argback());
+    }
+    
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void lua::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const lua* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const lua*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void lua::MergeFrom(const lua& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_uid()) {
+      set_uid(from.uid());
+    }
+    if (from.has_argback()) {
+      set_argback(from.argback());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void lua::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void lua::CopyFrom(const lua& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool lua::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+  
+  return true;
+}
+
+void lua::Swap(lua* other) {
+  if (other != this) {
+    std::swap(uid_, other->uid_);
+    std::swap(argback_, other->argback_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata lua::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = lua_descriptor_;
+  metadata.reflection = lua_reflection_;
   return metadata;
 }
 

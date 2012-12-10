@@ -7,6 +7,7 @@
 #include <mysdk/base/BlockingQueue.h>
 
 #include <game/dbsrv/cache/rcache.h>
+#include <game/dbsrv/lua/LuaEngine.h>
 #include <game/dbsrv/mysql/MySQLConnection.h>
 #include <game/dbsrv/dispatcher.h>
 
@@ -51,6 +52,7 @@ private:
 	void onMGet(int conId, db_srv::mget* message);
 	void onUnknownMessage(int conId, google::protobuf::Message* message);
 
+	void onLuaMessage(int conId, google::protobuf::Message* message);
 private:
 	bool loadFromRedis(int uid, const std::string& tablename, ::db_srv::get_reply_table* table);
 	bool loadFromMySql(int uid, const std::string& tablename, ::db_srv::get_reply_table* table);
@@ -62,11 +64,14 @@ private:
 	bool loadFromMySql(int uid, const std::string& tablename, ::db_srv::mget_reply_user_table* table);
 private:
 	void sendReply(int conId, google::protobuf::Message* message);
+public:
+	void sendReplyEx(int conId, google::protobuf::Message& message);
 private:
 	int id_;
 	BlockingQueue<ThreadParam> queue_;
 	Thread thread_;
 	DBSrv* srv_;
+	LuaEngine luaEngine_;
 	rcache::Cache readis_;
 	MySQLConnection mysql_;
 	ProtobufDispatcher dispatcher_;

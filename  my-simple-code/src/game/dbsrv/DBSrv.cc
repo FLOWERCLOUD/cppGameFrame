@@ -123,7 +123,7 @@ void setupSignalHandlers(void)
 }
 
 static int sthreadnum = 8;
-
+static int swritethreadnum = 8;
 DBSrv::DBSrv(EventLoop* loop, InetAddress& serverAddr):
 	codec_(
 			std::tr1::bind(&DBSrv::onKaBuMessage,
@@ -133,7 +133,8 @@ DBSrv::DBSrv(EventLoop* loop, InetAddress& serverAddr):
 			std::tr1::placeholders::_3)),
 	loop_(loop),
 	server_(loop, serverAddr, "DBSrv"),
-	threadPool_(this, sthreadnum)
+	threadPool_(this, sthreadnum),
+	writeThreadPool_(swritethreadnum)
 {
 	server_.setConnectionCallback(std::tr1::bind(&DBSrv::onConnectionCallback,
 																this,
@@ -146,6 +147,7 @@ DBSrv::DBSrv(EventLoop* loop, InetAddress& serverAddr):
 														std::tr1::placeholders::_3));
 
 	 loop->runEvery(1, std::tr1::bind(&DBSrv::tickMe, this));
+	 loop->runEvery(10, std::tr1::bind(&DBSrv::ping, this));
 
 	 mysql_library_init(0, NULL, NULL);
 }
@@ -163,16 +165,24 @@ void DBSrv::tickMe()
 	}
 }
 
+void DBSrv::ping()
+{
+	threadPool_.ping();
+	writeThreadPool_.ping();
+}
+
 void DBSrv::start()
 {
 	setupSignalHandlers();
 	threadPool_.start();
+	writeThreadPool_.start();
 	server_.start();
 }
 
 void DBSrv::stop()
 {
 	threadPool_.stop();
+	writeThreadPool_.stop();
 }
 
 static int nextid = 0;
@@ -218,6 +228,8 @@ void DBSrv::sendReply(int conId, google::protobuf::Message* message)
 	if (iter == conMap_.end())
 	{
 		// 这个连接断开过？？
+	    // 现在可以释放掉这个消息了
+	    delete message;
 		return;
 	}
 
@@ -225,4 +237,29 @@ void DBSrv::sendReply(int conId, google::protobuf::Message* message)
     codec_.send(pCon, message);
     // 现在可以释放掉这个消息了
     delete message;
+}
+
+void DBSrv::sendReplyEx(int conId, mysdk::net::Buffer* pBuf)
+{
+	assert(pBuf);
+
+	ConMapT::iterator iter;
+	iter = conMap_.find(conId);
+	if (iter == conMap_.end())
+	{
+		// 这个连接断开过？？
+	    delete pBuf;
+		return;
+	}
+
+	mysdk::net::TcpConnection* pCon = iter->second;
+	if (!pCon)
+	{
+		// 这个连接竟然是null 不会吧
+		delete pBuf;
+		return;
+	}
+
+	pCon->send(pBuf);
+    delete pBuf;
 }

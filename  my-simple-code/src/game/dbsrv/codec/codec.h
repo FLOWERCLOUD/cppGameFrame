@@ -29,8 +29,8 @@ public:
 	{
 		kNoError	=	0,
 		kInvalidLength,
-		kCheckSumError,
 		kInvalidNameLen,
+		kInvalidHeadLen,
 		kUnknownMessageType,
 		kParseError,
 	};
@@ -48,6 +48,7 @@ public:
 			messageCallback_(messageCb),
 			errorCallback_(defaultErrorCallback)
 	{
+		init();
 	}
 
 	KabuCodec(const  KabuMessageCallback& messageCb,
@@ -55,7 +56,10 @@ public:
 			messageCallback_(messageCb),
 			errorCallback_(errorCb)
 	{
+		init();
 	}
+
+	void init();
 
 	void onMessage(mysdk::net::TcpConnection* pCon,
 									mysdk::net::Buffer* pBuf,
@@ -73,7 +77,7 @@ public:
 	static const std::string& errorCodeToString(ErrorCode errorCode);
 	static void fillEmptyBuff(mysdk::net::Buffer* pBuf, google::protobuf::Message* message);
 	static google::protobuf::Message* createMessage(const std::string& type_name);
-
+	static google::protobuf::Message* createDynamicMessage(const std::string& typeName);
 	static google::protobuf::Message* parse(const char* buf, int len, ErrorCode* errorCode);
 
 private:

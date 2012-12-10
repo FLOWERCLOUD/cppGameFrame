@@ -43,6 +43,7 @@ class mget;
 class mget_user_table;
 class mget_reply;
 class mget_reply_user_table;
+class lua;
 
 // ===================================================================
 
@@ -1217,6 +1218,102 @@ class mget_reply : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static mget_reply* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class lua : public ::google::protobuf::Message {
+ public:
+  lua();
+  virtual ~lua();
+  
+  lua(const lua& from);
+  
+  inline lua& operator=(const lua& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const lua& default_instance();
+  
+  void Swap(lua* other);
+  
+  // implements Message ----------------------------------------------
+  
+  lua* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const lua& from);
+  void MergeFrom(const lua& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // required int32 uid = 1;
+  inline bool has_uid() const;
+  inline void clear_uid();
+  static const int kUidFieldNumber = 1;
+  inline ::google::protobuf::int32 uid() const;
+  inline void set_uid(::google::protobuf::int32 value);
+  
+  // required string argback = 2;
+  inline bool has_argback() const;
+  inline void clear_argback();
+  static const int kArgbackFieldNumber = 2;
+  inline const ::std::string& argback() const;
+  inline void set_argback(const ::std::string& value);
+  inline void set_argback(const char* value);
+  inline void set_argback(const char* value, size_t size);
+  inline ::std::string* mutable_argback();
+  inline ::std::string* release_argback();
+  
+  // @@protoc_insertion_point(class_scope:db_srv.lua)
+ private:
+  inline void set_has_uid();
+  inline void clear_has_uid();
+  inline void set_has_argback();
+  inline void clear_has_argback();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::std::string* argback_;
+  ::google::protobuf::int32 uid_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_msg_2eproto();
+  friend void protobuf_AssignDesc_msg_2eproto();
+  friend void protobuf_ShutdownFile_msg_2eproto();
+  
+  void InitAsDefaultInstance();
+  static lua* default_instance_;
 };
 // ===================================================================
 
@@ -2478,6 +2575,90 @@ mget_reply::tables() const {
 inline ::google::protobuf::RepeatedPtrField< ::db_srv::mget_reply_user_table >*
 mget_reply::mutable_tables() {
   return &tables_;
+}
+
+// -------------------------------------------------------------------
+
+// lua
+
+// required int32 uid = 1;
+inline bool lua::has_uid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void lua::set_has_uid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void lua::clear_has_uid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void lua::clear_uid() {
+  uid_ = 0;
+  clear_has_uid();
+}
+inline ::google::protobuf::int32 lua::uid() const {
+  return uid_;
+}
+inline void lua::set_uid(::google::protobuf::int32 value) {
+  set_has_uid();
+  uid_ = value;
+}
+
+// required string argback = 2;
+inline bool lua::has_argback() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void lua::set_has_argback() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void lua::clear_has_argback() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void lua::clear_argback() {
+  if (argback_ != &::google::protobuf::internal::kEmptyString) {
+    argback_->clear();
+  }
+  clear_has_argback();
+}
+inline const ::std::string& lua::argback() const {
+  return *argback_;
+}
+inline void lua::set_argback(const ::std::string& value) {
+  set_has_argback();
+  if (argback_ == &::google::protobuf::internal::kEmptyString) {
+    argback_ = new ::std::string;
+  }
+  argback_->assign(value);
+}
+inline void lua::set_argback(const char* value) {
+  set_has_argback();
+  if (argback_ == &::google::protobuf::internal::kEmptyString) {
+    argback_ = new ::std::string;
+  }
+  argback_->assign(value);
+}
+inline void lua::set_argback(const char* value, size_t size) {
+  set_has_argback();
+  if (argback_ == &::google::protobuf::internal::kEmptyString) {
+    argback_ = new ::std::string;
+  }
+  argback_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* lua::mutable_argback() {
+  set_has_argback();
+  if (argback_ == &::google::protobuf::internal::kEmptyString) {
+    argback_ = new ::std::string;
+  }
+  return argback_;
+}
+inline ::std::string* lua::release_argback() {
+  clear_has_argback();
+  if (argback_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = argback_;
+    argback_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
 }
 
 

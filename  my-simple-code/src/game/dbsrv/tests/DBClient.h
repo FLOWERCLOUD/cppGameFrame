@@ -23,6 +23,10 @@ public:
 
 	void connect();
 
+public:
+	void sendGetCmd();
+	void sendSetCmd();
+	void sendUnknowCmd();
 private:
 	void onConnection(mysdk::net::TcpConnection* pCon);
 	void onKaBuMessage(mysdk::net::TcpConnection* pCon,

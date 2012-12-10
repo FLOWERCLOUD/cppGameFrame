@@ -2,7 +2,10 @@
 #include <game/dbsrv/WorkerThread.h>
 
 #include <game/dbsrv/DBSrv.h>
+#include <game/dbsrv/WriterThread.h>
+#include <game/dbsrv/codec/codec.h>
 #include <game/dbsrv/config/ConfigMgr.h>
+#include <game/dbsrv/lua/LuaMyLibs.h>
 #include <game/dbsrv/mysql/QueryResult.h>
 
 #include <google/protobuf/message.h>
@@ -12,7 +15,7 @@ WorkerThread::WorkerThread(DBSrv* srv, int id):
 	thread_(std::tr1::bind(&WorkerThread::threadHandler, this), "workerThread"),
 	srv_(srv),
 	dispatcher_(
-			std::tr1::bind(&WorkerThread::onUnknownMessage,
+			std::tr1::bind(&WorkerThread::onLuaMessage,
 					this,
 					std::tr1::placeholders::_1,
 					std::tr1::placeholders::_2))
@@ -60,6 +63,13 @@ void WorkerThread::start()
 
 	mysql_.open();
 	thread_.start();
+	// 打开lua的基本函数库
+	luaEngine_.openlibs();
+	// 导入自定义的函数库
+	lua_State* L = luaEngine_.getLuaState();
+	LuaMyLibs::openmylibs(L);
+
+	luaEngine_.dofile("test.lua");
 }
 
 void WorkerThread::stop()
@@ -104,6 +114,7 @@ void WorkerThread::handler(struct ThreadParam& param)
 {
 	int conId = param.conId;
 	google::protobuf::Message* msg = static_cast<google::protobuf::Message*>(param.msg);
+	printf("WorkerThread::handler msg: %s\n", msg->GetTypeName().c_str());
 	dispatcher_.onProtobufMessage(conId, msg);
 }
 
@@ -172,15 +183,74 @@ bool WorkerThread::saveToRedis(int uid, const ::db_srv::set_table& set_table, ::
 	char rediskey[100];
 	snprintf(rediskey, 99, "%d:%s", uid, set_table.table_name().c_str());
 	redisReply* reply = static_cast<redisReply*>(readis_.RedisCommand("SET %s %b", rediskey, set_table.table_bin().c_str(), set_table.table_bin().length()));
-	LOG_DEBUG << "saveToRedis, rediscmd: " << rediskey;
+	LOG_DEBUG << "saveToRedis, rediscmd: " << rediskey << " reply type: " << reply->type;
+    if (reply->type == REDIS_REPLY_STATUS && strcasecmp(reply->str,"ok") == 0)
+    {
+    	status->set_table_name(set_table.table_name());
+    	status->set_status("OK");
+    	readis_.FreeReplyObject(reply);
+    	return true;
+	}
+
 	status->set_table_name(set_table.table_name());
-	status->set_status("OK");
+	if (reply->str)
+	{
+		status->set_status(reply->str);
+	}
+	else
+	{
+		status->set_status("ERROR");
+	}
 	readis_.FreeReplyObject(reply);
-	return true;
+	return false;
 }
 
 bool WorkerThread::saveToMySql(int uid, const ::db_srv::set_table& set_table, ::db_srv::set_reply_table_status* status)
 {
+	int table_bin_length = set_table.table_bin().length();
+	// 大于20k的时候 打个警告的日志吧
+	if (table_bin_length >= 1024 * 20)
+	{
+		LOG_WARN << "table bin too length, uid: " << uid << " tablename: " << set_table.table_name() << " length: " << table_bin_length;
+	}
+
+	char str_rs[1024 * 40]; // 40k空间
+	int len = mysql_.format_to_real_string(str_rs, set_table.table_bin().c_str(), table_bin_length);
+	if (len == 0)
+	{
+		// 数据库有问题了吧
+		LOG_ERROR << "format_to_real_string error, uid: " << uid << " tablename: " << set_table.table_name() << " length: " << table_bin_length;
+		return false;
+	}
+
+	char* sql_buf = new char[len + 200];
+	// replace into tablename(uid, table_bin, update_time) values(%d, %s, %d)
+	// 一张表的时候的sql语句
+	static const char sql[] = "replace into %s(uid, table_bin, update_time) values(%d, '%s', %d)";
+	// 多张表的时候的sql语句
+	static const char sql2[] = "replace into %s_%d(uid, table_bin, update_time) values(%d, '%s', %d)";
+	// 该类型的表 有多少张
+	int tablenum = sConfigMgr.MainConfig.GetIntDefault("table", set_table.table_name().c_str(), 1);
+
+	int sqlbuflen = 0;
+	if (tablenum == 1)
+	{
+		sqlbuflen = snprintf(sql_buf, len + 200, sql, set_table.table_name().c_str(), uid, str_rs, time(NULL));
+	}
+	else
+	{
+		sqlbuflen = snprintf(sql_buf, len + 200, sql2, tablenum, set_table.table_name().c_str(), uid, str_rs, time(NULL));
+	}
+
+
+	struct WriterThreadParam param;
+	param.Type = WRITERTHREAD_CMD;
+	param.sql = sql_buf;
+	param.length = sqlbuflen;
+
+	if (!srv_) return false;
+	WriterThreadPool& pool = srv_->getWriteThreadPool();
+	pool.push(param);
 	return true;
 }
 
@@ -212,10 +282,21 @@ void WorkerThread::sendReply(int conId, google::protobuf::Message* message)
 	loop->queueInLoop(std::tr1::bind(&DBSrv::sendReply, srv_, conId, message));
 }
 
+void WorkerThread::sendReplyEx(int conId, google::protobuf::Message& message)
+{
+	if (!srv_) return;
+	EventLoop* loop = srv_->getEventLoop();
+	if (!loop) return;
+
+	Buffer* pBuf = new Buffer();
+	KabuCodec::fillEmptyBuff(pBuf, &message);
+	loop->queueInLoop(std::tr1::bind(&DBSrv::sendReplyEx, srv_, conId, pBuf));
+}
+
 void WorkerThread::onGet(int conId, db_srv::get* message)
 {
 	if (!message) return;
-	LOG_DEBUG << "onGet:\n" << message->GetTypeName() << message->DebugString();
+	LOG_DEBUG << "onGet:\n" << message->GetTypeName() << message->DebugString()<< " threadid:" << id_;
 
 	int uid = message->uid();
 	std::string argback(message->argback());
@@ -249,7 +330,7 @@ void WorkerThread::onGet(int conId, db_srv::get* message)
 void WorkerThread::onSet(int conId, db_srv::set* message)
 {
 	if (!message) return;
-	LOG_DEBUG << "onSet: " << message->GetTypeName() << message->DebugString();
+	LOG_DEBUG << "onSet: " << message->GetTypeName() << message->DebugString()<< " threadid:" << id_;
 
 	int uid = message->uid();
 	std::string argback(message->argback());
@@ -261,9 +342,11 @@ void WorkerThread::onSet(int conId, db_srv::set* message)
 	{
 		::db_srv::set_reply_table_status* table_status = set_reply->add_table_statuses();
 		// 首先保存到redis 中
-		saveToRedis(uid, message->tables(i), table_status);
-		// 然后保存到mysql 中
-		saveToMySql(uid, message->tables(i), table_status);
+		if (saveToRedis(uid, message->tables(i), table_status))
+		{
+			// 保存redis成功后，在保存到mysql 中
+			saveToMySql(uid, message->tables(i), table_status);
+		}
 	}
 
 	// 现在可以释放掉这个消息包了
@@ -274,7 +357,7 @@ void WorkerThread::onSet(int conId, db_srv::set* message)
 void WorkerThread::onMGet(int conId, db_srv::mget* message)
 {
 	if (!message) return;
-	LOG_DEBUG << "onMGet: " << message->GetTypeName() << message->DebugString();
+	LOG_DEBUG << "onMGet: " << message->GetTypeName() << message->DebugString()<< " threadid:" << id_;
 
 	int uid = message->uid();
 	std::string argback(message->argback());
@@ -352,5 +435,43 @@ bool WorkerThread::loadFromMySql(int uid, const std::string& tablename, ::db_srv
 void WorkerThread::onUnknownMessage(int conId, google::protobuf::Message* message)
 {
 	if (!message) return;
-	LOG_INFO << "onUnknownMessage: " << message->GetTypeName()<< message->DebugString();
+	LOG_INFO << "onUnknownMessage: " << message->GetTypeName()<< message->DebugString() << " threadid:" << id_;
+}
+
+void WorkerThread::onLuaMessage(int conId, google::protobuf::Message* message)
+{
+	if (!message) return;
+	LOG_INFO << "onLuaMessage: " << message->GetTypeName()<< message->DebugString()<< " threadid:" << id_;
+
+	lua_State* L = luaEngine_.getLuaState();
+
+	lua_getglobal(L, "onLuaMessage");
+	luaL_checktype(L, 1, LUA_TFUNCTION);
+
+	lua_pushinteger(L, conId);
+	google::protobuf::Message ** tmp = static_cast<google::protobuf::Message**>(lua_newuserdata(L, sizeof(google::protobuf::Message *)));
+	*tmp = message;
+	luaL_getmetatable(L, "pb");
+	lua_setmetatable(L, -2);
+
+	lua_pushlightuserdata(L, this);
+	if (lua_pcall(L, 3, 1, 0) != 0)
+	{
+		fprintf(stderr, "lua_pcall WorkerThread::onLuaMessage error, error msg:%s\n",
+				lua_tostring(L, -1));
+		lua_pop(L, 1);// 从栈中弹出出错消息
+		return;
+	}
+
+	int ir = lua_gettop(L);
+
+	if (ir > 0)
+	{
+		int tr = static_cast<int>(lua_tonumber(L, -1));
+		lua_pop(L, ir);
+
+		printf("WorkerThread::onLuaMessage ret:%d\n", tr);
+	}
+
+    return;
 }

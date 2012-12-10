@@ -203,6 +203,16 @@ ResultSet* MySQLConnection::query(const char* sql)
     return new ResultSet(result, fields, rowCount, fieldCount);
 }
 
+unsigned long MySQLConnection::format_to_real_string(char *to, const char *from, unsigned long length)
+{
+	if (mysql_)
+	{
+		return mysql_real_escape_string(mysql_, to, from, length);
+	}
+
+	return 0;
+}
+
 bool MySQLConnection::handleMySQLErrno(int errNo)
 {
     switch (errNo)

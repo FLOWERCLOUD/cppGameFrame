@@ -7,7 +7,8 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/io/zero_copy_stream_impl_lite.h>
 
-#include <zlib.h>  // adler32
+#include <google/protobuf/dynamic_message.h>
+#include <google/protobuf/compiler/importer.h>
 
 using namespace mysdk;
 using namespace mysdk::net;
@@ -104,9 +105,10 @@ void KabuCodec::fillEmptyBuff(Buffer* pBuf, google::protobuf::Message* message)
 	// head
 	pBuf->appendInt16(0);
 
+	// code copied from MessageLite::SerializeToArray() and MessageLite::SerializePartialToArray().
+	GOOGLE_DCHECK(message->IsInitialized()) << InitializationErrorMessage("serialize", (*message));
 
 	int byte_size = message->ByteSize();
-	//printf("typename[%s], bytesize[%d]\n", typeName.c_str(), byte_size);
 	pBuf->ensureWritableBytes(byte_size);
 
 	  uint8* start = reinterpret_cast<uint8*>(pBuf->beginWrite());
@@ -118,7 +120,6 @@ void KabuCodec::fillEmptyBuff(Buffer* pBuf, google::protobuf::Message* message)
 	  pBuf->hasWritten(byte_size);
 
 	  int32 len = (static_cast<int32_t>(pBuf->readableBytes()));
-	  //printf("msg len[%d]\n", len);
 	  pBuf->prepend(&len, sizeof len);
 }
 
@@ -183,7 +184,6 @@ void KabuCodec::onMessage(TcpConnection* pCon,
 	while (buf->readableBytes() >= kMinMessageLen + kHeaderLen)
 	{
 		const int32 len = buf->peekInt32();
-		//printf("onmsg, len[%d]\n", len);
 		if (len > kMaxMessageLen || len < kMinMessageLen)
 		{
 			errorCallback_(pCon, buf, receiveTime, kInvalidLength);
@@ -225,24 +225,72 @@ google::protobuf::Message* KabuCodec::createMessage(const std::string& typeName)
 			message = prototype->New();
 		}
 	}
+	// 从动态编译中找找看看吧
+	if (!message)
+	{
+		message = createDynamicMessage(typeName);
+	}
 	return message;
+}
+
+class MyMultiFileErrorCollector : public google::protobuf::compiler::MultiFileErrorCollector
+{
+        virtual void AddError(
+                const std::string & filename,
+                int line,
+                int column,
+                const std::string & message)
+        {
+        	fprintf(stderr, "%s:%d:%d:%s\n", filename.c_str(), line, column, message.c_str());
+       }
+};
+
+static MyMultiFileErrorCollector errorCollector;
+static google::protobuf::compiler::DiskSourceTree sourceTree;
+static google::protobuf::compiler::Importer importer(&sourceTree, &errorCollector);
+static google::protobuf::DynamicMessageFactory factory;
+
+void KabuCodec::init()
+{
+    sourceTree.MapPath("", "");
+	importer.Import("test.proto");
+}
+
+google::protobuf::Message* KabuCodec::createDynamicMessage(const std::string& typeName)
+{
+	  google::protobuf::Message* message = NULL;
+	  const google::protobuf::Descriptor* descriptor = importer.pool()->FindMessageTypeByName(typeName);
+	  if (descriptor)
+	  {
+	     const google::protobuf::Message* prototype = factory.GetPrototype(descriptor);
+			if (prototype)
+			{
+				message = prototype->New();
+			}
+	  }
+	  return message;
 }
 
 google::protobuf::Message* KabuCodec::parse(const char* buf, int len, ErrorCode* error)
 {
 	google::protobuf::Message* message = NULL;
 	int16_t nameLen = asInt16(buf);
-	if (nameLen >= 2 && nameLen <= 100)
+	if (nameLen >= 2 && nameLen <= static_cast<int16_t>(len - sizeof(int16_t)))
 	{
-		std::string typeName(buf + sizeof(int16_t), buf  + sizeof(int16_t) + nameLen - 1);
+		// head
+		int16_t headLen = asInt16(buf  + sizeof(int16_t) + nameLen);
+		if (headLen > static_cast<int16_t>(len - sizeof(int16_t) - headLen))
+		{
+			*error = kInvalidHeadLen;
+			return message;
+		}
 
+		std::string typeName(buf + sizeof(int16_t), buf  + sizeof(int16_t) + nameLen - 1);
 		// create message object
 		message = createMessage(typeName);
+		//message = createDynamicMessage(typeName);
 		if (message)
 		{
-				// head
-				int16_t headLen = asInt16(buf  + sizeof(int16_t) + nameLen);
-				printf("typename[%s], headlen[%d]\n", typeName.c_str(), headLen);
 		       // parse from buffer
 		       const char* data = buf + sizeof(int16_t) + nameLen + sizeof(int16_t) + headLen;
 		        int32 dataLen = len - (sizeof(int16_t) + nameLen + sizeof(int16_t) + headLen);

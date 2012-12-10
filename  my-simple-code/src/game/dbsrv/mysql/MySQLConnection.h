@@ -35,6 +35,8 @@ public:
 		bool execute(const char* sql, unsigned long length);
 		ResultSet* query(const char* sql);
 
+		unsigned long format_to_real_string(char *to, const char *from, unsigned long length);
+
 		operator bool() const { return mysql_ != NULL; }
 		void ping() { mysql_ping(mysql_); }
 

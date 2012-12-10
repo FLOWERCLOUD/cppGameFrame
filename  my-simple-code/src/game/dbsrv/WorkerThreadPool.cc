@@ -53,3 +53,14 @@ void WorkThreadPool::push(struct ThreadParam& param)
 	asyncThreads_[nextThreadId]->push(param);
 }
 
+void WorkThreadPool::ping()
+{
+	struct ThreadParam param;
+	param.Type = PING;
+
+	int threadnum = asyncThreads_.size();
+	for (int i = 0; i < threadnum; i++)
+	{
+		asyncThreads_[i]->push(param);
+	}
+}
