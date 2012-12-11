@@ -36,6 +36,7 @@ namespace rcache {
 		void internalRun(int curTime);
 
 		bool CheckReplyStatus(redisReply* reply,const char* def = "OK");
+	public:
 		bool ReConnect();
 	private:
 	    redisContext* m_redisContext;

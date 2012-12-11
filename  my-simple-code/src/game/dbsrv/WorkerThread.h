@@ -68,6 +68,7 @@ public:
 	void sendReplyEx(int conId, google::protobuf::Message& message);
 private:
 	int id_;
+	int nextWriterThreadId_;
 	BlockingQueue<ThreadParam> queue_;
 	Thread thread_;
 	DBSrv* srv_;

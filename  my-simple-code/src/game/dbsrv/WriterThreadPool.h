@@ -16,9 +16,12 @@ public:
 	void stop();
 
 	void push(struct WriterThreadParam& param);
+	void push(int threadId, struct WriterThreadParam& param);
+	int getThreadNum();
 	void ping();
 private:
 	std::vector<WriterThread* > threads_;
+	int threadnum_;
 };
 
 #endif /* WRITERTHREADPOOL_H_ */

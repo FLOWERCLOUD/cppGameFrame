@@ -173,11 +173,11 @@ bool MySQLConnection::_query(const char *sql, MYSQL_RES **pResult, MYSQL_FIELD *
     	return false;
     }
 
-    if (!*pRowCount)
-    {
-        mysql_free_result(*pResult);
-        return false;
-    }
+    //if (!*pRowCount)
+    //{
+   //     mysql_free_result(*pResult);
+    //    return false;
+   // }
 
     *pFields = mysql_fetch_fields(*pResult);
     return true;

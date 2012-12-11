@@ -12,6 +12,7 @@
 
 WorkerThread::WorkerThread(DBSrv* srv, int id):
 	id_(id),
+	nextWriterThreadId_(0),
 	thread_(std::tr1::bind(&WorkerThread::threadHandler, this), "workerThread"),
 	srv_(srv),
 	dispatcher_(
@@ -53,7 +54,7 @@ void WorkerThread::start()
 	std::string redisAddr = sConfigMgr.MainConfig.GetStringDefault("redis", "addr", "127.0.0.1");;
 	int redisPort = sConfigMgr.MainConfig.GetIntDefault("redis", "port", 6379) ;
 	readis_.SetServerAddr(redisAddr, redisPort);
-	readis_.Connect();
+	readis_.ReConnect();
 	// mysql
 	std::string host = sConfigMgr.MainConfig.GetStringDefault("mysql", "host", "192.168.1.6");
 	std::string port_or_socket = sConfigMgr.MainConfig.GetStringDefault("mysql", "port_or_socket", "3306");
@@ -153,12 +154,22 @@ bool WorkerThread::loadFromMySql(int uid, const std::string& tablename, ::db_srv
 	ResultSet* res = mysql_.query(sql);
 	if (!res)
 	{
+		//LOG_DEBUG << "loadFromMySql, ResultSet is null ";
+		// 数据库连不上了
+		table->set_table_name(tablename);
+		table->set_table_bin("");
+		table->set_table_status(0); // 数据库连不上了
 		return false;
 	}
 
 	//  没有这个玩家的记录哦
 	if (res->getRowCount() == 0)
 	{
+		// 数据库没有这个玩家的记录
+		table->set_table_name(tablename);
+		table->set_table_bin("");
+		table->set_table_status(1); // 数据库没有这个玩家的记录
+
 		delete res;
 		return false;
 	}
@@ -273,8 +284,14 @@ bool WorkerThread::saveToMySql(int uid, const ::db_srv::set_table& set_table, ::
 	param.length = sqlbuflen;
 
 	if (!srv_) return false;
+
 	WriterThreadPool& pool = srv_->getWriteThreadPool();
-	pool.push(param);
+	nextWriterThreadId_++;
+	if (nextWriterThreadId_ >= pool.getThreadNum())
+	{
+		nextWriterThreadId_ = 0;
+	}
+	pool.push(nextWriterThreadId_, param);
 	return true;
 }
 
@@ -336,13 +353,12 @@ void WorkerThread::onGet(int conId, db_srv::get* message)
 		if (!rres)
 		{
 			// redis 没找到, 就从数据库中找
-			bool mres = loadFromMySql(uid, message->table_name(i), table);
-			if (!mres)
+			if(!loadFromMySql(uid, message->table_name(i), table))
 			{
-				// 连数据库都没有找到, 没有方法了只能设空了
-				table->set_table_name(message->table_name(i));
-				table->set_table_bin("");
-				table->set_table_status(1); // 数据库不存在
+				// 数据库没有这个玩家的记录
+				//table->set_table_name(message->table_name(i));
+				//table->set_table_bin("");
+				//table->set_table_status(1); // 数据库没有这个玩家的记录
 			}
 		}
 	}

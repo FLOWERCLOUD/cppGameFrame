@@ -99,7 +99,7 @@ void KabuCodec::fillEmptyBuff(Buffer* pBuf, google::protobuf::Message* message)
 
 	const std::string& typeName = message->GetTypeName();
 
-	int16 nameLen = static_cast<int16>(typeName.size() + 1);
+	int16 nameLen = static_cast<int16>(typeName.size());
 	pBuf->appendInt16(nameLen);
 	pBuf->append(typeName.c_str(), nameLen);
 	// head
@@ -232,54 +232,11 @@ google::protobuf::Message* KabuCodec::createMessage(const std::string& typeName)
 	}
 	return message;
 }
-/*
-class MyMultiFileErrorCollector : public google::protobuf::compiler::MultiFileErrorCollector
-{
-        virtual void AddError(
-                const std::string & filename,
-                int line,
-                int column,
-                const std::string & message)
-        {
-        	fprintf(stderr, "%s:%d:%d:%s\n", filename.c_str(), line, column, message.c_str());
-       }
-};
 
-static MyMultiFileErrorCollector errorCollector;
-static google::protobuf::compiler::DiskSourceTree sourceTree;
-static google::protobuf::compiler::Importer importer(&sourceTree, &errorCollector);
-static google::protobuf::DynamicMessageFactory factory;
-
-#include <game/dbsrv/Util.h>
-#include <game/dbsrv/config/ConfigMgr.h>
-#include <stdlib.h>
-*/
 void KabuCodec::init()
 {
-	/*
-	char* protopath = getenv("PROTO_PATH");
-	if (!protopath)
-	{
-		sourceTree.MapPath("", "");
-	}
-	else
-	{
-		sourceTree.MapPath("", protopath);
-	}
-	printf("[KabuCodec] protopath:%s\n", protopath);
-	std::string filenames = sConfigMgr.MainConfig.GetStringDefault("proto", "filelist", "test.proto");
-
-	std::vector<std::string> vec = StrSplit(filenames, ",");
-	for (size_t i = 0; i < vec.size(); i++)
-	{
-		const  google::protobuf::FileDescriptor* filedescriptor = importer.Import("test.proto");
-		 if (!filedescriptor)
-		 {
-			 fprintf(stderr, "test.proto file descriptor error\n");
-		 }
-	}
-	*/
 }
+
 #include <game/dbsrv/ProtoImporter.h>
 google::protobuf::Message* KabuCodec::createDynamicMessage(const std::string& typeName)
 {
@@ -310,9 +267,10 @@ google::protobuf::Message* KabuCodec::parse(const char* buf, int len, ErrorCode*
 			return message;
 		}
 
-		std::string typeName(buf + sizeof(int16_t), buf  + sizeof(int16_t) + nameLen - 1);
+		std::string typeName(buf + sizeof(int16_t), buf  + sizeof(int16_t) + nameLen);
 		// create message object
 		message = createMessage(typeName);
+		//printf("typename: %s\n", typeName.c_str());
 		//message = createDynamicMessage(typeName);
 		if (message)
 		{

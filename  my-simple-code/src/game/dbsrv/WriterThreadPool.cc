@@ -3,7 +3,8 @@
 
 #include <game/dbsrv/WriterThread.h>
 
-WriterThreadPool::WriterThreadPool(int threadnum)
+WriterThreadPool::WriterThreadPool(int threadnum):
+	threadnum_(threadnum)
 {
 	threads_.resize(threadnum);
 
@@ -43,9 +44,8 @@ void WriterThreadPool::stop()
 void WriterThreadPool::push(struct WriterThreadParam& param)
 {
 	static int nextThreadId = 0;
-	int threadnum = threads_.size();
 	nextThreadId++;
-	if (nextThreadId >= threadnum)
+	if (nextThreadId >= threadnum_)
 	{
 		nextThreadId = 0;
 	}
@@ -53,15 +53,30 @@ void WriterThreadPool::push(struct WriterThreadParam& param)
 	threads_[nextThreadId]->push(param);
 }
 
+void WriterThreadPool::push(int threadId, struct WriterThreadParam& param)
+{
+	if (threadId >= threadnum_ || threadId < 0)
+	{
+		LOG_ERROR << "WriterThreadPool::push threadid error, threadid: " << threadId;
+		push(param);
+		return;
+	}
+
+	threads_[threadId]->push(param);
+}
+
 void WriterThreadPool::ping()
 {
 	struct WriterThreadParam param;
 	param.Type = WRITERTHREAD_PING;
 
-	int threadnum = threads_.size();
-	for (int i = 0; i < threadnum; i++)
+	for (int i = 0; i < threadnum_; i++)
 	{
 		threads_[i]->push(param);
 	}
 }
 
+int WriterThreadPool::getThreadNum()
+{
+	return threadnum_;
+}

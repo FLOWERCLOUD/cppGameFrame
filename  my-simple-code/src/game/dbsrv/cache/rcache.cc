@@ -91,6 +91,7 @@ bool Cache::Ping()
 {
 	if(!m_redisContext)
 	{
+		ReConnect();
 		return false;
 	}
 
@@ -126,8 +127,13 @@ bool Cache::CheckReplyStatus(redisReply* reply, const char* def /*= "OK"*/)
 bool Cache::ReConnect()
 {
 	printf("[reids] Redis Connect Failed, now Reconnect \n");
-	m_redisContext = NULL;
-	return Connect();
+	bool flag = Connect();
+	if (!flag)
+	{
+    	redisFree(m_redisContext);
+    	m_redisContext = NULL;
+	}
+	return flag;
 }
 
 void Cache::internalRun(int curTime)

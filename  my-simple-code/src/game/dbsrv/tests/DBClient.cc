@@ -98,7 +98,7 @@ void DBClient::send(google::protobuf::Message* message)
 void DBClient::sendGetCmd()
 {
 	db_srv::get* get = new db_srv::get();
-	get->set_uid(100);
+	get->set_uid(54689020);
 	get->set_argback("test111111");
 	get->add_table_name("user");
 	get->add_table_name("pet");
