@@ -1,0 +1,6 @@
+package lm;
+message test
+{
+	required int32 uid = 1;
+	required int32 param = 2;
+};

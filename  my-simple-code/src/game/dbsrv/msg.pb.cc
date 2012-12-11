@@ -164,9 +164,10 @@ void protobuf_AssignDesc_msg_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(get_reply));
   get_reply_table_descriptor_ = get_reply_descriptor_->nested_type(0);
-  static const int get_reply_table_offsets_[2] = {
+  static const int get_reply_table_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(get_reply_table, table_name_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(get_reply_table, table_bin_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(get_reply_table, table_status_),
   };
   get_reply_table_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -344,19 +345,19 @@ void protobuf_AddDesc_msg_2eproto() {
     "s\030\003 \003(\0132\036.db_srv.set_reply.table_status\032"
     "2\n\014table_status\022\022\n\ntable_name\030\001 \002(\t\022\016\n\006s"
     "tatus\030\002 \002(\t\"7\n\003get\022\013\n\003uid\030\001 \002(\005\022\017\n\007argba"
-    "ck\030\002 \002(\t\022\022\n\ntable_name\030\003 \003(\t\"\202\001\n\tget_rep"
+    "ck\030\002 \002(\t\022\022\n\ntable_name\030\003 \003(\t\"\230\001\n\tget_rep"
     "ly\022\013\n\003uid\030\001 \002(\005\022\017\n\007argback\030\002 \002(\t\022\'\n\006tabl"
-    "es\030\003 \003(\0132\027.db_srv.get_reply.table\032.\n\005tab"
+    "es\030\003 \003(\0132\027.db_srv.get_reply.table\032D\n\005tab"
     "le\022\022\n\ntable_name\030\001 \002(\t\022\021\n\ttable_bin\030\002 \002("
-    "\t\"\201\001\n\004mget\022\013\n\003uid\030\001 \002(\005\022\017\n\007argback\030\002 \002(\t"
-    "\022,\n\013user_tables\030\003 \003(\0132\027.db_srv.mget.user"
-    "_table\032-\n\nuser_table\022\013\n\003uid\030\001 \002(\005\022\022\n\ntab"
-    "le_name\030\002 \002(\t\"\233\001\n\nmget_reply\022\013\n\003uid\030\001 \002("
-    "\005\022\017\n\007argback\030\002 \002(\t\022-\n\006tables\030\003 \003(\0132\035.db_"
-    "srv.mget_reply.user_table\032@\n\nuser_table\022"
-    "\013\n\003uid\030\001 \002(\005\022\022\n\ntable_name\030\002 \002(\t\022\021\n\ttabl"
-    "e_bin\030\003 \002(\t\"#\n\003lua\022\013\n\003uid\030\001 \002(\005\022\017\n\007argba"
-    "ck\030\002 \002(\t", 808);
+    "\t\022\024\n\014table_status\030\003 \002(\005\"\201\001\n\004mget\022\013\n\003uid\030"
+    "\001 \002(\005\022\017\n\007argback\030\002 \002(\t\022,\n\013user_tables\030\003 "
+    "\003(\0132\027.db_srv.mget.user_table\032-\n\nuser_tab"
+    "le\022\013\n\003uid\030\001 \002(\005\022\022\n\ntable_name\030\002 \002(\t\"\233\001\n\n"
+    "mget_reply\022\013\n\003uid\030\001 \002(\005\022\017\n\007argback\030\002 \002(\t"
+    "\022-\n\006tables\030\003 \003(\0132\035.db_srv.mget_reply.use"
+    "r_table\032@\n\nuser_table\022\013\n\003uid\030\001 \002(\005\022\022\n\nta"
+    "ble_name\030\002 \002(\t\022\021\n\ttable_bin\030\003 \002(\t\"#\n\003lua"
+    "\022\013\n\003uid\030\001 \002(\005\022\017\n\007argback\030\002 \002(\t", 830);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "msg.proto", &protobuf_RegisterTypes);
   set::default_instance_ = new set();
@@ -1891,6 +1892,7 @@ void get::Swap(get* other) {
 #ifndef _MSC_VER
 const int get_reply_table::kTableNameFieldNumber;
 const int get_reply_table::kTableBinFieldNumber;
+const int get_reply_table::kTableStatusFieldNumber;
 #endif  // !_MSC_VER
 
 get_reply_table::get_reply_table()
@@ -1911,6 +1913,7 @@ void get_reply_table::SharedCtor() {
   _cached_size_ = 0;
   table_name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   table_bin_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  table_status_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -1961,6 +1964,7 @@ void get_reply_table::Clear() {
         table_bin_->clear();
       }
     }
+    table_status_ = 0;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -1998,6 +2002,22 @@ bool get_reply_table::MergePartialFromCodedStream(
           ::google::protobuf::internal::WireFormat::VerifyUTF8String(
             this->table_bin().data(), this->table_bin().length(),
             ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(24)) goto parse_table_status;
+        break;
+      }
+      
+      // required int32 table_status = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_table_status:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &table_status_)));
+          set_has_table_status();
         } else {
           goto handle_uninterpreted;
         }
@@ -2041,6 +2061,11 @@ void get_reply_table::SerializeWithCachedSizes(
       2, this->table_bin(), output);
   }
   
+  // required int32 table_status = 3;
+  if (has_table_status()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->table_status(), output);
+  }
+  
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -2069,6 +2094,11 @@ void get_reply_table::SerializeWithCachedSizes(
         2, this->table_bin(), target);
   }
   
+  // required int32 table_status = 3;
+  if (has_table_status()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->table_status(), target);
+  }
+  
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -2092,6 +2122,13 @@ int get_reply_table::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
           this->table_bin());
+    }
+    
+    // required int32 table_status = 3;
+    if (has_table_status()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->table_status());
     }
     
   }
@@ -2127,6 +2164,9 @@ void get_reply_table::MergeFrom(const get_reply_table& from) {
     if (from.has_table_bin()) {
       set_table_bin(from.table_bin());
     }
+    if (from.has_table_status()) {
+      set_table_status(from.table_status());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -2144,7 +2184,7 @@ void get_reply_table::CopyFrom(const get_reply_table& from) {
 }
 
 bool get_reply_table::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+  if ((_has_bits_[0] & 0x00000007) != 0x00000007) return false;
   
   return true;
 }
@@ -2153,6 +2193,7 @@ void get_reply_table::Swap(get_reply_table* other) {
   if (other != this) {
     std::swap(table_name_, other->table_name_);
     std::swap(table_bin_, other->table_bin_);
+    std::swap(table_status_, other->table_status_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

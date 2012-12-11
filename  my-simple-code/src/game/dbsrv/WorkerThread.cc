@@ -45,6 +45,8 @@ WorkerThread::~WorkerThread()
 {
 }
 
+#include "Util.h"
+
 void WorkerThread::start()
 {
 	// redis
@@ -69,7 +71,13 @@ void WorkerThread::start()
 	lua_State* L = luaEngine_.getLuaState();
 	LuaMyLibs::openmylibs(L);
 
-	luaEngine_.dofile("test.lua");
+	std::string filenames = sConfigMgr.MainConfig.GetStringDefault("lua", "filelist", "test.lua");
+
+	std::vector<std::string> vec = StrSplit(filenames, ",");
+	for (size_t i = 0; i < vec.size(); i++)
+	{
+		luaEngine_.dofile(vec[i].c_str());
+	}
 }
 
 void WorkerThread::stop()
@@ -128,6 +136,7 @@ bool WorkerThread::loadFromRedis(int uid, const std::string& tablename, ::db_srv
 	{
 		table->set_table_name(tablename);
 		table->set_table_bin(reply->str);
+		table->set_table_status(2); //从redis拿的数据
 
 		readis_.FreeReplyObject(reply);
 		return true;
@@ -162,10 +171,18 @@ bool WorkerThread::loadFromMySql(int uid, const std::string& tablename, ::db_srv
 	{
 		const Field* field = res->fetch();
 		const char* table_bin =  field[0].getCString();
+		const size_t table_bin_length = field[0].getLength();
 		table->set_table_name(tablename);
+		table->set_table_status(3); // 从数据库拿到的数据
 		if (table_bin)
 		{
-			table->set_table_bin(table_bin);
+			table->set_table_bin(table_bin, table_bin_length);
+
+			// 顺便把这个数据cache到redis中吧
+			char rediskey[100];
+			snprintf(rediskey, 99, "%d:%s", uid, tablename.c_str());
+			redisReply* reply = static_cast<redisReply*>(readis_.RedisCommand("SET %s %b", rediskey, table_bin, table_bin_length));
+		    readis_.FreeReplyObject(reply);
 		}
 		else
 		{
@@ -183,6 +200,13 @@ bool WorkerThread::saveToRedis(int uid, const ::db_srv::set_table& set_table, ::
 	char rediskey[100];
 	snprintf(rediskey, 99, "%d:%s", uid, set_table.table_name().c_str());
 	redisReply* reply = static_cast<redisReply*>(readis_.RedisCommand("SET %s %b", rediskey, set_table.table_bin().c_str(), set_table.table_bin().length()));
+	if (!reply)
+	{
+    	status->set_table_name(set_table.table_name());
+    	status->set_status("REDISERROR");
+		return false;
+	}
+
 	LOG_DEBUG << "saveToRedis, rediscmd: " << rediskey << " reply type: " << reply->type;
     if (reply->type == REDIS_REPLY_STATUS && strcasecmp(reply->str,"ok") == 0)
     {
@@ -214,7 +238,7 @@ bool WorkerThread::saveToMySql(int uid, const ::db_srv::set_table& set_table, ::
 		LOG_WARN << "table bin too length, uid: " << uid << " tablename: " << set_table.table_name() << " length: " << table_bin_length;
 	}
 
-	char str_rs[1024 * 40]; // 40k空间
+	char str_rs[1024 * 60]; // 60k空间
 	int len = mysql_.format_to_real_string(str_rs, set_table.table_bin().c_str(), table_bin_length);
 	if (len == 0)
 	{
@@ -318,6 +342,7 @@ void WorkerThread::onGet(int conId, db_srv::get* message)
 				// 连数据库都没有找到, 没有方法了只能设空了
 				table->set_table_name(message->table_name(i));
 				table->set_table_bin("");
+				table->set_table_status(1); // 数据库不存在
 			}
 		}
 	}
@@ -419,7 +444,8 @@ bool WorkerThread::loadFromMySql(int uid, const std::string& tablename, ::db_srv
 		table->set_table_name(tablename);
 		if (table_bin)
 		{
-			table->set_table_bin(table_bin);
+			const size_t table_bin_length = field[0].getLength();
+			table->set_table_bin(table_bin, table_bin_length);
 		}
 		else
 		{

@@ -8,7 +8,7 @@
 #include <google/protobuf/dynamic_message.h>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/compiler/importer.h>
-
+/*
 class MyMultiFileErrorCollector : public google::protobuf::compiler::MultiFileErrorCollector
 {
         virtual void AddError(
@@ -25,7 +25,7 @@ static MyMultiFileErrorCollector errorCollector;
 static google::protobuf::compiler::DiskSourceTree sourceTree;
 static google::protobuf::compiler::Importer importer(&sourceTree, &errorCollector);
 static google::protobuf::DynamicMessageFactory factory;
-
+*/
 static int pb_get(lua_State* L)
 {
 	luaL_checkudata(L, 1, "pb");
@@ -140,12 +140,14 @@ static int pb_set(lua_State* L)
     return 0;
 }
 
+#include <game/dbsrv/ProtoImporter.h>
+
 static int pb_import(lua_State* L)
 {
 	luaL_checktype(L, 1, LUA_TSTRING);
 
 	const char* filename = lua_tostring(L, 1);
-	 const  google::protobuf::FileDescriptor* filedescriptor = importer.Import(filename);
+	 const  google::protobuf::FileDescriptor* filedescriptor = sProtoImporter.importer.Import(filename);
 	 if (!filedescriptor)
 	 {
 		 fprintf(stderr, "filename:%s file descriptor error\n", filename);
@@ -158,10 +160,10 @@ static int pb_import(lua_State* L)
 static google::protobuf::Message* create_pb_msg(const char* name)
 {
 	  google::protobuf::Message* message = NULL;
-	  const google::protobuf::Descriptor* descriptor = importer.pool()->FindMessageTypeByName(name);
+	  const google::protobuf::Descriptor* descriptor = sProtoImporter.importer.pool()->FindMessageTypeByName(name);
 	  if (descriptor)
 	  {
-	     const google::protobuf::Message* prototype = factory.GetPrototype(descriptor);
+	     const google::protobuf::Message* prototype = sProtoImporter.factory.GetPrototype(descriptor);
 	     if (prototype)
 	     {
 	          message = prototype->New();
@@ -229,7 +231,7 @@ int LuaPB::openpb(lua_State* L)
 	luaL_register(L, NULL, pblib_m);
 	luaL_register(L, "pb", pblib_f);
 
-    sourceTree.MapPath("", "");
+    //sourceTree.MapPath("", "");
 
 	return 1;
 }

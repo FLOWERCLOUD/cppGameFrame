@@ -12,14 +12,14 @@
 #include <string>
 #include <tr1/functional>
 
-// struct ProtobufTransportFormat __attribute__ ((__packed__))
+// struct KabuCodecTransportFormat __attribute__ ((__packed__))
 // {
 //   int32  len;
 //   int16  nameLen;
 //   char    typeName[nameLen];
 //   int16  headlen;
 //   char   headcontent[headlen];
-//   char   protobufData[len-nameLen-headlen];
+//   char   protobufData[len-nameLen-headlen - 2*sizeof(int16)];
 // }
 
 class KabuCodec

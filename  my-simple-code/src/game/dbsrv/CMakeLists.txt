@@ -27,6 +27,8 @@ set(dbsrv_SRCS
   DBSrv.cc
   main.cc
   msg.pb.cc
+  ProtoImporter.cc
+  Util.cc
   WorkerThread.cc
   WorkerThreadPool.cc
   WriterThread.cc

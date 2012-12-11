@@ -203,6 +203,10 @@ public:
         return std::string( static_cast<char*>(data.value) );
     }
 
+    uint32 getLength() const
+    {
+    	return data.length;
+    }
 public:
     #pragma pack(1)
     struct

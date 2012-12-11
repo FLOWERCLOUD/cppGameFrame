@@ -10,8 +10,10 @@ set(Testluapb_SRCS
 	TestLuaPB.cc
 	../LuaEngine.cc
 	../LuaPB.cc
+	../../ProtoImporter.cc
+	../../Util.cc
   )
   
 add_executable(testluapb ${Testluapb_SRCS})
-target_link_libraries(testluapb lua protobuf)
+target_link_libraries(testluapb lua protobuf mysdk_exconfig)
 

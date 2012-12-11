@@ -658,20 +658,30 @@ class get_reply_table : public ::google::protobuf::Message {
   inline ::std::string* mutable_table_bin();
   inline ::std::string* release_table_bin();
   
+  // required int32 table_status = 3;
+  inline bool has_table_status() const;
+  inline void clear_table_status();
+  static const int kTableStatusFieldNumber = 3;
+  inline ::google::protobuf::int32 table_status() const;
+  inline void set_table_status(::google::protobuf::int32 value);
+  
   // @@protoc_insertion_point(class_scope:db_srv.get_reply.table)
  private:
   inline void set_has_table_name();
   inline void clear_has_table_name();
   inline void set_has_table_bin();
   inline void clear_has_table_bin();
+  inline void set_has_table_status();
+  inline void clear_has_table_status();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::std::string* table_name_;
   ::std::string* table_bin_;
+  ::google::protobuf::int32 table_status_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
   
   friend void  protobuf_AddDesc_msg_2eproto();
   friend void protobuf_AssignDesc_msg_2eproto();
@@ -2022,6 +2032,28 @@ inline ::std::string* get_reply_table::release_table_bin() {
     table_bin_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
     return temp;
   }
+}
+
+// required int32 table_status = 3;
+inline bool get_reply_table::has_table_status() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void get_reply_table::set_has_table_status() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void get_reply_table::clear_has_table_status() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void get_reply_table::clear_table_status() {
+  table_status_ = 0;
+  clear_has_table_status();
+}
+inline ::google::protobuf::int32 get_reply_table::table_status() const {
+  return table_status_;
+}
+inline void get_reply_table::set_table_status(::google::protobuf::int32 value) {
+  set_has_table_status();
+  table_status_ = value;
 }
 
 // -------------------------------------------------------------------

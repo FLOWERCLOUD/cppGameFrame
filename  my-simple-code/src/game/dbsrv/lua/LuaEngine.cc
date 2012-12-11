@@ -27,9 +27,32 @@ void LuaEngine::openlibs()
 	lua_gc(luaState_, LUA_GCRESTART, 0);
 }
 
+#include <stdlib.h>
+
 int LuaEngine::dofile(const char *filename)
 {
-	return luaL_dofile(luaState_, filename);
+	char* luapath = getenv("MYLUA_PATH");
+	if (!luapath)
+	{
+		 if(luaL_dofile(luaState_, filename) != 0)
+		 {
+			 //
+			 printf("[LuaEngine] LuaEngine::dofile(%s) error!!\n", filename);
+			 exit(1);
+		 }
+	}
+	else
+	{
+		printf("[LuaEngine] LuaEngine::dofile lua path is: %s\n",luapath);
+		char name[1024];
+		snprintf(name, 1023, "%s/%s", luapath, filename);
+		if(luaL_dofile(luaState_, name) != 0)
+		{
+			printf("[LuaEngine] LuaEngine::dofile(%s) error!!\n", name);
+			exit(1);
+		}
+	}
+	return 0;
 }
 
 int LuaEngine::dostring(const char *s)

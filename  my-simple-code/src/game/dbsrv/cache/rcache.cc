@@ -107,7 +107,10 @@ bool Cache::Ping()
 	}
 	printf("[redis] Ping to Server Have Some Problem,So Reconnect Now \n");
 	//ping不通，重新建立起连接
-	ReConnect();
+	if (!ReConnect())
+	{
+		m_redisContext = NULL;
+	}
 	return false;
 }
 
@@ -123,6 +126,7 @@ bool Cache::CheckReplyStatus(redisReply* reply, const char* def /*= "OK"*/)
 bool Cache::ReConnect()
 {
 	printf("[reids] Redis Connect Failed, now Reconnect \n");
+	m_redisContext = NULL;
 	return Connect();
 }
 

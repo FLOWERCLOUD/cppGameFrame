@@ -232,7 +232,7 @@ google::protobuf::Message* KabuCodec::createMessage(const std::string& typeName)
 	}
 	return message;
 }
-
+/*
 class MyMultiFileErrorCollector : public google::protobuf::compiler::MultiFileErrorCollector
 {
         virtual void AddError(
@@ -250,19 +250,44 @@ static google::protobuf::compiler::DiskSourceTree sourceTree;
 static google::protobuf::compiler::Importer importer(&sourceTree, &errorCollector);
 static google::protobuf::DynamicMessageFactory factory;
 
+#include <game/dbsrv/Util.h>
+#include <game/dbsrv/config/ConfigMgr.h>
+#include <stdlib.h>
+*/
 void KabuCodec::init()
 {
-    sourceTree.MapPath("", "");
-	importer.Import("test.proto");
-}
+	/*
+	char* protopath = getenv("PROTO_PATH");
+	if (!protopath)
+	{
+		sourceTree.MapPath("", "");
+	}
+	else
+	{
+		sourceTree.MapPath("", protopath);
+	}
+	printf("[KabuCodec] protopath:%s\n", protopath);
+	std::string filenames = sConfigMgr.MainConfig.GetStringDefault("proto", "filelist", "test.proto");
 
+	std::vector<std::string> vec = StrSplit(filenames, ",");
+	for (size_t i = 0; i < vec.size(); i++)
+	{
+		const  google::protobuf::FileDescriptor* filedescriptor = importer.Import("test.proto");
+		 if (!filedescriptor)
+		 {
+			 fprintf(stderr, "test.proto file descriptor error\n");
+		 }
+	}
+	*/
+}
+#include <game/dbsrv/ProtoImporter.h>
 google::protobuf::Message* KabuCodec::createDynamicMessage(const std::string& typeName)
 {
 	  google::protobuf::Message* message = NULL;
-	  const google::protobuf::Descriptor* descriptor = importer.pool()->FindMessageTypeByName(typeName);
+	  const google::protobuf::Descriptor* descriptor = sProtoImporter.importer.pool()->FindMessageTypeByName(typeName);
 	  if (descriptor)
 	  {
-	     const google::protobuf::Message* prototype = factory.GetPrototype(descriptor);
+	     const google::protobuf::Message* prototype = sProtoImporter.factory.GetPrototype(descriptor);
 			if (prototype)
 			{
 				message = prototype->New();
