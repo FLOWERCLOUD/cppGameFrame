@@ -1,11 +1,15 @@
 
 #include <game/dbsrv/cache/rcache.h>
 
+#include <mysdk/base/Logging.h>
+
 #include <strings.h>
 #include <stdarg.h>
 
 namespace rcache
 {
+
+using namespace mysdk;
 
 Cache::Cache():
 		m_redisContext(NULL),
@@ -37,7 +41,8 @@ bool Cache::Connect()
     m_redisContext = redisConnectWithTimeout(m_redisIP.c_str(), m_redisPort, timeout);
     if (m_redisContext->err)
     {
-    	printf("[redis] connection error: %d\n", m_redisContext->err);
+    	//printf("[redis] connection error: %d\n", m_redisContext->err);
+    	LOG_INFO << "[redis] connection error[" << m_redisContext->err << "]";
     	return false;
     }
 
@@ -49,7 +54,8 @@ bool Cache::Connect()
 
 		if (!CheckReplyStatus(reply))
 		{
-			printf("[redis] failed by password :%s\n", reply->str);
+			//printf("[redis] failed by password :%s\n", reply->str);
+	    	LOG_INFO << "[redis] failed by password[" << reply->str << "]";
 			freeReplyObject(reply);
 			return false;
 		}
@@ -64,13 +70,15 @@ bool Cache::Connect()
 
 		if (!CheckReplyStatus(reply))
 		{
-			printf("[redis] failed by select db(%d) :%s\n", m_DBid, reply->str);
+			//printf("[redis] failed by select db(%d) :%s\n", m_DBid, reply->str);
+			LOG_INFO << "[redis] failed by select db[" << m_DBid << "]:[" << reply->str << "]" ;
 			freeReplyObject(reply);
 			return false;
 		}
 		freeReplyObject(reply);
 	}
-	printf("[redis] successful connected %s :%d\n", m_redisIP.data(), m_redisPort);
+	//printf("[redis] successful connected %s :%d\n", m_redisIP.data(), m_redisPort);
+	LOG_INFO << "[redis] successful connected[" <<m_redisIP.data() << ":" << m_redisPort << "]" ;
     return true;
 }
 
@@ -103,10 +111,12 @@ bool Cache::Ping()
 			freeReplyObject(reply);
 			return true;
 		}
-		printf("[redis]Ping has an error occur:%s\n ", reply->str);
+		//printf("[redis]Ping has an error occur:%s\n ", reply->str);
+		LOG_INFO << "[redis]Ping has an error occur[" <<reply->str  << "]" ;
 		freeReplyObject(reply);
 	}
-	printf("[redis] Ping to Server Have Some Problem,So Reconnect Now \n");
+	//printf("[redis] Ping to Server Have Some Problem,So Reconnect Now \n");
+	LOG_INFO << "[redis] Ping to Server Have Some Problem,So Reconnect Now" ;
 	//ping不通，重新建立起连接
 	if (!ReConnect())
 	{
@@ -126,7 +136,7 @@ bool Cache::CheckReplyStatus(redisReply* reply, const char* def /*= "OK"*/)
 
 bool Cache::ReConnect()
 {
-	printf("[reids] Redis Connect Failed, now Reconnect \n");
+	//printf("[reids] Redis Connect Failed, now Reconnect \n");
 	bool flag = Connect();
 	if (!flag)
 	{

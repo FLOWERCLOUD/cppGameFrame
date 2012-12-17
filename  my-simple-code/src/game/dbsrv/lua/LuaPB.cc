@@ -8,24 +8,7 @@
 #include <google/protobuf/dynamic_message.h>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/compiler/importer.h>
-/*
-class MyMultiFileErrorCollector : public google::protobuf::compiler::MultiFileErrorCollector
-{
-        virtual void AddError(
-                const std::string & filename,
-                int line,
-                int column,
-                const std::string & message)
-        {
-        	fprintf(stderr, "%s:%d:%d:%s\n", filename.c_str(), line, column, message.c_str());
-       }
-};
 
-static MyMultiFileErrorCollector errorCollector;
-static google::protobuf::compiler::DiskSourceTree sourceTree;
-static google::protobuf::compiler::Importer importer(&sourceTree, &errorCollector);
-static google::protobuf::DynamicMessageFactory factory;
-*/
 static int pb_get(lua_State* L)
 {
 	luaL_checkudata(L, 1, "pb");

@@ -2,7 +2,7 @@
 #include <game/dbsrv/tests/DBClient.h>
 
 #include <mysdk/base/Logging.h>
-#include "../msg.pb.h"
+#include "msg.pb.h"
 
 DBClient::DBClient(EventLoop* loop, const InetAddress& listenAddr):
 	loop_(loop),

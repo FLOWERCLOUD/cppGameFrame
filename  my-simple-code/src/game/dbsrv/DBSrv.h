@@ -29,7 +29,7 @@ class DBSrv
 public:
 	typedef std::map<int, mysdk::net::TcpConnection*> ConMapT;
 public:
-	DBSrv(EventLoop* loop, InetAddress& serverAddr);
+	DBSrv(EventLoop* loop, InetAddress& serverAddr, int workthreadnum, int writethreadnum);
 	~DBSrv();
 
 public:

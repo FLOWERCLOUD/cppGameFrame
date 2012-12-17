@@ -122,9 +122,7 @@ void setupSignalHandlers(void)
     return;
 }
 
-static int sthreadnum = 8;
-static int swritethreadnum = 8;
-DBSrv::DBSrv(EventLoop* loop, InetAddress& serverAddr):
+DBSrv::DBSrv(EventLoop* loop, InetAddress& serverAddr, int workthreadnum, int writethreadnum):
 	codec_(
 			std::tr1::bind(&DBSrv::onKaBuMessage,
 			this,
@@ -133,8 +131,8 @@ DBSrv::DBSrv(EventLoop* loop, InetAddress& serverAddr):
 			std::tr1::placeholders::_3)),
 	loop_(loop),
 	server_(loop, serverAddr, "DBSrv"),
-	threadPool_(this, sthreadnum),
-	writeThreadPool_(swritethreadnum)
+	threadPool_(this, workthreadnum),
+	writeThreadPool_(writethreadnum)
 {
 	server_.setConnectionCallback(std::tr1::bind(&DBSrv::onConnectionCallback,
 																this,

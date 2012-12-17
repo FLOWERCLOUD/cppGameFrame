@@ -277,10 +277,12 @@ int main(int argc, char **argv)
     }
 
 	uint16 srvPort = static_cast<uint16>(sConfigMgr.MainConfig.GetIntDefault("net", "port", defalutPort));
-	LOG_INFO << "dbsrv listen port[" << srvPort << "]";
+	int workthreadnum = static_cast<int>(sConfigMgr.MainConfig.GetIntDefault("thread", "workthreadnum", 8));
+	int writethreadnum = static_cast<int>(sConfigMgr.MainConfig.GetIntDefault("thread", "writethreadnum", 8));
+	LOG_INFO << "dbsrv listen port[" << srvPort << "]" << " workthreadnum[" << workthreadnum << "] writethreadnum[" << writethreadnum << "]";
 	EventLoop loop;
 	InetAddress listenAddr(srvPort);
-	DBSrv server(&loop, listenAddr);
+	DBSrv server(&loop, listenAddr, workthreadnum, writethreadnum);
 	server.start();
 	loop.loop();
 	server.stop();

@@ -28,7 +28,8 @@ int main(int argc, char* argv[])
 	  if (argc > 2)
 	  {
 		  EventLoop loop;
-		  InetAddress serverAddr(argv[1], 5007);
+		  short port = static_cast<short>(atoi(argv[2]));
+		  InetAddress serverAddr(argv[1], port);
 
 		  ClientThread thread(serverAddr);
 		  thread.start();

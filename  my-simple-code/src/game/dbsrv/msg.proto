@@ -63,7 +63,6 @@ message mget{
     }
     repeated user_table user_tables = 3;
 }
-
 /*
  * cmd db.mget
  */
@@ -82,4 +81,3 @@ message lua{
     required int32 uid = 1;
     required string argback = 2;
 }
-

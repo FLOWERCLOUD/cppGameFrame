@@ -130,7 +130,7 @@ void WorkerThread::handler(struct ThreadParam& param)
 bool WorkerThread::loadFromRedis(int uid, const std::string& tablename, ::db_srv::get_reply_table* table)
 {
 	char rediskey[100];
-	snprintf(rediskey, 99, "%d:%s", uid, tablename.c_str());
+	snprintf(rediskey, 99, "%s:%d", tablename.c_str(), uid);
 	redisReply* reply = static_cast<redisReply*>(readis_.RedisCommand("GET %s", rediskey));
 	LOG_DEBUG << "loadFromRedis, rediscmd: " << rediskey;
 	if (reply && reply->type == REDIS_REPLY_STRING)
@@ -190,10 +190,10 @@ bool WorkerThread::loadFromMySql(int uid, const std::string& tablename, ::db_srv
 			table->set_table_bin(table_bin, table_bin_length);
 
 			// 顺便把这个数据cache到redis中吧
-			char rediskey[100];
-			snprintf(rediskey, 99, "%d:%s", uid, tablename.c_str());
-			redisReply* reply = static_cast<redisReply*>(readis_.RedisCommand("SET %s %b", rediskey, table_bin, table_bin_length));
-		    readis_.FreeReplyObject(reply);
+			//char rediskey[100];
+			//snprintf(rediskey, 99, "%s:%d", tablename.c_str(), uid);
+			//redisReply* reply = static_cast<redisReply*>(readis_.RedisCommand("SET %s %b", rediskey, table_bin, table_bin_length));
+		    //readis_.FreeReplyObject(reply);
 		}
 		else
 		{
@@ -209,7 +209,7 @@ bool WorkerThread::loadFromMySql(int uid, const std::string& tablename, ::db_srv
 bool WorkerThread::saveToRedis(int uid, const ::db_srv::set_table& set_table, ::db_srv::set_reply_table_status* status)
 {
 	char rediskey[100];
-	snprintf(rediskey, 99, "%d:%s", uid, set_table.table_name().c_str());
+	snprintf(rediskey, 99, "%s:%d", set_table.table_name().c_str(), uid);
 	redisReply* reply = static_cast<redisReply*>(readis_.RedisCommand("SET %s %b", rediskey, set_table.table_bin().c_str(), set_table.table_bin().length()));
 	if (!reply)
 	{
@@ -249,7 +249,7 @@ bool WorkerThread::saveToMySql(int uid, const ::db_srv::set_table& set_table, ::
 		LOG_WARN << "table bin too length, uid: " << uid << " tablename: " << set_table.table_name() << " length: " << table_bin_length;
 	}
 
-	char str_rs[1024 * 60]; // 60k空间
+	char str_rs[1024 * 100]; // 100k空间
 	int len = mysql_.format_to_real_string(str_rs, set_table.table_bin().c_str(), table_bin_length);
 	if (len == 0)
 	{
@@ -298,7 +298,7 @@ bool WorkerThread::saveToMySql(int uid, const ::db_srv::set_table& set_table, ::
 bool WorkerThread::loadFromRedis(int uid, const std::string& tablename, ::db_srv::mget_reply_user_table* table)
 {
 	char rediskey[100];
-	snprintf(rediskey, 99, "%d:%s", uid, tablename.c_str());
+	snprintf(rediskey, 99, "%s:%d", tablename.c_str(), uid);
 	redisReply* reply = static_cast<redisReply*>(readis_.RedisCommand("GET %s", rediskey));
 	LOG_DEBUG << "loadFromRedis, mget_reply_user_table, rediscmd: " << rediskey;
 	if (reply && reply->type == REDIS_REPLY_STRING)
