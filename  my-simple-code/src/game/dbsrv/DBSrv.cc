@@ -183,7 +183,7 @@ void DBSrv::stop()
 	writeThreadPool_.stop();
 }
 
-static int nextid = 0;
+static intptr_t nextid = 0;
 void DBSrv::onConnectionCallback(mysdk::net::TcpConnection* pCon)
 {
 	if (!pCon) return;
@@ -197,7 +197,7 @@ void DBSrv::onConnectionCallback(mysdk::net::TcpConnection* pCon)
 	}
 	else
 	{
-		int conid = reinterpret_cast  <int>(pCon->getContext());
+		int conid = reinterpret_cast  <intptr_t>(pCon->getContext());
 		conMap_.erase(conid);
 	}
 }
@@ -208,7 +208,7 @@ void DBSrv::onKaBuMessage(mysdk::net::TcpConnection* pCon,
 		mysdk::Timestamp timestamp)
 {
 	if (!pCon) return;
-	int conid = reinterpret_cast  <int>(pCon->getContext());
+	long conid = reinterpret_cast  <long>(pCon->getContext());
 
 	struct ThreadParam param;
 	param.Type = CMD;

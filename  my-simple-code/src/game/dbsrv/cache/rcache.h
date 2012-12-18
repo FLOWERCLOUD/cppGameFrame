@@ -31,7 +31,7 @@ namespace rcache {
 		bool Ping();
 	public:
 		void *RedisCommand(const char *format, ...);
-		void FreeReplyObject(redisReply* reply);
+		static void FreeReplyObject(redisReply* reply);
 	private:
 		void internalRun(int curTime);
 

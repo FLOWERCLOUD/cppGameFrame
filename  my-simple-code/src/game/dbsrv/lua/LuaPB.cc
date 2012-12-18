@@ -208,13 +208,11 @@ static const struct luaL_Reg pblib_m[] =
 		{NULL, NULL}
 };
 
-int LuaPB::openpb(lua_State* L)
+int LuaPB::openlib(lua_State* L)
 {
 	luaL_newmetatable(L, "pb");
 	luaL_register(L, NULL, pblib_m);
 	luaL_register(L, "pb", pblib_f);
-
-    //sourceTree.MapPath("", "");
 
 	return 1;
 }

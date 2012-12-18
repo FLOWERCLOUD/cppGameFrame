@@ -72,6 +72,11 @@ void WorkerThread::start()
 	lua_State* L = luaEngine_.getLuaState();
 	LuaMyLibs::openmylibs(L);
 
+	reloadLua();
+}
+
+void WorkerThread::reloadLua()
+{
 	std::string filenames = sConfigMgr.MainConfig.GetStringDefault("lua", "filelist", "test.lua");
 
 	std::vector<std::string> vec = StrSplit(filenames, ",");
@@ -242,7 +247,7 @@ bool WorkerThread::saveToRedis(int uid, const ::db_srv::set_table& set_table, ::
 
 bool WorkerThread::saveToMySql(int uid, const ::db_srv::set_table& set_table, ::db_srv::set_reply_table_status* status)
 {
-	int table_bin_length = set_table.table_bin().length();
+	size_t table_bin_length = set_table.table_bin().length();
 	// 大于20k的时候 打个警告的日志吧
 	if (table_bin_length >= 1024 * 20)
 	{
@@ -250,7 +255,7 @@ bool WorkerThread::saveToMySql(int uid, const ::db_srv::set_table& set_table, ::
 	}
 
 	char str_rs[1024 * 100]; // 100k空间
-	int len = mysql_.format_to_real_string(str_rs, set_table.table_bin().c_str(), table_bin_length);
+	unsigned long len = mysql_.format_to_real_string(str_rs, set_table.table_bin().c_str(), table_bin_length);
 	if (len == 0)
 	{
 		// 数据库有问题了吧
@@ -482,6 +487,8 @@ void WorkerThread::onUnknownMessage(int conId, google::protobuf::Message* messag
 
 void WorkerThread::onLuaMessage(int conId, google::protobuf::Message* message)
 {
+	reloadLua();
+
 	if (!message) return;
 	LOG_INFO << "onLuaMessage: " << message->GetTypeName()<< message->DebugString()<< " threadid:" << id_;
 
@@ -497,7 +504,9 @@ void WorkerThread::onLuaMessage(int conId, google::protobuf::Message* message)
 	lua_setmetatable(L, -2);
 
 	lua_pushlightuserdata(L, this);
-	if (lua_pcall(L, 3, 1, 0) != 0)
+
+	lua_pushlightuserdata(L, &this->readis_);
+	if (lua_pcall(L, 4, 1, 0) != 0)
 	{
 		fprintf(stderr, "lua_pcall WorkerThread::onLuaMessage error, error msg:%s\n",
 				lua_tostring(L, -1));

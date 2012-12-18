@@ -16,8 +16,7 @@ WriterThreadPool::WriterThreadPool(int threadnum):
 
 WriterThreadPool::~WriterThreadPool()
 {
-	int threadnum = threads_.size();
-	for (int i = 0; i < threadnum; i++)
+	for (int i = 0; i < threadnum_; i++)
 	{
 		delete threads_[i];
 	}
@@ -25,8 +24,7 @@ WriterThreadPool::~WriterThreadPool()
 
 void WriterThreadPool::start()
 {
-	int threadnum = threads_.size();
-	for (int i = 0; i < threadnum; i++)
+	for (int i = 0; i < threadnum_; i++)
 	{
 		threads_[i]->start();
 	}
@@ -34,8 +32,7 @@ void WriterThreadPool::start()
 
 void WriterThreadPool::stop()
 {
-	int threadnum = threads_.size();
-	for (int i = 0; i < threadnum; i++)
+	for (int i = 0; i < threadnum_; i++)
 	{
 		threads_[i]->stop();
 	}

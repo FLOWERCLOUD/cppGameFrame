@@ -15,8 +15,8 @@ WorkThreadPool::WorkThreadPool(DBSrv* srv, int threadnum)
 
 WorkThreadPool::~WorkThreadPool()
 {
-	int threadnum = asyncThreads_.size();
-	for (int i = 0; i < threadnum; i++)
+	size_t threadnum = asyncThreads_.size();
+	for (size_t i = 0; i < threadnum; i++)
 	{
 		delete asyncThreads_[i];
 	}
@@ -24,8 +24,8 @@ WorkThreadPool::~WorkThreadPool()
 
 void WorkThreadPool::start()
 {
-	int threadnum = asyncThreads_.size();
-	for (int i = 0; i < threadnum; i++)
+	size_t threadnum = asyncThreads_.size();
+	for (size_t i = 0; i < threadnum; i++)
 	{
 		asyncThreads_[i]->start();
 	}
@@ -33,8 +33,8 @@ void WorkThreadPool::start()
 
 void WorkThreadPool::stop()
 {
-	int threadnum = asyncThreads_.size();
-	for (int i = 0; i < threadnum; i++)
+	size_t threadnum = asyncThreads_.size();
+	for (size_t i = 0; i < threadnum; i++)
 	{
 		asyncThreads_[i]->stop();
 	}
@@ -42,8 +42,8 @@ void WorkThreadPool::stop()
 
 void WorkThreadPool::push(struct ThreadParam& param)
 {
-	static int nextThreadId = 0;
-	int threadnum = asyncThreads_.size();
+	static size_t nextThreadId = 0;
+	size_t threadnum = asyncThreads_.size();
 	nextThreadId++;
 	if (nextThreadId >= threadnum)
 	{
@@ -58,8 +58,8 @@ void WorkThreadPool::ping()
 	struct ThreadParam param;
 	param.Type = PING;
 
-	int threadnum = asyncThreads_.size();
-	for (int i = 0; i < threadnum; i++)
+	size_t threadnum = asyncThreads_.size();
+	for (size_t i = 0; i < threadnum; i++)
 	{
 		asyncThreads_[i]->push(param);
 	}

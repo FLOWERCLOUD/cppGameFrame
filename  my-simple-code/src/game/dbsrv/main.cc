@@ -92,7 +92,7 @@ int main(int argc, char **argv)
 
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 	int defalutPort = 5007;  //默认端口
-	std::string configFile("config/def.conf");
+	std::string configFile("def.conf");
 	int maxconns = 1024;
 
 	int o;

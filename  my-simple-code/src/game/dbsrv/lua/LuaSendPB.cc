@@ -12,7 +12,7 @@ static int wk_send(lua_State* L)
     luaL_argcheck(L, ptr != NULL, 1, "wk_send workthread userdata expected");
 
     luaL_checktype(L, 2, LUA_TNUMBER);
-    int conId = lua_tointeger(L, 2);
+    int conId = static_cast<int>(lua_tointeger(L, 2));
 
 	luaL_checkudata(L, 3, "pb");
     void *msg = *(static_cast<void**>(lua_touserdata(L, 3)));
@@ -31,7 +31,7 @@ static const struct luaL_reg wklib_f[] =
 		{NULL, NULL}
 };
 
-int LuaSendPB::openSendPB(lua_State* L)
+int LuaSendPB::openlib(lua_State* L)
 {
 	luaL_register(L, "wk", wklib_f);
 	return 1;

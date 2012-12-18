@@ -1,5 +1,5 @@
 
-add_subdirectory(deps)
+##add_subdirectory(deps)
 
 add_custom_command(OUTPUT  msg.pb.h msg.pb.cc
   COMMAND protoc
@@ -13,8 +13,11 @@ set(dbsrv_SRCS
   cache/rcache.cc
   codec/codec.cc
   lua/LuaEngine.cc
+  lua/LuaLog.cc
   lua/LuaMyLibs.cc
+  lua/LuaMySql.cc
   lua/LuaPB.cc
+  lua/LuaRedis.cc
   lua/LuaSendPB.cc
   mysql/Field.cc
   mysql/MySQLConnection.cc
@@ -78,6 +81,12 @@ target_link_libraries(msg_proto ${PROTOBUF_LIBRARY})
 add_executable(dbsrv ${dbsrv_SRCS})
 target_link_libraries(dbsrv  msg_proto mysdk_exconfig  mysdk_net ${REDIS_LIBRARY} ${MYSQL_LIBRARY}  ${LUA_LIBRARY} )
 
+add_custom_target(EXE ALL
+  COMMAND cp ${CMAKE_BINARY_DIR}/bin/dbsrv ${CMAKE_SOURCE_DIR}/apps/dbsrv/bin
+  COMMENT "install dbsrv"
+  DEPENDS ${CMAKE_BINARY_DIR}/bin/dbsrv
+)
+  
 add_subdirectory(tests)
 add_subdirectory(lua/tests)
 

@@ -66,6 +66,9 @@ private:
 	void sendReply(int conId, google::protobuf::Message* message);
 public:
 	void sendReplyEx(int conId, google::protobuf::Message& message);
+
+private:
+	void reloadLua();
 private:
 	int id_;
 	int nextWriterThreadId_;

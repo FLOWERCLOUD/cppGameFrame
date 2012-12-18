@@ -276,7 +276,7 @@ google::protobuf::Message* KabuCodec::parse(const char* buf, int len, ErrorCode*
 		{
 		       // parse from buffer
 		       const char* data = buf + sizeof(int16_t) + nameLen + sizeof(int16_t) + headLen;
-		        int32 dataLen = len - (sizeof(int16_t) + nameLen + sizeof(int16_t) + headLen);
+		        int32 dataLen = static_cast<int32>(len - (sizeof(int16_t) + nameLen + sizeof(int16_t) + headLen));
 		        ::google::protobuf::io::ArrayInputStream zeroCopy(static_cast<const void*>(data), dataLen);
 		        if(message->ParseFromZeroCopyStream(&zeroCopy))
 		        {

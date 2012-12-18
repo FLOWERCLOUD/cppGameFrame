@@ -1,13 +1,17 @@
 
 #include "LuaMyLibs.h"
 
+#include "LuaLog.h"
 #include "LuaPB.h"
+#include "LuaRedis.h"
 #include "LuaSendPB.h"
 
 static const luaL_Reg lualibs[] =
 {
-  {"pb", LuaPB::openpb},
-  {"wk", LuaSendPB::openSendPB},
+  {"pb", LuaPB::openlib},
+  {"wk", LuaSendPB::openlib},
+  {"redis", LuaRedis::openlib},
+  {"log", LuaLog::openlib},
   {NULL, NULL}
 };
 

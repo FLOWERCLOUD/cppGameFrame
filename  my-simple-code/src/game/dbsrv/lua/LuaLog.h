@@ -1,10 +1,10 @@
 
-#ifndef GAME_LUAPB_H_
-#define GAME_LUAPB_H_
+#ifndef GAME_LUALOG_H_
+#define GAME_LUALOG_H_
 
 #include "lua.hpp"
 
-class LuaPB
+class LuaLog
 {
 public:
 	static int openlib(lua_State* L);
