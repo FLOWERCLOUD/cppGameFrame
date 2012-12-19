@@ -15,7 +15,7 @@ public:
 	void start();
 	void stop();
 
-	void push(struct ThreadParam& param);
+	int push(struct ThreadParam& param);
 
 	void ping();
 private:

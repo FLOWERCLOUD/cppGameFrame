@@ -18,7 +18,7 @@ set(dbsrv_SRCS
   lua/LuaMySql.cc
   lua/LuaPB.cc
   lua/LuaRedis.cc
-  lua/LuaSendPB.cc
+  lua/LuaWK.cc
   mysql/Field.cc
   mysql/MySQLConnection.cc
   mysql/MySQLConnectionInfo.cc

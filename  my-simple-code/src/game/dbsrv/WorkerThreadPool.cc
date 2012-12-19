@@ -40,7 +40,7 @@ void WorkThreadPool::stop()
 	}
 }
 
-void WorkThreadPool::push(struct ThreadParam& param)
+int WorkThreadPool::push(struct ThreadParam& param)
 {
 	static size_t nextThreadId = 0;
 	size_t threadnum = asyncThreads_.size();
@@ -51,6 +51,7 @@ void WorkThreadPool::push(struct ThreadParam& param)
 	}
 
 	asyncThreads_[nextThreadId]->push(param);
+	return nextThreadId;
 }
 
 void WorkThreadPool::ping()

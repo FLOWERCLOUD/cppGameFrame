@@ -42,6 +42,7 @@ public:
 
 		uint32 getLastError() { return mysql_errno(mysql_); }
 
+		bool query(const char *sql, MYSQL_RES **pResult, MYSQL_FIELD **pFields, uint64* pRowCount, uint32* pFieldCount);
 private:
 		bool _query(const char *sql, MYSQL_RES **pResult, MYSQL_FIELD **pFields, uint64* pRowCount, uint32* pFieldCount);
 		MYSQL* getHandle() { return mysql_; }

@@ -72,6 +72,7 @@ void WorkerThread::start()
 	lua_State* L = luaEngine_.getLuaState();
 	LuaMyLibs::openmylibs(L);
 
+	registerGlobalLua();
 	reloadLua();
 }
 
@@ -84,6 +85,22 @@ void WorkerThread::reloadLua()
 	{
 		luaEngine_.dofile(vec[i].c_str());
 	}
+}
+
+bool WorkerThread::registerGlobalLua()
+{
+	lua_State* L = luaEngine_.getLuaState();
+
+	lua_pushlightuserdata(L, this);
+	lua_setglobal(L, "sThread");
+
+	lua_pushlightuserdata(L, &this->readis_);
+	lua_setglobal(L, "sRedis");
+
+	lua_pushlightuserdata(L, &this->mysql_);
+	lua_setglobal(L, "sMySql");
+
+	return true;
 }
 
 void WorkerThread::stop()
@@ -339,6 +356,54 @@ void WorkerThread::sendReplyEx(int conId, google::protobuf::Message& message)
 	loop->queueInLoop(std::tr1::bind(&DBSrv::sendReplyEx, srv_, conId, pBuf));
 }
 
+void WorkerThread::startTime(double delay, const std::string funname, bool bOne)
+{
+	if (!srv_) return;
+	EventLoop* loop = srv_->getEventLoop();
+	if (!loop) return;
+
+	if (bOne)
+	{
+		loop->runAfter(delay, std::tr1::bind(&WorkerThread::_startTime, this, funname));
+	}
+	else
+	{
+		loop->runEvery(delay, std::tr1::bind(&WorkerThread::_startTime, this, funname));
+	}
+}
+
+void WorkerThread::_startTime(const std::string funname)
+{
+	reloadLua();
+
+	lua_State* L = luaEngine_.getLuaState();
+
+	lua_getglobal(L, funname.c_str());
+	if (!lua_isfunction(L, -1))
+	{
+		fprintf(stderr, "WorkerThread::_startTime funname(%s) not exist\n", funname.c_str());
+		return;
+	}
+
+	if (lua_pcall(L, 0, 1, 0) != 0)
+	{
+		fprintf(stderr, "lua_pcall WorkerThread::startTime error, error msg:%s\n",
+				lua_tostring(L, -1));
+		lua_pop(L, 1);// 从栈中弹出出错消息
+		return;
+	}
+
+	int ir = lua_gettop(L);
+
+	if (ir > 0)
+	{
+		int tr = static_cast<int>(lua_tonumber(L, -1));
+		lua_pop(L, ir);
+
+		printf("WorkerThread::startTime ret:%d\n", tr);
+	}
+}
+
 void WorkerThread::onGet(int conId, db_srv::get* message)
 {
 	if (!message) return;
@@ -495,7 +560,11 @@ void WorkerThread::onLuaMessage(int conId, google::protobuf::Message* message)
 	lua_State* L = luaEngine_.getLuaState();
 
 	lua_getglobal(L, "onLuaMessage");
-	luaL_checktype(L, 1, LUA_TFUNCTION);
+	if (!lua_isfunction(L, -1))
+	{
+		fprintf(stderr, "WorkerThread::onLuaMessage, on lua message funname not exist\n");
+		return;
+	}
 
 	lua_pushinteger(L, conId);
 	google::protobuf::Message ** tmp = static_cast<google::protobuf::Message**>(lua_newuserdata(L, sizeof(google::protobuf::Message *)));
@@ -503,10 +572,7 @@ void WorkerThread::onLuaMessage(int conId, google::protobuf::Message* message)
 	luaL_getmetatable(L, "pb");
 	lua_setmetatable(L, -2);
 
-	lua_pushlightuserdata(L, this);
-
-	lua_pushlightuserdata(L, &this->readis_);
-	if (lua_pcall(L, 4, 1, 0) != 0)
+	if (lua_pcall(L, 2, 1, 0) != 0)
 	{
 		fprintf(stderr, "lua_pcall WorkerThread::onLuaMessage error, error msg:%s\n",
 				lua_tostring(L, -1));

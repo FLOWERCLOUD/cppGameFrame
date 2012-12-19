@@ -73,13 +73,13 @@ bool MySQLConnection::open()
         return false;
     }
 
-    if (!reconnectiong_)
-    {
-		if (mysql_get_server_version(mysql_) != mysql_get_client_version())
-		{
+    //if (!reconnectiong_)
+    //{
+	//	if (mysql_get_server_version(mysql_) != mysql_get_client_version())
+	//	{
 		//	fprintf(stderr, "MySQL client/server version mismatch; may conflict with behaviour of prepared statements.\n");
-		}
-    }
+	//	}
+  //  }
 
     //fprintf(stderr,  "Connected to MySQL database at: [%s]\n", connectionInfo_.getDatabase().c_str());
     LOG_INFO << "[MySQL] " << "Connected to MySQL database at: ["
@@ -142,6 +142,15 @@ bool MySQLConnection::execute(const char* sql, unsigned long length)
     }
 
     return true;
+}
+
+bool MySQLConnection::query(const char *sql, MYSQL_RES **pResult, MYSQL_FIELD **pFields, uint64* pRowCount, uint32* pFieldCount)
+{
+	if (!sql)
+	{
+		return false;
+	}
+	return _query(sql, pResult, pFields, pRowCount, pFieldCount);
 }
 
 bool MySQLConnection::_query(const char *sql, MYSQL_RES **pResult, MYSQL_FIELD **pFields, uint64* pRowCount, uint32* pFieldCount)

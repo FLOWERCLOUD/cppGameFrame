@@ -183,7 +183,7 @@ void DBSrv::stop()
 	writeThreadPool_.stop();
 }
 
-static intptr_t nextid = 0;
+static int nextid = 0;
 void DBSrv::onConnectionCallback(mysdk::net::TcpConnection* pCon)
 {
 	if (!pCon) return;
@@ -192,13 +192,19 @@ void DBSrv::onConnectionCallback(mysdk::net::TcpConnection* pCon)
 		int conid = nextid++;
 		if (conid >= 90000000) conid = 0;
 
-		pCon->setContext(reinterpret_cast  <void*>(conid));
+		Context* context = new Context();
+		if (!context) return;
+
+		context->conId = conid;
+		pCon->setContext(context);
 		conMap_.insert(std::pair<int, mysdk::net::TcpConnection*>(conid, pCon));
 	}
 	else
 	{
-		int conid = reinterpret_cast  <intptr_t>(pCon->getContext());
-		conMap_.erase(conid);
+		Context* context = static_cast<Context*>(pCon->getContext());
+		assert(context);
+		conMap_.erase(context->conId);
+		delete context;
 	}
 }
 
@@ -208,12 +214,14 @@ void DBSrv::onKaBuMessage(mysdk::net::TcpConnection* pCon,
 		mysdk::Timestamp timestamp)
 {
 	if (!pCon) return;
-	long conid = reinterpret_cast  <long>(pCon->getContext());
+
+	Context* context = static_cast<Context*>(pCon->getContext());
+	if (!context) return;
 
 	struct ThreadParam param;
 	param.Type = CMD;
 	param.msg = msg;
-	param.conId = conid;
+	param.conId = context->conId;
 	threadPool_.push(param);
 }
 

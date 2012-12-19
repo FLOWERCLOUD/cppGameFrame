@@ -24,6 +24,12 @@
 using namespace mysdk;
 using namespace mysdk::net;
 
+typedef struct tagContext
+{
+	int conId;
+	int threadId;
+} Context;
+
 class DBSrv
 {
 public:

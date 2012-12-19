@@ -207,6 +207,10 @@ public:
     {
     	return data.length;
     }
+    enum_field_types getFieldType()
+    {
+    	return data.type;
+    }
 public:
     #pragma pack(1)
     struct

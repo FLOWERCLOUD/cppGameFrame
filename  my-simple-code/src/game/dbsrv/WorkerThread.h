@@ -19,7 +19,7 @@ typedef enum tagThreadMsgType
 {
 	PING = 1,
 	CMD = 2,
-	STOP = 3
+	STOP = 3,
 } ThreadMsgType;
 
 struct ThreadParam
@@ -28,7 +28,6 @@ struct ThreadParam
 	int conId;
 	void* msg;
 };
-
 
 class DBSrv;
 class WorkerThread
@@ -66,9 +65,12 @@ private:
 	void sendReply(int conId, google::protobuf::Message* message);
 public:
 	void sendReplyEx(int conId, google::protobuf::Message& message);
-
+	void startTime(double delay, const std::string funname, bool bOne = true);
+private:
+	void _startTime(const std::string funname);
 private:
 	void reloadLua();
+	bool registerGlobalLua();
 private:
 	int id_;
 	int nextWriterThreadId_;
