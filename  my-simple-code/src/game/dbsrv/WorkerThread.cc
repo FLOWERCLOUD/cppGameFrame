@@ -550,6 +550,7 @@ void WorkerThread::onUnknownMessage(int conId, google::protobuf::Message* messag
 	LOG_INFO << "onUnknownMessage: " << message->GetTypeName()<< message->DebugString() << " threadid:" << id_;
 }
 
+#include "lua/LuaPB.h"
 void WorkerThread::onLuaMessage(int conId, google::protobuf::Message* message)
 {
 	reloadLua();
@@ -567,10 +568,7 @@ void WorkerThread::onLuaMessage(int conId, google::protobuf::Message* message)
 	}
 
 	lua_pushinteger(L, conId);
-	google::protobuf::Message ** tmp = static_cast<google::protobuf::Message**>(lua_newuserdata(L, sizeof(google::protobuf::Message *)));
-	*tmp = message;
-	luaL_getmetatable(L, "pb");
-	lua_setmetatable(L, -2);
+	LuaPB::pushMessage(L, message);
 
 	if (lua_pcall(L, 2, 1, 0) != 0)
 	{

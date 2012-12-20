@@ -5,6 +5,38 @@
 
 #include <strings.h>
 
+static int pushRedisReplyArray(lua_State* L, redisReply* reply)
+{
+	lua_newtable(L);
+    redisReply **elements = reply->element;
+    for(size_t i = 0; i < reply->elements; i++)
+    {
+       redisReply *reply = elements[i];
+
+       if (reply->type == REDIS_REPLY_STRING)
+       {
+    	   lua_pushlstring(L, reply->str, reply->len);
+       }
+       else if (reply->type == REDIS_REPLY_INTEGER)
+       {
+    	   lua_pushnumber(L, static_cast<lua_Number>(reply->integer));
+       }
+       else if (reply->type == REDIS_REPLY_ARRAY)
+       {
+    	   pushRedisReplyArray(L, reply);
+       }
+       else
+       {
+    	   char buf[100];
+    	   snprintf(buf, 99, "pushRedisReplyArray reply type(%d) not support!!", reply->type);
+    	   luaL_argerror(L, 0, buf);
+       }
+
+       lua_rawseti(L, -2, i + 1);
+    }
+    return 0;
+}
+
 static int pushReplyObjectToLua(lua_State* L, redisReply* reply)
 {
 	if (reply->type == REDIS_REPLY_STATUS)
@@ -25,30 +57,7 @@ static int pushReplyObjectToLua(lua_State* L, redisReply* reply)
 	}
 	else if (reply->type == REDIS_REPLY_ARRAY)
 	{
-		lua_newtable(L);
-
-        redisReply **elements = reply->element;
-        for(size_t i = 0; i < reply->elements; i++)
-        {
-           redisReply *reply = elements[i];
-           // value
-           if (reply->type == REDIS_REPLY_STRING)
-           {
-        	   lua_pushlstring(L, reply->str, reply->len);
-           }
-           else if (reply->type == REDIS_REPLY_INTEGER)
-           {
-        	   lua_pushnumber(L, static_cast<lua_Number>(reply->integer));
-           }
-           else
-           {
-        	   char buf[100];
-        	   snprintf(buf, 99, "redis_getReplyObjectResult reply type(%d) not support!!", reply->type);
-        	   luaL_argerror(L, 0, buf);
-           }
-
-           lua_rawseti(L, -2, i + 1);
-        }
+		pushRedisReplyArray(L, reply);
 	}
 	else
 	{
@@ -69,11 +78,12 @@ static int redis_command(lua_State* L)
 
 	rcache::Cache* redis = static_cast<rcache::Cache*>(ptr);
 	redisReply* reply = static_cast<redisReply*>(redis->RedisCommand(command));
-	// 命令没有执行成功怎么处理呢？？
+
 	if (!reply)
 	{
 		lua_pushnumber(L, REDIS_REPLY_ERROR);
-		return 1;
+		lua_pushstring(L, "redis Reply is null");
+		return 2;
 	}
 
 	lua_pushnumber(L, reply->type);

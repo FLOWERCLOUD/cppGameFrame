@@ -37,20 +37,20 @@ ProtoImporter::ProtoImporter():
 		std::vector<std::string> vec = StrSplit(filenames, ",");
 		for (size_t i = 0; i < vec.size(); i++)
 		{
-			const  google::protobuf::FileDescriptor* filedescriptor = importer.Import("test.proto");
+			const  google::protobuf::FileDescriptor* filedescriptor = importer.Import(vec[i]);
 			 if (!filedescriptor)
 			 {
-				 fprintf(stderr, "test.proto file descriptor error\n");
+				 fprintf(stderr, "import (%s) file descriptor error\n", vec[i].c_str());
 			 }
 		}
 }
 
 bool ProtoImporter::Import(const std::string& filename)
 {
-	const  google::protobuf::FileDescriptor* filedescriptor = importer.Import("test.proto");
+	const  google::protobuf::FileDescriptor* filedescriptor = importer.Import(filename);
 	 if (!filedescriptor)
 	 {
-		 fprintf(stderr, "test.proto file descriptor error\n");
+		 fprintf(stderr, "import (%s) file descriptor error\n", filename.c_str());
 		 return false;
 	 }
 	 return true;

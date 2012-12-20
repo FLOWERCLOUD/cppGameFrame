@@ -95,6 +95,8 @@ int main(int argc, char **argv)
 	std::string configFile("def.conf");
 	int maxconns = 1024;
 
+	uint16 srvPort = static_cast<uint16>(sConfigMgr.MainConfig.GetIntDefault("net", "port", defalutPort));
+
 	int o;
 	int maxcore = 0;
 	char *username = NULL;
@@ -120,7 +122,7 @@ int main(int argc, char **argv)
 			show_help();
 			return 0;
 		case 'p':
-			defalutPort = atoi(optarg);
+			srvPort = static_cast<uint16>(atoi(optarg));
 			break;
 		case 'f':
 			configFile = optarg;
@@ -276,7 +278,6 @@ int main(int argc, char **argv)
     	save_pid(getpid(), pid_file);
     }
 
-	uint16 srvPort = static_cast<uint16>(sConfigMgr.MainConfig.GetIntDefault("net", "port", defalutPort));
 	int workthreadnum = static_cast<int>(sConfigMgr.MainConfig.GetIntDefault("thread", "workthreadnum", 8));
 	int writethreadnum = static_cast<int>(sConfigMgr.MainConfig.GetIntDefault("thread", "writethreadnum", 8));
 	LOG_INFO << "dbsrv listen port[" << srvPort << "]" << " workthreadnum[" << workthreadnum << "] writethreadnum[" << writethreadnum << "]";
