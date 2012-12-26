@@ -1,6 +1,6 @@
 
-#ifndef GAME_LOONGBGCLIENT_H_
-#define GAME_LOONGBGCLIENT_H_
+#ifndef GAME_DBBGCLIENT_H_
+#define GAME_DBBGCLIENT_H_
 
 #include <mysdk/base/Common.h>
 #include <mysdk/base/Timestamp.h>

@@ -68,6 +68,7 @@ public:
 	void startTime(double delay, const std::string funname, bool bOne = true);
 private:
 	void _startTime(const std::string funname);
+	bool isParseTable(const std::string& tablename, std::string& outTypeName);
 private:
 	void reloadLua();
 	bool registerGlobalLua();

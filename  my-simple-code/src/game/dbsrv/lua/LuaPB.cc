@@ -14,71 +14,145 @@
 
 static int pb_repeated_get(lua_State* L)
 {
-	luaL_checkudata(L, 1, LuaPB::sRepeatedMessageMeta);
-	LuaRepeatedMessage* repeated  = static_cast<LuaRepeatedMessage*>(lua_touserdata(L, 1));
+	luaL_checktype(L, 1, LUA_TTABLE);
+	lua_getfield(L, 1, LuaPB::sRepeatedMessageCore);
+
+	LuaRepeatedMessage* repeated  = static_cast<LuaRepeatedMessage*>(lua_touserdata(L, -1));
+    luaL_argcheck(L, repeated != NULL, 1, "pb_repeated_get LuaRepeatedMessage* is null");
+
+    google::protobuf::Message* message = repeated->msg;
+    google::protobuf::FieldDescriptor *field = repeated->field;
+    const google::protobuf::Reflection* reflection = message->GetReflection();
+    luaL_argcheck(L, field != NULL, 1, "pb_repeated_get field not exist");
+
+    luaL_argcheck(L, lua_isnumber(L, 2), 2, "pb_repeated_get index expected int");
+    // -1 为了和lua的下标从一开始保持一致
+	int index = static_cast<int>(lua_tonumber(L, 2)) - 1;
+	luaL_argcheck(L, index >= 0, 2, "pb_repeated_get index expected >= 1");
+	if(field->type() == google::protobuf::FieldDescriptor::TYPE_INT32)
+	{
+		lua_pushnumber(L, reflection->GetRepeatedInt32(*message, field, index));
+	}
+	else if(field->type() == google::protobuf::FieldDescriptor::TYPE_STRING)
+	{
+		lua_pushstring(L, reflection->GetRepeatedString(*message, field, index).data());
+	}
+	else if(field->type() == google::protobuf::FieldDescriptor::TYPE_UINT32)
+	{
+		lua_pushnumber(L, reflection->GetRepeatedUInt32(*message, field, index));
+	}
+	else if(field->type() == google::protobuf::FieldDescriptor::TYPE_FLOAT)
+	{
+		lua_pushnumber(L, reflection->GetRepeatedFloat(*message, field, index));
+	}
+	else if(field->type() == google::protobuf::FieldDescriptor::TYPE_DOUBLE)
+	{
+		lua_pushnumber(L, reflection->GetRepeatedDouble(*message, field, index));
+	}
+	else if(field->type() == google::protobuf::FieldDescriptor::TYPE_BOOL)
+	{
+		lua_pushboolean(L, reflection->GetRepeatedBool(*message, field, index));
+	}
+	else if(field->type() == google::protobuf::FieldDescriptor::TYPE_MESSAGE)
+	{
+		const google::protobuf::Message& repeatedMessage = reflection->GetRepeatedMessage(*message, field, index);
+		LuaMessage* luamsg = static_cast<LuaMessage*>(lua_newuserdata(L, sizeof(LuaMessage)));
+		luamsg->msg = const_cast<google::protobuf::Message*>(&repeatedMessage);
+		luamsg->isDelete = false;
+		luaL_getmetatable(L, LuaPB::sMessageMeta);
+		lua_setmetatable(L, -2);
+	}
+	else
+	{
+		luaL_argerror(L, 0, "pb_repeated_get field type for get not support!!!");
+		return 0;
+	}
+	return 1;
+}
+
+static int pb_repeated_set(lua_State* L)
+{
+	luaL_checktype(L, 1, LUA_TTABLE);
+	lua_getfield(L, 1, LuaPB::sRepeatedMessageCore);
+
+	LuaRepeatedMessage* repeated  = static_cast<LuaRepeatedMessage*>(lua_touserdata(L, -1));
+    luaL_argcheck(L, repeated != NULL, 1, "pb_repeated_set LuaRepeatedMessage* is null");
+
+    google::protobuf::Message *message = repeated->msg;
+    const google::protobuf::Reflection* reflection = message->GetReflection();
+    google::protobuf::FieldDescriptor *field = repeated->field;
+
+    luaL_argcheck(L, field != NULL, 1, "pb_repeated_set field not exist");
+    luaL_argcheck(L, lua_isnumber(L, 2), 2, "pb_repeated_set index expected int");
+
+	int index = static_cast<int>(lua_tonumber(L, 2)) - 1;
+	luaL_argcheck(L, index >= 0, 2, "pb_repeated_set index expected >= 1");
+
+	if(field->type() == google::protobuf::FieldDescriptor::TYPE_INT32)
+	{
+		int val = static_cast<int>(lua_tonumber(L, 3));
+		reflection->SetRepeatedInt32(message, field, index, val);
+	}
+	else if(field->type() == google::protobuf::FieldDescriptor::TYPE_UINT32)
+	{
+		unsigned int val = static_cast<unsigned int>(lua_tonumber(L, 3));
+		reflection->SetRepeatedUInt32(message, field, index, val);
+	}
+	else if(field->type() == google::protobuf::FieldDescriptor::TYPE_FLOAT)
+	{
+		float val = static_cast<float>(lua_tonumber(L, 3));
+		reflection->SetRepeatedFloat(message, field, index, val);
+	}
+	else if(field->type() == google::protobuf::FieldDescriptor::TYPE_DOUBLE)
+	{
+		double val = static_cast<double>(lua_tonumber(L, 3));
+		reflection->SetRepeatedDouble(message, field, index, val);
+	}
+	else if(field->type() == google::protobuf::FieldDescriptor::TYPE_BOOL)
+	{
+		int val = static_cast<int>(lua_toboolean(L, 3));
+		reflection->SetRepeatedBool(message, field, index, val);
+	}
+	else if(field->type() == google::protobuf::FieldDescriptor::TYPE_STRING)
+	{
+		luaL_checktype(L, 3, LUA_TSTRING);
+		const char *str = static_cast<const char *>(lua_tostring(L, 3));
+		reflection->SetRepeatedString(message, field, index, str);
+	}
+	else
+	{
+		luaL_argerror(L, (2), "pb_repeated_set type for set not support!!!");
+	}
+	return 0;
+}
+
+static int pb_repeated_len(lua_State* L)
+{
+	LuaRepeatedMessage* repeated  = static_cast<LuaRepeatedMessage*>(lua_touserdata(L, lua_upvalueindex(1)));
+    luaL_argcheck(L, repeated != NULL, 1, "pb_repeated_len userdata expected");
+
+    google::protobuf::Message *message = repeated->msg;
+    const google::protobuf::Reflection* reflection = message->GetReflection();
+    google::protobuf::FieldDescriptor *field = repeated->field;
+    luaL_argcheck(L, field != NULL, 1, "pb_repeated_set field not exist");
+
+    int fieldsize = reflection->FieldSize(*message, field);
+    lua_pushnumber(L, fieldsize);
+    return 1;
+}
+
+static int pb_repeated_add(lua_State* L)
+{
+	LuaRepeatedMessage* repeated  = static_cast<LuaRepeatedMessage*>(lua_touserdata(L, lua_upvalueindex(1)));
     luaL_argcheck(L, repeated != NULL, 1, "pb_repeated_get userdata expected");
 
     google::protobuf::Message* message = repeated->msg;
     google::protobuf::FieldDescriptor *field = repeated->field;
     const google::protobuf::Reflection* reflection = message->GetReflection();
-    luaL_argcheck(L, field != NULL, 1, "pb_repeated_get field is null");
-    // 访问repeated message 的数据
-    if (lua_isnumber(L, 2))
-    {
-			int index = static_cast<int>(lua_tonumber(L, 2));
+    luaL_argcheck(L, field != NULL, 1, "pb_repeated_add field is null");
 
-			if(field->type() == google::protobuf::FieldDescriptor::TYPE_INT32)
-			{
-				lua_pushnumber(L, reflection->GetRepeatedInt32(*message, field, index));
-			}
-			else if(field->type() == google::protobuf::FieldDescriptor::TYPE_STRING)
-			{
-				lua_pushstring(L, reflection->GetRepeatedString(*message, field, index).data());
-			}
-			else if(field->type() == google::protobuf::FieldDescriptor::TYPE_UINT32)
-			{
-				 lua_pushnumber(L, reflection->GetRepeatedUInt32(*message, field, index));
-			}
-			else if(field->type() == google::protobuf::FieldDescriptor::TYPE_FLOAT)
-			{
-				 lua_pushnumber(L, reflection->GetRepeatedFloat(*message, field, index));
-			}
-			else if(field->type() == google::protobuf::FieldDescriptor::TYPE_DOUBLE)
-			{
-				 lua_pushnumber(L, reflection->GetRepeatedDouble(*message, field, index));
-			}
-			else if(field->type() == google::protobuf::FieldDescriptor::TYPE_BOOL)
-			{
-				lua_pushboolean(L, reflection->GetRepeatedBool(*message, field, index));
-			}
-			else if(field->type() == google::protobuf::FieldDescriptor::TYPE_MESSAGE)
-			{
-				const google::protobuf::Message& repeatedMessage = reflection->GetRepeatedMessage(*message, field, index);
-				LuaMessage* luamsg = static_cast<LuaMessage*>(lua_newuserdata(L, sizeof(LuaMessage)));
-				luamsg->msg = const_cast<google::protobuf::Message*>(&repeatedMessage);
-				luamsg->isDelete = false;
-				luaL_getmetatable(L, LuaPB::sMessageMeta);
-				lua_setmetatable(L, -2);
-			}
-			else
-			{
-				luaL_argerror(L, 0, "pb_repeated_get field type for get not support!!!");
-				return 0;
-			}
-			return 1;
-    }
-    // 添加repeated message
-    if (lua_isstring(L, 2))
-    {
-    	const char* cmd = lua_tostring(L, 2);
-    	if (strcasecmp(cmd, "add") != 0)
-    	{
-    		luaL_argerror(L, (2), "pb_repeated_get cmd is not support, need 'add' cmd !!");
-    		return 0;
-    	}
-
-    	if(field->type() == google::protobuf::FieldDescriptor::TYPE_MESSAGE)
-        {
+    if(field->type() == google::protobuf::FieldDescriptor::TYPE_MESSAGE)
+   {
             google::protobuf::Message* repeatedmsg = reflection->AddMessage(message, field);
             LuaMessage* luamsg = static_cast<LuaMessage*>(lua_newuserdata(L, sizeof(LuaMessage)));
             luamsg->msg = repeatedmsg;
@@ -87,153 +161,53 @@ static int pb_repeated_get(lua_State* L)
         	lua_setmetatable(L, -2);
 
         	return 1;
-        }
-        else
-        {
-        	luaL_argerror(L, (2), "pb_repeated_add field name type for add  is not support!!");
-        }
-    	return 0;
     }
-
-	return 0;
-}
-
-static int pb_repeated_set(lua_State* L)
-{
-	luaL_checkudata(L, 1, LuaPB::sRepeatedMessageMeta);
-	LuaRepeatedMessage* repeated  = static_cast<LuaRepeatedMessage*>(lua_touserdata(L, 1));
-    luaL_argcheck(L, repeated != NULL, 1, "pb_repeated_set userdata expected");
-
-    google::protobuf::Message *message = repeated->msg;
-    const google::protobuf::Reflection* reflection = message->GetReflection();
-    google::protobuf::FieldDescriptor *field = repeated->field;
-
-    if (lua_isnumber(L, 2))
+    else if(field->type() == google::protobuf::FieldDescriptor::TYPE_INT32)
     {
-		int index = static_cast<int>(lua_tonumber(L, 2));
-
-		if(field->type() == google::protobuf::FieldDescriptor::TYPE_INT32)
-		{
-			int val = static_cast<int>(lua_tonumber(L, 3));
-			reflection->SetRepeatedInt32(message, field, index, val);
-		}
-		else if (field->type() == google::protobuf::FieldDescriptor::TYPE_INT64)
-		{
-			long val = static_cast<long>(lua_tonumber(L, 3));
-			reflection->SetRepeatedInt64(message, field, index, val);
-		}
-		else if(field->type() == google::protobuf::FieldDescriptor::TYPE_UINT32)
-		{
-			unsigned int val = static_cast<unsigned int>(lua_tonumber(L, 3));
-			reflection->SetRepeatedUInt32(message, field, index, val);
-		}
-		else if (field->type() == google::protobuf::FieldDescriptor::TYPE_UINT64)
-		{
-			unsigned long val = static_cast<unsigned int>(lua_tonumber(L, 3));
-			reflection->SetRepeatedUInt64(message, field, index, val);
-		}
-		else if(field->type() == google::protobuf::FieldDescriptor::TYPE_FLOAT)
-		{
-			float val = static_cast<float>(lua_tonumber(L, 3));
-			reflection->SetRepeatedFloat(message, field, index, val);
-		}
-		else if(field->type() == google::protobuf::FieldDescriptor::TYPE_DOUBLE)
-		{
-			double val = static_cast<double>(lua_tonumber(L, 3));
-			reflection->SetRepeatedDouble(message, field, index, val);
-		}
-		else if(field->type() == google::protobuf::FieldDescriptor::TYPE_BOOL)
-		{
-			int val = static_cast<int>(lua_toboolean(L, 3));
-			reflection->SetRepeatedBool(message, field, index, val);
-		}
-		else if(field->type() == google::protobuf::FieldDescriptor::TYPE_STRING)
-		{
-			luaL_checktype(L, 3, LUA_TSTRING);
-			const char *str = static_cast<const char *>(lua_tostring(L, 3));
-			reflection->SetRepeatedString(message, field, index, str);
-		}
-		else
-		{
-			luaL_argerror(L, (2), "pb_repeated_set type for set not support!!!");
-		}
-		return 0;
+    	int val = static_cast<int>(lua_tonumber(L, 1));
+        reflection->AddInt32(message, field, val);
     }
-
-    if (lua_isstring(L, 2))
+    else if (field->type() == google::protobuf::FieldDescriptor::TYPE_INT64)
     {
-    	const char* cmd = lua_tostring(L, 2);
-    	if (strcasecmp(cmd, "add") != 0)
-    	{
-    		char error[100];
-    		snprintf(error, 99, "pb_repeated_get cmd is not support, need 'add' cmd(%s) !!", cmd);
-    		luaL_argerror(L, (2), error);
-    		return 0;
-    	}
-        if(field->type() == google::protobuf::FieldDescriptor::TYPE_INT32)
-        {
-        	int val = static_cast<int>(lua_tonumber(L, 3));
-            reflection->AddInt32(message, field, val);
-        }
-        else if (field->type() == google::protobuf::FieldDescriptor::TYPE_INT64)
-        {
-            long val = static_cast<long>(lua_tonumber(L, 3));
-            reflection->AddInt64(message, field, val);
-        }
-        else if(field->type() == google::protobuf::FieldDescriptor::TYPE_UINT32)
-        {
-            unsigned int val = static_cast<unsigned int>(lua_tonumber(L, 3));
-            reflection->AddUInt32(message, field, val);
-        }
-        else if (field->type() == google::protobuf::FieldDescriptor::TYPE_UINT64)
-        {
-            unsigned long val = static_cast<unsigned int>(lua_tonumber(L, 3));
-            reflection->AddUInt64(message, field, val);
-        }
-        else if(field->type() == google::protobuf::FieldDescriptor::TYPE_FLOAT)
-        {
-            float val = static_cast<float>(lua_tonumber(L, 3));
-            reflection->AddFloat(message, field, val);
-        }
-        else if(field->type() == google::protobuf::FieldDescriptor::TYPE_DOUBLE)
-        {
-            double val = static_cast<double>(lua_tonumber(L, 3));
-            reflection->AddDouble(message, field, val);
-        }
-        else if(field->type() == google::protobuf::FieldDescriptor::TYPE_BOOL)
-        {
-            int val = static_cast<int>(lua_toboolean(L, 3));
-            reflection->AddBool(message, field, val);
-        }
-        else if(field->type() == google::protobuf::FieldDescriptor::TYPE_STRING)
-        {
-        	luaL_checktype(L, 3, LUA_TSTRING);
-            const char *str = static_cast<const char *>(lua_tostring(L, 3));
-            reflection->AddString(message, field, str);
-        }
-		else
-		{
-			luaL_argerror(L, (2), "pb_repeated_set type for add  not support!!!");
-		}
-    	return 0;
+        long val = static_cast<long>(lua_tonumber(L, 1));
+        reflection->AddInt64(message, field, val);
     }
-
+    else if(field->type() == google::protobuf::FieldDescriptor::TYPE_UINT32)
+    {
+        unsigned int val = static_cast<unsigned int>(lua_tonumber(L, 1));
+        reflection->AddUInt32(message, field, val);
+    }
+    else if (field->type() == google::protobuf::FieldDescriptor::TYPE_UINT64)
+    {
+        unsigned long val = static_cast<unsigned int>(lua_tonumber(L, 1));
+        reflection->AddUInt64(message, field, val);
+    }
+    else if(field->type() == google::protobuf::FieldDescriptor::TYPE_FLOAT)
+    {
+        float val = static_cast<float>(lua_tonumber(L, 1));
+        reflection->AddFloat(message, field, val);
+    }
+    else if(field->type() == google::protobuf::FieldDescriptor::TYPE_DOUBLE)
+    {
+        double val = static_cast<double>(lua_tonumber(L, 1));
+        reflection->AddDouble(message, field, val);
+    }
+    else if(field->type() == google::protobuf::FieldDescriptor::TYPE_BOOL)
+    {
+        int val = static_cast<int>(lua_toboolean(L, 1));
+        reflection->AddBool(message, field, val);
+    }
+    else if(field->type() == google::protobuf::FieldDescriptor::TYPE_STRING)
+    {
+    	luaL_checktype(L, 1, LUA_TSTRING);
+        const char *str = static_cast<const char *>(lua_tostring(L, 1));
+        reflection->AddString(message, field, str);
+    }
+    else
+    {
+        	luaL_argerror(L, (1), "pb_repeated_add field name type for add  is not support!!");
+     }
     return 0;
-}
-
-static int pb_repeated_len(lua_State* L)
-{
-	luaL_checkudata(L, 1, LuaPB::sRepeatedMessageMeta);
-	LuaRepeatedMessage* repeated  = static_cast<LuaRepeatedMessage*>(lua_touserdata(L, 1));
-    luaL_argcheck(L, repeated != NULL, 1, "pb_repeated_set userdata expected");
-
-    google::protobuf::Message *message = repeated->msg;
-    const google::protobuf::Reflection* reflection = message->GetReflection();
-    google::protobuf::FieldDescriptor *field = repeated->field;
-
-    int fieldsize = reflection->FieldSize(*message, field);
-    lua_pushnumber(L, fieldsize);
-    return 1;
 }
 
 ///////////////////////////////////////////////////////
@@ -245,7 +219,6 @@ static int pb_get(lua_State* L)
 
 	luaL_checktype(L, 2, LUA_TSTRING);
     const char *field_name = lua_tostring(L, 2);
-
 
     google::protobuf::Message *message = luamsg->msg;
     if (!message)
@@ -260,9 +233,24 @@ static int pb_get(lua_State* L)
 
     if (field->is_repeated())
     {
+    	lua_newtable(L);
+
     	LuaRepeatedMessage* repeated = static_cast<LuaRepeatedMessage*>(lua_newuserdata(L, sizeof(LuaRepeatedMessage)));
     	repeated->msg = message;
     	repeated->field = const_cast<google::protobuf::FieldDescriptor *>(field);
+
+    	// copy luaRepeatedMessage newuserdata
+    	lua_pushvalue(L, -1);
+    	lua_setfield(L, -3, LuaPB::sRepeatedMessageCore);
+
+    	// copy luaRepeatedMessage newuserdata
+    	lua_pushvalue(L, -1);
+    	lua_pushcclosure(L, pb_repeated_len, 1);
+    	lua_setfield(L, -3, "size");
+
+    	lua_pushcclosure(L, pb_repeated_add, 1);
+    	lua_setfield(L, -2, "add");
+
     	luaL_getmetatable(L, LuaPB::sRepeatedMessageMeta);
     	lua_setmetatable(L, -2);
     }
@@ -278,6 +266,10 @@ static int pb_get(lua_State* L)
 		    	lua_setmetatable(L, -2);
 			}
 			else if(field->type() == google::protobuf::FieldDescriptor::TYPE_STRING)
+			{
+				lua_pushstring(L, reflection->GetString(*message, field).data());
+			}
+			else if(field->type() == google::protobuf::FieldDescriptor::TYPE_BYTES)
 			{
 				lua_pushstring(L, reflection->GetString(*message, field).data());
 			}
@@ -328,6 +320,12 @@ static int pb_set(lua_State* L)
     luaL_argcheck(L, !field->is_repeated(), 2, "LuaPB::set field_name is repeated");
 
     if(field->type() == google::protobuf::FieldDescriptor::TYPE_STRING)
+    {
+    	luaL_checktype(L, 3, LUA_TSTRING);
+        const char *str = static_cast<const char *>(lua_tostring(L, 3));
+        reflection->SetString(message, field, str);
+    }
+    else if (field->type() == google::protobuf::FieldDescriptor::TYPE_BYTES)
     {
     	luaL_checktype(L, 3, LUA_TSTRING);
         const char *str = static_cast<const char *>(lua_tostring(L, 3));
@@ -444,6 +442,20 @@ static int pb_tostring(lua_State* L)
 	return 1;
 }
 
+static int pb_serializeToString(lua_State* L)
+{
+	luaL_checkudata(L, 1, LuaPB::sMessageMeta);
+	LuaMessage* luamsg  = static_cast<LuaMessage*>(lua_touserdata(L, 1));
+    luaL_argcheck(L, luamsg != NULL, 1, "pb_get userdata expected, luamsg is null");
+
+    google::protobuf::Message *message = luamsg->msg;
+
+    std::string msg;
+    message->SerializeToString(&msg);
+    lua_pushlstring(L, msg.c_str(), msg.length());
+	return 1;
+}
+
 static const struct luaL_reg pblib_f[] =
 {
 		{"new", pb_new},
@@ -452,6 +464,7 @@ static const struct luaL_reg pblib_f[] =
 		{"set", pb_set},
 		{"delete", pb_delete},
 		{"tostring", pb_tostring},
+		{"serializeToString", pb_serializeToString},
 		{NULL, NULL}
 };
 
@@ -468,7 +481,6 @@ static const struct luaL_reg pbrepeatedlib_m[] =
 {
 		{"__index", pb_repeated_get},
 		{"__newindex", pb_repeated_set},
-		{"__len", pb_repeated_len},
 		{NULL, NULL}
 };
 
@@ -495,4 +507,5 @@ int LuaPB::pushMessage(lua_State* L, google::protobuf::Message *message)
 }
 
 const char* LuaPB::sRepeatedMessageMeta = "RepeatedMessageMeta";
+const char* LuaPB::sRepeatedMessageCore = "luaRepeatedMessageCore";
 const char* LuaPB::sMessageMeta = "MessageMeta";

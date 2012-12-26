@@ -25,6 +25,7 @@ set(dbsrv_SRCS
   mysql/QueryResult.cc
   DBSrv.cc
   main.cc
+  PBSql.cc
   ProtoImporter.cc
   Util.cc
   WorkerThread.cc
@@ -90,3 +91,22 @@ add_custom_target(EXE ALL
 add_subdirectory(tests)
 add_subdirectory(lua/tests)
 
+### 
+set(dbclient_SRCS
+  codec/codec.cc
+  lua/LuaEngine.cc
+  lua/LuaLog.cc
+  lua/LuaPB.cc
+  lua/LuaEngine.cc
+  lua/LuaLog.cc
+  lua/LuaPB.cc
+  tests/DBLuaClient.cc
+  tests/LuaClient.cc
+  tests/main.cc
+  ProtoImporter.cc
+  Util.cc
+  )
+add_executable(dbclient ${dbclient_SRCS})
+target_link_libraries(dbclient  msg_proto mysdk_exconfig  mysdk_net   ${LUA_LIBRARY} )
+
+add_subdirectory(tools/pb_sql_plugin)

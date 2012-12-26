@@ -1,9 +1,3 @@
-/*
- * Util.h
- *
- *  Created on: 2012-3-22
- *    
- */
 
 #ifndef GAME_UTIL_H_
 #define GAME_UTIL_H_

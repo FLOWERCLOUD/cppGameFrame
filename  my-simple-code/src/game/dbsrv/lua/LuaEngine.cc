@@ -48,7 +48,7 @@ int LuaEngine::dofile(const char *filename)
 		snprintf(name, 1023, "%s/%s", luapath, filename);
 		if(luaL_dofile(luaState_, name) != 0)
 		{
-			printf("[LuaEngine] LuaEngine::dofile(%s) error!!\n", name);
+			printf("[LuaEngine] LuaEngine::dofile(%s) error, result:%s!!\n", name, lua_tostring(luaState_, -1));
 			exit(1);
 		}
 	}

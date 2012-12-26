@@ -52,11 +52,19 @@ void WriterThread::threadHandler()
 	while (true)
 	{
 		WriterThreadParam param = queue_.take();
+		size_t queue_size = queue_.size();
+		static size_t warn_queue_size = sConfigMgr.MainConfig.GetIntDefault("writerthread", "warn_queue_size", 1000);
+		static size_t max_writesql_num = sConfigMgr.MainConfig.GetIntDefault("writerthread", "max_writesql_num", 100);
+		if (queue_size >= warn_queue_size)
+		{
+			LOG_WARN << "write thread queue size too larger, size: " << queue_size
+								<< " threadid: " << id_;
+		}
 		if (param.Type == WRITERTHREAD_CMD)
 		{
 			handler(param);
-			// 每保存100条sql 就sleep 1 s 一下吧， 防止mysql io拥堵
-			if (saveSqlNum++ >= 100)
+			// 每保存max_writesql_num条sql 就sleep 1 s 一下吧， 防止mysql io拥堵
+			if (saveSqlNum++ >= max_writesql_num)
 			{
 				saveSqlNum = 0;
 				sleep(1);
@@ -78,11 +86,12 @@ void WriterThread::handler(struct WriterThreadParam& param)
 {
 	char* sql = static_cast<char*>(param.sql);
 	LOG_DEBUG << "WriterThread::handler, sql: " << sql;
+	LOG_SQL << "- " << sql;
 	if (!mysql_.execute(sql, param.length))
 	{
 		// 保存到数据库失败~~~
 		// 怎么处理呢？？？
-		LOG_WARN << "[SQL]" << param.sql;
+		LOG_SQL << "- " << sql;
 	}
 	// 释放掉这个内存空间啦
 	delete[] sql;

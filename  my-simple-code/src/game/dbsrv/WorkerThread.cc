@@ -7,6 +7,7 @@
 #include <game/dbsrv/config/ConfigMgr.h>
 #include <game/dbsrv/lua/LuaMyLibs.h>
 #include <game/dbsrv/mysql/QueryResult.h>
+#include <game/dbsrv/PBSql.h>
 
 #include <google/protobuf/message.h>
 
@@ -168,10 +169,60 @@ bool WorkerThread::loadFromRedis(int uid, const std::string& tablename, ::db_srv
 	return false;
 }
 
+// 是否要把这个表的数据解出来
+bool WorkerThread::isParseTable(const std::string& tablename, std::string& outTypeName)
+{
+	if(sConfigMgr.MainConfig.GetString("parsetable", tablename.c_str(), &outTypeName))
+	{
+		return true;
+	}
+	return false;
+}
+
 bool WorkerThread::loadFromMySql(int uid, const std::string& tablename, ::db_srv::get_reply_table* table)
 {
+	std::string typeName;
+	if (isParseTable(tablename, typeName))
+	{
+		google::protobuf::Message* msg = PBSql::select(tablename, typeName, uid, mysql_);
+		if (!msg)
+		{
+			table->set_table_name(tablename);
+			table->set_table_bin("");
+			table->set_table_status(0); // 数据库连不上了
+			return false;
+		}
+
+		std::string table_bin;
+		if (!msg->SerializeToString(&table_bin))
+		{
+			table->set_table_name(tablename);
+			table->set_table_bin("");
+			table->set_table_status(-1); // 序列化出错啦
+
+			delete msg;
+			return false;
+		}
+
+		table->set_table_name(tablename);
+		table->set_table_bin(table_bin.c_str(), table_bin.length());
+		table->set_table_status(3); // 从数据库拿到的数据
+
+		delete msg;
+		return true;
+	}
+
 	char sql[1024];
-	snprintf(sql, 1023, "select table_bin from %s where uid=%d", tablename.c_str(), uid);
+	// 该类型的表 有多少张
+	int tablenum = sConfigMgr.MainConfig.GetIntDefault("table", tablename.c_str(), 1);
+	if (tablenum == 1)
+	{
+		snprintf(sql, 1023, "select table_bin from %s where uid=%d", tablename.c_str(), uid);
+	}
+	else
+	{
+		snprintf(sql, 1023, "select table_bin from %s_%d where uid=%d", tablename.c_str(), uid % tablenum, uid);
+	}
 	LOG_DEBUG << "loadFromMySql, sql: " << sql;
 	ResultSet* res = mysql_.query(sql);
 	if (!res)
@@ -264,6 +315,48 @@ bool WorkerThread::saveToRedis(int uid, const ::db_srv::set_table& set_table, ::
 
 bool WorkerThread::saveToMySql(int uid, const ::db_srv::set_table& set_table, ::db_srv::set_reply_table_status* status)
 {
+	std::string tablename(set_table.table_name());
+	std::string typeName;
+	if (isParseTable(tablename, typeName))
+	{
+		google::protobuf::Message* message = KabuCodec::createDynamicMessage(typeName);
+		if (!message)
+		{
+			return false;
+		}
+
+		if (!message->ParseFromString(set_table.table_bin()))
+		{
+			return false;
+		}
+
+		std::string replaceSql(PBSql::buildReplaceSql(message, tablename, mysql_));
+		if (replaceSql == "")
+		{
+			return false;
+		}
+
+		char* sql_buf = new char[replaceSql.length() + 10];
+		snprintf(sql_buf, replaceSql.length() + 1, "%s", replaceSql.c_str());
+		//printf("sqlbuf: %s\n", sql_buf);
+		struct WriterThreadParam param;
+		param.Type = WRITERTHREAD_CMD;
+		param.sql = sql_buf;
+		param.length = replaceSql.length();
+
+		if (!srv_) return false;
+
+		WriterThreadPool& pool = srv_->getWriteThreadPool();
+		nextWriterThreadId_++;
+		if (nextWriterThreadId_ >= pool.getThreadNum())
+		{
+			nextWriterThreadId_ = 0;
+		}
+		pool.push(nextWriterThreadId_, param);
+
+		return true;
+	}
+
 	size_t table_bin_length = set_table.table_bin().length();
 	// 大于20k的时候 打个警告的日志吧
 	if (table_bin_length >= 1024 * 20)
@@ -296,7 +389,7 @@ bool WorkerThread::saveToMySql(int uid, const ::db_srv::set_table& set_table, ::
 	}
 	else
 	{
-		sqlbuflen = snprintf(sql_buf, len + 200, sql2, tablenum, set_table.table_name().c_str(), uid, str_rs, time(NULL));
+		sqlbuflen = snprintf(sql_buf, len + 200, sql2, set_table.table_name().c_str(), uid % tablenum, uid, str_rs, time(NULL));
 	}
 
 
@@ -502,8 +595,40 @@ void WorkerThread::onMGet(int conId, db_srv::mget* message)
 
 bool WorkerThread::loadFromMySql(int uid, const std::string& tablename, ::db_srv::mget_reply_user_table* table)
 {
+	std::string typeName;
+	if (isParseTable(tablename, typeName))
+	{
+		google::protobuf::Message* msg = PBSql::select(tablename, typeName, uid, mysql_);
+		if (!msg)
+		{
+			return false;
+		}
+
+		std::string table_bin;
+		if (!msg->SerializeToString(&table_bin))
+		{
+			delete msg;
+			return false;
+		}
+
+		table->set_uid(uid);
+		table->set_table_name(tablename);
+		table->set_table_bin(table_bin.c_str(), table_bin.length());
+
+		return true;
+	}
+
 	char sql[1024];
-	snprintf(sql, 1023, "select table_bin from %s where uid=%d", tablename.c_str(), uid);
+	int tablenum = sConfigMgr.MainConfig.GetIntDefault("table", tablename.c_str(), 1);
+	if (tablenum == 1)
+	{
+		snprintf(sql, 1023, "select table_bin from %s where uid=%d", tablename.c_str(), uid);
+	}
+	else
+	{
+		snprintf(sql, 1023, "select table_bin from %s_%d where uid=%d", tablename.c_str(), uid % tablenum, uid);
+	}
+
 	LOG_DEBUG << "loadFromMySql, sql: " << sql;
 	ResultSet* res = mysql_.query(sql);
 	if (!res)

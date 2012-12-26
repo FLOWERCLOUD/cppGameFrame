@@ -23,6 +23,7 @@ class LuaPB
 {
 public:
 	static const char* sRepeatedMessageMeta;
+	static const char* sRepeatedMessageCore;
 	static const char* sMessageMeta;
 	static int pushMessage(lua_State* L, google::protobuf::Message *message);
 	static int openlib(lua_State* L);
