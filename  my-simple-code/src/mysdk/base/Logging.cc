@@ -61,6 +61,7 @@ const char* LoggerImpl::LogLevelName[Logger::NUM_LOG_LEVELS] =
 		"WARN",
 		"ERROR",
 		"FATAL",
+		"SQL"
 };
 
 LoggerImpl::LoggerImpl(LogLevel level, int savedErrno, const char* file, int line):
@@ -75,7 +76,7 @@ LoggerImpl::LoggerImpl(LogLevel level, int savedErrno, const char* file, int lin
 	const char* path_sep_pos = strrchr(fullname_, '/');
 	basename_ = (path_sep_pos != NULL) ? path_sep_pos + 1 : fullname_;
 	char message_head[512];
-	snprintf(message_head, sizeof(message_head) - 1, "%s  %s ",
+	snprintf(message_head, sizeof(message_head) - 1, "%s %s ",
 			time_.toFormattedString().c_str(), LogLevelName[level]);
 	stream_ <<  message_head;
 	if (savedErrno != 0)

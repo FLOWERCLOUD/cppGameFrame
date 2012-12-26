@@ -13,7 +13,7 @@ using namespace mysdk::net;
 
 namespace
 {
-	const int kPollTimeMs = 10000;
+	const int kPollTimeMs = 1000;
 	int createEventfd()
 	{
 		int evtfd = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);

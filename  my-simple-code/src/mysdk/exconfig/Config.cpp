@@ -364,7 +364,7 @@ bool ConfigFile::SetSource(const char* file, bool ignorecase)
 						}
 						else
 						{
-							LOG_ERROR << "Block without name.";
+							LOG_ERROR << "Block without name. line:" << line;
 							return false;
 						}
 
