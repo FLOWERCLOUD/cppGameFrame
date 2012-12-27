@@ -15,7 +15,7 @@ public:
 	ProtoImporter();
 public:
 	bool Import(const std::string& filename);
-
+	google::protobuf::Message* createDynamicMessage(const std::string& typeName);
 public:
 	google::protobuf::compiler::Importer importer;
 	google::protobuf::DynamicMessageFactory factory;

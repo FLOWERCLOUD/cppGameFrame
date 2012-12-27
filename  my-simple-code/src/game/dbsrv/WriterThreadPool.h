@@ -5,7 +5,8 @@
 
 #include <vector>
 
-class WriterThread;
+#include <game/dbsrv/WriterThread.h>
+
 class WriterThreadPool
 {
 public:
@@ -15,8 +16,8 @@ public:
 	void start();
 	void stop();
 
-	void push(struct WriterThreadParam& param);
-	void push(int threadId, struct WriterThreadParam& param);
+	void push(WriterThreadParam& param);
+	void push(int threadId, WriterThreadParam& param);
 	int getThreadNum();
 	void ping();
 private:

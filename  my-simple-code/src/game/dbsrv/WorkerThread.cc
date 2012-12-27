@@ -2,7 +2,6 @@
 #include <game/dbsrv/WorkerThread.h>
 
 #include <game/dbsrv/DBSrv.h>
-#include <game/dbsrv/WriterThread.h>
 #include <game/dbsrv/codec/codec.h>
 #include <game/dbsrv/config/ConfigMgr.h>
 #include <game/dbsrv/lua/LuaMyLibs.h>
@@ -339,20 +338,12 @@ bool WorkerThread::saveToMySql(int uid, const ::db_srv::set_table& set_table, ::
 		char* sql_buf = new char[replaceSql.length() + 10];
 		snprintf(sql_buf, replaceSql.length() + 1, "%s", replaceSql.c_str());
 		//printf("sqlbuf: %s\n", sql_buf);
-		struct WriterThreadParam param;
+		WriterThreadParam param;
 		param.Type = WRITERTHREAD_CMD;
 		param.sql = sql_buf;
 		param.length = replaceSql.length();
 
-		if (!srv_) return false;
-
-		WriterThreadPool& pool = srv_->getWriteThreadPool();
-		nextWriterThreadId_++;
-		if (nextWriterThreadId_ >= pool.getThreadNum())
-		{
-			nextWriterThreadId_ = 0;
-		}
-		pool.push(nextWriterThreadId_, param);
+		dispatchWriterThread(param);
 
 		return true;
 	}
@@ -393,12 +384,17 @@ bool WorkerThread::saveToMySql(int uid, const ::db_srv::set_table& set_table, ::
 	}
 
 
-	struct WriterThreadParam param;
+	WriterThreadParam param;
 	param.Type = WRITERTHREAD_CMD;
 	param.sql = sql_buf;
 	param.length = sqlbuflen;
+	dispatchWriterThread(param);
+	return true;
+}
 
-	if (!srv_) return false;
+void WorkerThread::dispatchWriterThread(WriterThreadParam& param)
+{
+	if (!srv_) return;
 
 	WriterThreadPool& pool = srv_->getWriteThreadPool();
 	nextWriterThreadId_++;
@@ -407,7 +403,6 @@ bool WorkerThread::saveToMySql(int uid, const ::db_srv::set_table& set_table, ::
 		nextWriterThreadId_ = 0;
 	}
 	pool.push(nextWriterThreadId_, param);
-	return true;
 }
 
 bool WorkerThread::loadFromRedis(int uid, const std::string& tablename, ::db_srv::mget_reply_user_table* table)
@@ -548,7 +543,7 @@ void WorkerThread::onSet(int conId, db_srv::set* message)
 		// 首先保存到redis 中
 		if (saveToRedis(uid, message->tables(i), table_status))
 		{
-			// 保存redis成功后，在保存到mysql 中
+			// 保存redis成功后，在异步保存到mysql 中
 			saveToMySql(uid, message->tables(i), table_status);
 		}
 	}

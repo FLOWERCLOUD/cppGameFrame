@@ -1,8 +1,6 @@
 
 #include <game/dbsrv/WriterThreadPool.h>
 
-#include <game/dbsrv/WriterThread.h>
-
 WriterThreadPool::WriterThreadPool(int threadnum):
 	threadnum_(threadnum)
 {
@@ -38,7 +36,7 @@ void WriterThreadPool::stop()
 	}
 }
 
-void WriterThreadPool::push(struct WriterThreadParam& param)
+void WriterThreadPool::push(WriterThreadParam& param)
 {
 	static int nextThreadId = 0;
 	nextThreadId++;
@@ -50,7 +48,7 @@ void WriterThreadPool::push(struct WriterThreadParam& param)
 	threads_[nextThreadId]->push(param);
 }
 
-void WriterThreadPool::push(int threadId, struct WriterThreadParam& param)
+void WriterThreadPool::push(int threadId, WriterThreadParam& param)
 {
 	if (threadId >= threadnum_ || threadId < 0)
 	{
@@ -64,7 +62,7 @@ void WriterThreadPool::push(int threadId, struct WriterThreadParam& param)
 
 void WriterThreadPool::ping()
 {
-	struct WriterThreadParam param;
+	WriterThreadParam param;
 	param.Type = WRITERTHREAD_PING;
 
 	for (int i = 0; i < threadnum_; i++)

@@ -14,12 +14,12 @@ typedef enum tagWriterThreadMsgType
 	WRITERTHREAD_STOP = 3
 } WriterThreadMsgType;
 
-struct WriterThreadParam
+typedef struct tagWriterThreadParam
 {
 	WriterThreadMsgType Type;
 	void* sql;
 	unsigned long length;
-};
+}WriterThreadParam;
 
 class WriterThread
 {
@@ -31,14 +31,14 @@ public:
 	void start();
 	void stop();
 
-	void push(struct WriterThreadParam& param);
+	void push(WriterThreadParam& param);
 
 private:
 	void threadHandler();
-	void handler(struct WriterThreadParam& param);
+	void handler(WriterThreadParam& param);
 private:
 	int id_;
-	mysdk::BlockingQueue<struct WriterThreadParam> queue_;
+	mysdk::BlockingQueue<WriterThreadParam> queue_;
 	mysdk::Thread thread_;
 	MySQLConnection mysql_;
 };

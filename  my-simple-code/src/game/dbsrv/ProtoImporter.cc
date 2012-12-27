@@ -4,6 +4,9 @@
 #include <game/dbsrv/config/ConfigMgr.h>
 #include <game/dbsrv/Util.h>
 
+#include <mysdk/base/Logging.h>
+using namespace mysdk;
+
 class MyMultiFileErrorCollector : public google::protobuf::compiler::MultiFileErrorCollector
 {
         virtual void AddError(
@@ -31,7 +34,8 @@ ProtoImporter::ProtoImporter():
 		{
 			sourceTree.MapPath("", protopath);
 		}
-		printf("[ProtoImporter] protopath:%s\n", protopath);
+		//printf("[ProtoImporter] protopath:%s\n", protopath);
+		LOG_INFO << "[ProtoImporter] protopath:" << protopath;
 		std::string filenames = sConfigMgr.MainConfig.GetStringDefault("proto", "filelist", "test.proto");
 
 		std::vector<std::string> vec = StrSplit(filenames, ",");
@@ -40,7 +44,8 @@ ProtoImporter::ProtoImporter():
 			const  google::protobuf::FileDescriptor* filedescriptor = importer.Import(vec[i]);
 			 if (!filedescriptor)
 			 {
-				 fprintf(stderr, "import (%s) file descriptor error\n", vec[i].c_str());
+				 //fprintf(stderr, "import (%s) file descriptor error\n", vec[i].c_str());
+				 LOG_WARN << "import file descriptor error, filename:" << vec[i].c_str();
 			 }
 		}
 }
@@ -56,3 +61,17 @@ bool ProtoImporter::Import(const std::string& filename)
 	 return true;
 }
 
+google::protobuf::Message* ProtoImporter::createDynamicMessage(const std::string& typeName)
+{
+	  google::protobuf::Message* message = NULL;
+	  const google::protobuf::Descriptor* descriptor = importer.pool()->FindMessageTypeByName(typeName);
+	  if (descriptor)
+	  {
+	     const google::protobuf::Message* prototype = factory.GetPrototype(descriptor);
+			if (prototype)
+			{
+				message = prototype->New();
+			}
+	  }
+	  return message;
+}

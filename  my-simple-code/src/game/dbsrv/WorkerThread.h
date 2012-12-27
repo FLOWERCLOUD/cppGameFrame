@@ -10,6 +10,7 @@
 #include <game/dbsrv/lua/LuaEngine.h>
 #include <game/dbsrv/mysql/MySQLConnection.h>
 #include <game/dbsrv/dispatcher.h>
+#include <game/dbsrv/WriterThread.h>
 
 #include "msg.pb.h"
 
@@ -69,6 +70,7 @@ public:
 private:
 	void _startTime(const std::string funname);
 	bool isParseTable(const std::string& tablename, std::string& outTypeName);
+	void dispatchWriterThread(WriterThreadParam& param);
 private:
 	void reloadLua();
 	bool registerGlobalLua();

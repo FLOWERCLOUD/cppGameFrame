@@ -40,12 +40,12 @@ void WriterThread::stop()
 	mysql_.close();
 }
 
-void WriterThread::push(struct WriterThreadParam& param)
+void WriterThread::push(WriterThreadParam& param)
 {
 	queue_.put(param);
 }
 
-static int saveSqlNum = 0;
+static size_t saveSqlNum = 0;
 void WriterThread::threadHandler()
 {
 	LOG_INFO << "WriterThread::threadHandler start... id[" << id_ << "]";
@@ -82,11 +82,11 @@ void WriterThread::threadHandler()
 	LOG_INFO << "WriterThread::threadHandler stop... id[" << id_ << "]";
 }
 
-void WriterThread::handler(struct WriterThreadParam& param)
+void WriterThread::handler(WriterThreadParam& param)
 {
 	char* sql = static_cast<char*>(param.sql);
 	LOG_DEBUG << "WriterThread::handler, sql: " << sql;
-	LOG_SQL << "- " << sql;
+	//LOG_SQL << "- " << sql;
 	if (!mysql_.execute(sql, param.length))
 	{
 		// 保存到数据库失败~~~

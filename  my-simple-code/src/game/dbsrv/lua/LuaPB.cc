@@ -211,6 +211,133 @@ static int pb_repeated_add(lua_State* L)
 }
 
 ///////////////////////////////////////////////////////
+
+static int pb_messagefield_get(lua_State* L)
+{
+	printf("pb_messagefield_get===============\n");
+	luaL_checkudata(L, 1, LuaPB::sMessageFieldMeta);
+	LuaMessageField* luamsgfield  = static_cast<LuaMessageField*>(lua_touserdata(L, 1));
+    luaL_argcheck(L, luamsgfield != NULL, 1, "pb_messagefield_get userdata expected, luamsg is null");
+
+	luaL_checktype(L, 2, LUA_TSTRING);
+    const char *field_name = lua_tostring(L, 2);
+
+    google::protobuf::Message *msg = luamsgfield->msg;
+    if (!msg) return 0;
+
+    google::protobuf::FieldDescriptor *fieldFieldDescriptor = luamsgfield->field;
+    if (!fieldFieldDescriptor) return 0;
+
+    const google::protobuf::Reflection* fieldreflection = msg->GetReflection();
+    const google::protobuf::Message& message = fieldreflection->GetMessage(*msg, fieldFieldDescriptor);
+
+    const google::protobuf::Descriptor* descriptor = message.GetDescriptor();
+    const google::protobuf::Reflection* reflection = message.GetReflection();
+    const google::protobuf::FieldDescriptor *field = descriptor->FindFieldByName(field_name);
+
+	if(field->type() == google::protobuf::FieldDescriptor::TYPE_STRING)
+	{
+		lua_pushstring(L, reflection->GetString(message, field).data());
+	}
+	else if(field->type() == google::protobuf::FieldDescriptor::TYPE_BYTES)
+	{
+		lua_pushstring(L, reflection->GetString(message, field).data());
+	}
+	else if(field->type() == google::protobuf::FieldDescriptor::TYPE_INT32)
+	{
+		lua_pushnumber(L, reflection->GetInt32(message, field));
+	}
+	else if(field->type() == google::protobuf::FieldDescriptor::TYPE_UINT32)
+	{
+		 lua_pushnumber(L, reflection->GetUInt32(message, field));
+	}
+	else if(field->type() == google::protobuf::FieldDescriptor::TYPE_FLOAT)
+	{
+		 lua_pushnumber(L, reflection->GetFloat(message, field));
+	}
+	else if(field->type() == google::protobuf::FieldDescriptor::TYPE_DOUBLE)
+	{
+		 lua_pushnumber(L, reflection->GetDouble(message, field));
+	}
+	else if(field->type() == google::protobuf::FieldDescriptor::TYPE_BOOL)
+	{
+		lua_pushboolean(L, reflection->GetBool(message, field));
+	}
+	else
+	{
+		return 0;
+	}
+	return 1;
+}
+
+static int pb_messagefield_set(lua_State* L)
+{
+	luaL_checkudata(L, 1, LuaPB::sMessageFieldMeta);
+	LuaMessageField* luamsgfield  = static_cast<LuaMessageField*>(lua_touserdata(L, 1));
+    luaL_argcheck(L, luamsgfield != NULL, 1, "pb_messagefield_set userdata expected, luamsg is null");
+
+	luaL_checktype(L, 2, LUA_TSTRING);
+    const char *field_name = lua_tostring(L, 2);
+
+    google::protobuf::Message *msg = luamsgfield->msg;
+    if (!msg) return 0;
+
+    google::protobuf::FieldDescriptor *fieldFieldDescriptor = luamsgfield->field;
+    if (!fieldFieldDescriptor) return 0;
+
+    const google::protobuf::Reflection* fieldreflection = msg->GetReflection();
+    google::protobuf::Message* message = fieldreflection->MutableMessage(msg, fieldFieldDescriptor);
+
+    const google::protobuf::Descriptor* descriptor = message->GetDescriptor();
+    const google::protobuf::Reflection* reflection = message->GetReflection();
+    const google::protobuf::FieldDescriptor *field = descriptor->FindFieldByName(field_name);
+
+    if(field->type() == google::protobuf::FieldDescriptor::TYPE_STRING)
+    {
+    	luaL_checktype(L, 3, LUA_TSTRING);
+        const char *str = static_cast<const char *>(lua_tostring(L, 3));
+        reflection->SetString(message, field, str);
+
+    }
+    else if (field->type() == google::protobuf::FieldDescriptor::TYPE_BYTES)
+    {
+    	luaL_checktype(L, 3, LUA_TSTRING);
+        const char *str = static_cast<const char *>(lua_tostring(L, 3));
+        reflection->SetString(message, field, str);
+    }
+    else if(field->type() == google::protobuf::FieldDescriptor::TYPE_INT32)
+    {
+        int val = static_cast<int>(lua_tonumber(L, 3));
+        reflection->SetInt32(message, field, val);
+    }
+    else if(field->type() == google::protobuf::FieldDescriptor::TYPE_UINT32)
+    {
+        unsigned int val = static_cast<unsigned int>(lua_tonumber(L, 3));
+        reflection->SetUInt32(message, field, val);
+    }
+    else if(field->type() == google::protobuf::FieldDescriptor::TYPE_FLOAT)
+    {
+        float val = static_cast<float>(lua_tonumber(L, 3));
+        reflection->SetFloat(message, field, val);
+    }
+    else if(field->type() == google::protobuf::FieldDescriptor::TYPE_DOUBLE)
+    {
+        double val = static_cast<double>(lua_tonumber(L, 3));
+        reflection->SetDouble(message, field, val);
+    }
+    else if(field->type() == google::protobuf::FieldDescriptor::TYPE_BOOL)
+    {
+        int val = static_cast<int>(lua_toboolean(L, 3));
+        reflection->SetBool(message, field, val);
+    }
+    else
+    {
+    	luaL_argerror(L, 2, "pb_messagefield_set field_name type error");
+    }
+
+	return 0;
+}
+///////////////////////////////////////////////////////
 static int pb_get(lua_State* L)
 {
 	luaL_checkudata(L, 1, LuaPB::sMessageMeta);
@@ -258,12 +385,20 @@ static int pb_get(lua_State* L)
     {
 			if(field->type() == google::protobuf::FieldDescriptor::TYPE_MESSAGE)
 			{
-		        google::protobuf::Message* repeatedmsg = reflection->AddMessage(message, field, sProtoImporter.factory.generated_factory());
-		        LuaMessage* tmp = static_cast<LuaMessage*>(lua_newuserdata(L, sizeof(LuaMessage)));
-		    	tmp->msg = repeatedmsg;
-		    	tmp->isDelete = false;
-		    	luaL_getmetatable(L, LuaPB::sMessageMeta);
+#if 0
+				LuaMessageField* tmp = static_cast<LuaMessageField*>(lua_newuserdata(L, sizeof(LuaMessageField)));
+		    	tmp->msg = message;
+		    	tmp->field = const_cast<google::protobuf::FieldDescriptor *>(field);
+		    	luaL_getmetatable(L, LuaPB::sMessageFieldMeta);
 		    	lua_setmetatable(L, -2);
+#else
+		    	google::protobuf::Message* msg = reflection->MutableMessage(message, field);
+				LuaMessage* luamsg = static_cast<LuaMessage*>(lua_newuserdata(L, sizeof(LuaMessage)));
+				luamsg->msg = msg;
+				luamsg->isDelete = false;
+				luaL_getmetatable(L, LuaPB::sMessageMeta);
+				lua_setmetatable(L, -2);
+#endif
 			}
 			else if(field->type() == google::protobuf::FieldDescriptor::TYPE_STRING)
 			{
@@ -355,6 +490,10 @@ static int pb_set(lua_State* L)
     {
         int val = static_cast<int>(lua_toboolean(L, 3));
         reflection->SetBool(message, field, val);
+    }
+    else
+    {
+    	luaL_argerror(L, 2, "LuaPB::set field_name type error");
     }
     return 0;
 }
@@ -456,10 +595,24 @@ static int pb_serializeToString(lua_State* L)
 	return 1;
 }
 
+static int pb_parseFromString(lua_State* L)
+{
+	luaL_checkudata(L, 1, LuaPB::sMessageMeta);
+	LuaMessage* luamsg  = static_cast<LuaMessage*>(lua_touserdata(L, 1));
+    luaL_argcheck(L, luamsg != NULL, 1, "pb_get userdata expected, luamsg is null");
+
+    google::protobuf::Message *message = luamsg->msg;
+
+    const char* msgbin = static_cast<const char*>(lua_tostring(L, 2));
+    message->ParseFromString(msgbin);
+    return 0;
+}
+
 static const struct luaL_reg pblib_f[] =
 {
 		{"new", pb_new},
 		{"import", pb_import},
+		{"parseFromString", pb_parseFromString},
 		{"get", pb_get},
 		{"set", pb_set},
 		{"delete", pb_delete},
@@ -484,6 +637,13 @@ static const struct luaL_reg pbrepeatedlib_m[] =
 		{NULL, NULL}
 };
 
+static const struct luaL_reg pbmessagefieldlib_m[] =
+{
+		{"__index", pb_messagefield_get},
+		{"__newindex", pb_messagefield_set},
+		{NULL, NULL}
+};
+
 int LuaPB::openlib(lua_State* L)
 {
 	luaL_newmetatable(L, sMessageMeta);
@@ -493,6 +653,8 @@ int LuaPB::openlib(lua_State* L)
 	luaL_newmetatable(L, sRepeatedMessageMeta);
 	luaL_register(L, NULL, pbrepeatedlib_m);
 
+	luaL_newmetatable(L, sMessageFieldMeta);
+	luaL_register(L, NULL, pbmessagefieldlib_m);
 	return 1;
 }
 
@@ -509,3 +671,4 @@ int LuaPB::pushMessage(lua_State* L, google::protobuf::Message *message)
 const char* LuaPB::sRepeatedMessageMeta = "RepeatedMessageMeta";
 const char* LuaPB::sRepeatedMessageCore = "luaRepeatedMessageCore";
 const char* LuaPB::sMessageMeta = "MessageMeta";
+const char* LuaPB::sMessageFieldMeta = "MessageFieldMeta";

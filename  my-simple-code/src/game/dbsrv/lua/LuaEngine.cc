@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#include <mysdk/base/Logging.h>
+using namespace mysdk;
 
 LuaEngine::LuaEngine()
 {
@@ -37,19 +39,24 @@ int LuaEngine::dofile(const char *filename)
 		 if(luaL_dofile(luaState_, filename) != 0)
 		 {
 			 //
-			 printf("[LuaEngine] LuaEngine::dofile(%s) error!!\n", filename);
-			 exit(1);
+			 //printf("[LuaEngine] LuaEngine::dofile(%s) error!!\n", filename);
+			 //exit(1);
+			 LOG_WARN << "[LuaEngine] LuaEngine::dofile( " << filename << ")error, result: " << lua_tostring(luaState_, -1);
+			 return -1;
 		 }
 	}
 	else
 	{
-		printf("[LuaEngine] LuaEngine::dofile lua path is: %s\n",luapath);
+		//printf("[LuaEngine] LuaEngine::dofile lua path is: %s\n",luapath);
+		LOG_INFO << "[LuaEngine] LuaEngine::dofile lua path is: " << luapath;
 		char name[1024];
 		snprintf(name, 1023, "%s/%s", luapath, filename);
 		if(luaL_dofile(luaState_, name) != 0)
 		{
-			printf("[LuaEngine] LuaEngine::dofile(%s) error, result:%s!!\n", name, lua_tostring(luaState_, -1));
-			exit(1);
+			//printf("[LuaEngine] LuaEngine::dofile(%s) error, result:%s!!\n", name, lua_tostring(luaState_, -1));
+			//exit(1);
+			LOG_WARN << "[LuaEngine] LuaEngine::dofile( " << filename << ")error, result: " << lua_tostring(luaState_, -1);
+			 return -1;
 		}
 	}
 	return 0;
