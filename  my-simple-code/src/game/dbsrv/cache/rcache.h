@@ -26,7 +26,7 @@ namespace rcache {
 		bool Connect();
 		void Run(int curTime);
 		void Shutdown();
-		bool SetServerAddr(const std::string& ip, int port);
+		bool SetServerAddr(const std::string& ip, int port, const std::string& password, int dbid);
 
 		bool Ping();
 	public:

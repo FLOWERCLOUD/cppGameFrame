@@ -28,10 +28,12 @@ bool Cache::Init()
 	return true;
 }
 
-bool Cache::SetServerAddr(const std::string& ip, int port)
+bool Cache::SetServerAddr(const std::string& ip, int port, const std::string& password, int dbid)
 {
 	m_redisIP = ip;
 	m_redisPort = port;
+	m_Password = password;
+	m_DBid = dbid;
 	return true;
 }
 

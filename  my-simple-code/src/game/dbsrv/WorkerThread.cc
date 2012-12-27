@@ -53,7 +53,9 @@ void WorkerThread::start()
 	// redis
 	std::string redisAddr = sConfigMgr.MainConfig.GetStringDefault("redis", "addr", "127.0.0.1");;
 	int redisPort = sConfigMgr.MainConfig.GetIntDefault("redis", "port", 6379) ;
-	readis_.SetServerAddr(redisAddr, redisPort);
+	std::string pas = sConfigMgr.MainConfig.GetStringDefault("redis", "password", "");
+	int dbid = sConfigMgr.MainConfig.GetIntDefault("redis", "dbid", 0) ;
+	readis_.SetServerAddr(redisAddr, redisPort, pas, dbid);
 	readis_.ReConnect();
 	// mysql
 	std::string host = sConfigMgr.MainConfig.GetStringDefault("mysql", "host", "192.168.1.6");
