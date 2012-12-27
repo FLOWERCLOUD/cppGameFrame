@@ -52,14 +52,10 @@ void WriterThread::threadHandler()
 	while (true)
 	{
 		WriterThreadParam param = queue_.take();
-		size_t queue_size = queue_.size();
+
 		static size_t warn_queue_size = sConfigMgr.MainConfig.GetIntDefault("writerthread", "warn_queue_size", 1000);
 		static size_t max_writesql_num = sConfigMgr.MainConfig.GetIntDefault("writerthread", "max_writesql_num", 100);
-		if (queue_size >= warn_queue_size)
-		{
-			LOG_WARN << "write thread queue size too larger, size: " << queue_size
-								<< " threadid: " << id_;
-		}
+
 		if (param.Type == WRITERTHREAD_CMD)
 		{
 			handler(param);
@@ -73,6 +69,13 @@ void WriterThread::threadHandler()
 		else if (param.Type == WRITERTHREAD_PING)
 		{
 			mysql_.ping();
+
+			size_t queue_size = queue_.size();
+			if (queue_size >= warn_queue_size)
+			{
+				LOG_WARN << "write thread queue size too larger, size: " << queue_size
+									<< " threadid: " << id_;
+			}
 		}
 		else if (param.Type == WRITERTHREAD_STOP)
 		{

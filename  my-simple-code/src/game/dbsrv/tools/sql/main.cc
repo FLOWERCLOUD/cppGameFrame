@@ -99,7 +99,8 @@ int main(int argc, char* argv[])
 		std::string name = descriptor->field(i)->name();
 		const google::protobuf::FieldDescriptor* fieldDescriptor = descriptor->field(i);
 		bool flag = false;
-		for (int j = 0; j < tablename.size(); j++)
+		int size = static_cast<int>(tablename.size());
+		for (int j = 0; j < size; j++)
 		{
 			if (name == tablename[j])
 			{
@@ -125,10 +126,11 @@ int main(int argc, char* argv[])
 	}
 	std::stringstream sqlbuf;
 	sqlbuf << "alter table user2 ";
-	for (int i = 0; i < field.size(); i++)
+	int size = static_cast<int>(field.size());
+	for (int i = 0; i < size; i++)
 	{
 		sqlbuf << field[i];
-		if (i != field.size() - 1)
+		if (i != size - 1)
 		{
 			sqlbuf << ",";
 		}
