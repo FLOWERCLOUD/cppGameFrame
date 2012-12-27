@@ -1,0 +1,69 @@
+#!/usr/bin/perl
+
+use FileHandle;
+
+$server = $ARGV[0];
+$lines = $ARGV[1];
+$name = $server . "_log";
+$path = $ARGV[2] or '/';
+
+
+STDOUT->autoflush;
+chdir("$path");
+openLog();
+while (my $line = <STDIN>)
+{
+	$count++;
+	print LOG $line;
+
+	my($logtype) = (split (/\s+/, $line))[2];
+	if ($logtype eq "SQL")
+	{
+		my($startpos) = index($line, "-", 30);
+		if ($startpos != -1)
+		{
+			my($endpos) = rindex($line, "-");
+			if ($endpos != -1 && $startpos != $endpos)
+			{
+				printf "%s\n", substr($line, $startpos + 1, $endpos - $startpos - 1);
+			}
+		}
+	}
+	
+	if ($count >= $lines)
+	{
+		rotateLog();
+	}
+}
+close(LOG);
+#rename "$name+", "$name";
+$datetag = `date +%y%m%d_%H%M%S`;
+system("mv $name+ ${name}_${datetag}");
+
+
+# Perform a rotation.
+sub rotateLog
+{
+	my ($logdir) = "../../log";
+	my ($datetag) = `date +%y%m%d_%H%M%S`;
+	my ($host) = `uname -n`;
+	chop($datetag, $host);
+
+	close(LOG);
+	rename "$name+", "$name-";
+	openLog();
+	system("mv $name- ${logdir}/${host}_${server}_log_${datetag}");
+}
+
+
+# Open the active log for writing.
+sub openLog
+{
+	open(LOG, ">$name+") or die "Can't open $name: $!\n";
+	$oldfh = select(LOG);
+	# disable output buffering
+	$| = 1;
+	select($oldfh);
+	$count = 0;
+}
+

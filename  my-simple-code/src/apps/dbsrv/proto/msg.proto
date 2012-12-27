@@ -1,0 +1,83 @@
+package db_srv;
+
+/*
+ * cmd: db.set
+ * set uid pet user pet_bin user_bin
+ */
+message set{
+    required int32 uid = 1;
+    required string argback = 2;
+    message table{
+        required string table_name = 1;
+        required bytes table_bin = 2;
+    }
+    repeated table tables = 3;
+}
+
+message set_reply{
+   required int32 uid = 1;
+   required string argback = 2;
+   message table_status{
+        required string table_name = 1;
+        //若保存成功, 则返回OK
+        required string status = 2; 
+   }   
+   repeated table_status table_statuses = 3;
+}
+
+/*
+ * cmd: db.get
+ * get uid pet user
+ */
+message get{
+    required int32 uid = 1;
+    required string argback = 2;
+    repeated string table_name = 3;
+}
+
+message get_reply{
+    required int32 uid = 1;
+    required string argback = 2;
+    message table{
+        required string table_name = 1;
+        //若请求的table_name不存在, 则对应的table_bin为空串
+        required bytes table_bin = 2;
+        /* 0 失败  1不存在 2 从redis 拿的数据  3 从mysql拿到的数据 */
+        required int32 table_status = 3; 
+    }
+    repeated table tables = 3;
+}
+
+/*
+ * cmd: db.mget
+ *用于实现 mget uid1:user uid2:user uid:user
+ *1.拿好友列表的个人信息
+ *
+ */
+message mget{
+    required int32 uid = 1;
+    required string argback = 2;
+    message user_table{
+        required int32 uid = 1;
+        required string table_name = 2;
+    }
+    repeated user_table user_tables = 3;
+}
+/*
+ * cmd db.mget
+ */
+message mget_reply{
+    required int32 uid = 1;
+    required string argback = 2;
+    message user_table{
+        required int32 uid = 1;
+        required string table_name = 2;
+        required bytes table_bin = 3;
+    }
+    repeated user_table tables = 3;
+}
+
+message lua{
+    required int32 uid = 1;
+    required string argback = 2;
+}

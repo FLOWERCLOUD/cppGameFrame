@@ -1,0 +1,23 @@
+package lm;
+message test
+{
+	required int32 uid = 1;
+	required int32 param = 2;
+	optional string param1 = 3;
+};
+
+message user2
+{
+	required int32 uid = 1;
+	required string uname = 2;
+	optional int32 param1 = 3;
+	optional string param2 = 4;
+	message msgt
+	{
+		required int32 uid = 1;
+		required int32 param = 2;
+		optional string param1 = 3;
+	};
+	optional msgt msg = 5;
+	optional string param3 = 6;
+};
