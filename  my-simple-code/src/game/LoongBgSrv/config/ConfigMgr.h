@@ -1,9 +1,3 @@
-/*
- * ConfigMgr.h
- *
- *  Created on: 2012-4-9
- *    
- */
 
 #ifndef GAME_CONFIGMGR_H_
 #define GAME_CONFIGMGR_H_
