@@ -16,9 +16,27 @@ set(CXX_FLAGS
  -Wpointer-arith
  -Wshadow
  -Wwrite-strings
+ -march=i686
+<<<<<<< .mine #-Werror
+ #-Wconversion
+ #-Wno-unused-parameter
+ #-Wold-style-cast
+ #-Woverloaded-virtual
+ #-Wpointer-arith
+ #-Wshadow
+ #-Wwrite-strings
+ #-march=i686
+======= -Werror
+ -Wconversion
+ -Wno-unused-parameter
+ -Wold-style-cast
+ -Woverloaded-virtual
+ -Wpointer-arith
+ -Wshadow
+ -Wwrite-strings
  #-march=i686
   -march=x86-64
- # -MMD
+>>>>>>> .theirs # -MMD
  -std=c++0x
  -rdynamic
  )

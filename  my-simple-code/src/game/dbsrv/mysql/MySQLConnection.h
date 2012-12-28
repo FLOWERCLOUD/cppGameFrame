@@ -38,7 +38,7 @@ public:
 		unsigned long format_to_real_string(char *to, const char *from, unsigned long length);
 
 		operator bool() const { return mysql_ != NULL; }
-		void ping() { mysql_ping(mysql_); }
+		void ping() { if(mysql_) mysql_ping(mysql_); }
 
 		uint32 getLastError() { return mysql_errno(mysql_); }
 

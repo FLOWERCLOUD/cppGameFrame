@@ -26,24 +26,13 @@ function test()
 	table3.table_bin = table_bin;
 	
 	local function assert_function(retmsg)
-		print("start test5 result ============================== ");
-		if retmsg.uid == 1111 and retmsg.argback== "test5" then
+		print("\nstart check test5============");
+		if retmsg.uid == 1111 then
 			local size = retmsg.table_statuses.size();
 			for i = 1, size do
-				if retmsg.table_statuses[i].status == "ok" then
-					print(" test success table " .. retmsg.table_statuses[i].table_name);
-				end
+				assert_equal(retmsg.table_statuses[i].status, "OK",  "", 1);
 			end
-			
-			print("test5 success");
-			print("end test5 result ==============================\n ");
-			--os.exit();
-			return true;
-		end
-		
-		print("test 5 error");
-		print("end test5 result ==============================\n ");
-		return false;
+		end	
 	end
 	
 	return msg, assert_function;

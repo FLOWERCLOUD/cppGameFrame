@@ -1,9 +1,10 @@
 
 module(..., package.seeall);
 
-function test2()
+local uid = 1111;
+function test()
 	local msg = pb.new("db_srv.set");
-	msg.uid = 1111;
+	msg.uid = uid;
 	msg.argback = "test2";
 	
 	local table1 = msg.tables.add();
@@ -14,28 +15,20 @@ function test2()
 	table2.table_name = "pet";
 	table2.table_bin = "dsfjsdkafjkjfksajfkjskdfjklasjfkdljafjalj";
 	
-	local function assert_function(retmsg)
-		print("start test2 result ============================== ");
-		if retmsg.uid == 1111 and retmsg.argback== "test2" then
+	local function checktest(retmsg)
+		print("\nstart check test2============");
+		if retmsg.uid == uid  then
 			local size = retmsg.table_statuses.size();
 			for i = 1, size do
 				if retmsg.table_statuses[i].status == "OK" then
 					print(" test success table " .. retmsg.table_statuses[i].table_name);
 				end
 			end
-			
-			print("test2 success");
-			print("end test2 result ==============================\n ");
-			--os.exit();
-			return true;
 		end
-		
-		print("test 2 error");
-		print("end test2 result ==============================\n ");
-		return false;
 	end
 	
-	return msg, assert_function;
+	return msg, checktest;
 end
 
-addTestUnit(test2);
+-- 添加到测试用例中出
+addTestUnit(test);

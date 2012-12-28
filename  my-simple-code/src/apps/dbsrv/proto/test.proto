@@ -15,7 +15,7 @@ message user2
 	message msgt
 	{
 		required int32 uid = 1;
-		required int32 param = 2;
+		optional int32 param = 2;
 		optional string param1 = 3;
 	};
 	optional msgt msg = 5;

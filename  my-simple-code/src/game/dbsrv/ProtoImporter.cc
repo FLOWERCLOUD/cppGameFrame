@@ -36,7 +36,7 @@ ProtoImporter::ProtoImporter():
 		}
 		//printf("[ProtoImporter] protopath:%s\n", protopath);
 		LOG_INFO << "[ProtoImporter] protopath:" << protopath;
-		std::string filenames = sConfigMgr.MainConfig.GetStringDefault("proto", "filelist", "test.proto");
+		std::string filenames = sConfigMgr.MainConfig.GetStringDefault("proto", "filelist", "game.proto");
 
 		std::vector<std::string> vec = StrSplit(filenames, ",");
 		for (size_t i = 0; i < vec.size(); i++)

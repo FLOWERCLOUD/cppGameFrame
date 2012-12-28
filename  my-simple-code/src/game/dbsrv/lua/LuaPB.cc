@@ -214,7 +214,7 @@ static int pb_repeated_add(lua_State* L)
 
 static int pb_messagefield_get(lua_State* L)
 {
-	printf("pb_messagefield_get===============\n");
+	//printf("pb_messagefield_get===============\n");
 	luaL_checkudata(L, 1, LuaPB::sMessageFieldMeta);
 	LuaMessageField* luamsgfield  = static_cast<LuaMessageField*>(lua_touserdata(L, 1));
     luaL_argcheck(L, luamsgfield != NULL, 1, "pb_messagefield_get userdata expected, luamsg is null");
@@ -402,11 +402,13 @@ static int pb_get(lua_State* L)
 			}
 			else if(field->type() == google::protobuf::FieldDescriptor::TYPE_STRING)
 			{
-				lua_pushstring(L, reflection->GetString(*message, field).data());
+				std::string str(reflection->GetString(*message, field));
+				lua_pushlstring(L, str.c_str(), str.length());
 			}
 			else if(field->type() == google::protobuf::FieldDescriptor::TYPE_BYTES)
 			{
-				lua_pushstring(L, reflection->GetString(*message, field).data());
+				std::string str(reflection->GetString(*message, field));
+				lua_pushlstring(L, str.c_str(), str.length());
 			}
 			else if(field->type() == google::protobuf::FieldDescriptor::TYPE_INT32)
 			{
@@ -457,14 +459,17 @@ static int pb_set(lua_State* L)
     if(field->type() == google::protobuf::FieldDescriptor::TYPE_STRING)
     {
     	luaL_checktype(L, 3, LUA_TSTRING);
-        const char *str = static_cast<const char *>(lua_tostring(L, 3));
+    	size_t strlen;
+        const char *str = static_cast<const char *>(lua_tolstring(L, 3, &strlen));
         reflection->SetString(message, field, str);
     }
     else if (field->type() == google::protobuf::FieldDescriptor::TYPE_BYTES)
     {
     	luaL_checktype(L, 3, LUA_TSTRING);
-        const char *str = static_cast<const char *>(lua_tostring(L, 3));
-        reflection->SetString(message, field, str);
+    	size_t strlen;
+        const char *str = static_cast<const char *>(lua_tolstring(L, 3, &strlen));
+        std::string strstr(str, strlen);
+        reflection->SetString(message, field, strstr);
     }
     else if(field->type() == google::protobuf::FieldDescriptor::TYPE_INT32)
     {
@@ -508,7 +513,7 @@ static int pb_import(lua_State* L)
 	 {
 		 fprintf(stderr, "filename:%s file descriptor error\n", filename);
 	 }
-	 printf("name: %s, package: %s, debugstr: %s\n", filedescriptor->name().c_str(), filedescriptor->package().c_str(), filedescriptor->DebugString().c_str());
+	 //printf("name: %s, package: %s, debugstr: %s\n", filedescriptor->name().c_str(), filedescriptor->package().c_str(), filedescriptor->DebugString().c_str());
 
 	return 0;
 }
@@ -603,8 +608,13 @@ static int pb_parseFromString(lua_State* L)
 
     google::protobuf::Message *message = luamsg->msg;
 
-    const char* msgbin = static_cast<const char*>(lua_tostring(L, 2));
-    message->ParseFromString(msgbin);
+    luaL_checktype(L, 2, LUA_TSTRING);
+
+    size_t bin_len;
+    const char* bin = static_cast<const char*>(lua_tolstring(L, 2, &bin_len));
+
+    message->ParseFromArray(bin, bin_len);
+    //printf("parsefromstring: %s\n", message->DebugString().c_str());
     return 0;
 }
 

@@ -184,7 +184,9 @@ std::string PBSql::buildReplaceSql(const google::protobuf::Message* message, con
 		{
 			const google::protobuf::Message& msg = reflection->GetMessage(*message, field);
 
-			std::string str(msg.SerializeAsString());
+			std::string str;
+			msg.SerializeToString(&str);
+			//std::string str(msg.SerializeAsString());
 			char str_rs[1024 * 20]; // 20k空间
 			unsigned long len = mysql.format_to_real_string(str_rs, str.c_str(), str.length());
 			if (len == 0) return "";

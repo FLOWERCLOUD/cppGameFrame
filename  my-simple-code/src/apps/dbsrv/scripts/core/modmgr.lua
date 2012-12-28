@@ -1,8 +1,4 @@
-
 module(..., package.seeall)
-
-local modloader = require("utils/modloader");
-local module_map = {};
 
 local debug_traceback = debug.traceback;
 local unpack, select = unpack, select;
@@ -12,45 +8,72 @@ pcall = function(f, ...)
 	return xpcall(function() return f(unpack(params, 1, n)) end, function(e) return tostring(e).."\n"..debug_traceback(); end);
 end
 
+local module_map = {};
 function load(modname)
 	if not module_map[modname] then 
-		local mod, err = modloader.load_code(modname);
+		local mod = require(modname);
 		if not mod then
-			print("load mod error, result: " .. err);
-			return;
+			return nil, "mod load fail";
 		end
-		local module = 
-		{
-			[module] = mod,
-			[name] = modname,
-			[path] = err,
-		};
-		module_map[modname] = module;
+		-- 初始化一下模块哦
+		call_module_method(mod, "load");
+		
+		module_map[modname] = mod;
+		return mod, "module load success";
 	else
-		print("mod has load");
+		return nil, "module has load";
 	end
 end
 
 function unload(modname)
 	if not module_map[modname] then
-		print("this mod not load");
+		return nil, "module not load";
 	end
+	-- 卸载模块的时候 清理一下模块吧
+	call_module_method(module_map[modname], "unload");
+	
+	_G[modname] = nil;
+	package.loaded[modname] = nil;
 	module_map[modname] = nil;
-	print("mod has unload");
+	return true, "module unload success";
 end
 
 function reload(modname)
+	if not module_map[modname] then 
+		return nil, "module-not-loaded"; 
+	end
+	-- reload模块的时候 是不是有数据要保存起来的
+	local ok, data = call_module_method(module_map[modname], "save");
+
+	_G[modname] = nil;
+	package.loaded[modname] = nil;
+	require(modname);
+	call_module_method(module_map[modname], "unload");
+	module_map[modname] = nil;
+	
+	load(modname);
+	
+	-- 是否有模块数据 要恢复的
+	if ok then
+		call_module_method(module_map[modname], "restore", data);
+	end
+	
+	return module_map[modname], "module reload success";
 end
 
 function module_has_method(module, method)
-	return type(module.module[method]) == "function";
+	return type(module[method]) == "function";
 end
 
 function call_module_method(module, method, ...)
 	if module_has_method(module, method) then
-		local f = module.module[method];
+		local f = module[method];
 		return pcall(f, ...);
 	else
 		return false, "no-such-method";
 	end
+end
+
+function get_module(modname)
+	return module_map[modname];
 end

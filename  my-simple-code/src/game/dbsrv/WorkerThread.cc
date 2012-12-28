@@ -80,7 +80,7 @@ void WorkerThread::start()
 
 void WorkerThread::reloadLua()
 {
-	std::string filenames = sConfigMgr.MainConfig.GetStringDefault("lua", "filelist", "test.lua");
+	std::string filenames = sConfigMgr.MainConfig.GetStringDefault("lua", "filelist", "server.lua");
 
 	std::vector<std::string> vec = StrSplit(filenames, ",");
 	for (size_t i = 0; i < vec.size(); i++)
@@ -160,7 +160,7 @@ bool WorkerThread::loadFromRedis(int uid, const std::string& tablename, ::db_srv
 	if (reply && reply->type == REDIS_REPLY_STRING)
 	{
 		table->set_table_name(tablename);
-		table->set_table_bin(reply->str);
+		table->set_table_bin(reply->str, reply->len);
 		table->set_table_status(2); //从redis拿的数据
 
 		readis_.FreeReplyObject(reply);
@@ -182,6 +182,14 @@ bool WorkerThread::isParseTable(const std::string& tablename, std::string& outTy
 
 bool WorkerThread::loadFromMySql(int uid, const std::string& tablename, ::db_srv::get_reply_table* table)
 {
+	if (!mysql_)
+	{
+		table->set_table_name(tablename);
+		table->set_table_bin("");
+		table->set_table_status(0); // 数据库连不上了
+		return false;
+	}
+
 	std::string typeName;
 	if (isParseTable(tablename, typeName))
 	{
@@ -284,6 +292,7 @@ bool WorkerThread::saveToRedis(int uid, const ::db_srv::set_table& set_table, ::
 {
 	char rediskey[100];
 	snprintf(rediskey, 99, "%s:%d", set_table.table_name().c_str(), uid);
+	//printf("%s : %s: len[%d]\n", rediskey, set_table.table_bin().c_str(), set_table.table_bin().length());
 	redisReply* reply = static_cast<redisReply*>(readis_.RedisCommand("SET %s %b", rediskey, set_table.table_bin().c_str(), set_table.table_bin().length()));
 	if (!reply)
 	{
@@ -417,7 +426,7 @@ bool WorkerThread::loadFromRedis(int uid, const std::string& tablename, ::db_srv
 	{
 		table->set_uid(uid);
 		table->set_table_name(tablename);
-		table->set_table_bin(reply->str);
+		table->set_table_bin(reply->str, reply->len);
 
 		readis_.FreeReplyObject(reply);
 		return true;
@@ -673,6 +682,7 @@ void WorkerThread::onUnknownMessage(int conId, google::protobuf::Message* messag
 }
 
 #include "lua/LuaPB.h"
+#include "ProtoImporter.h"
 void WorkerThread::onLuaMessage(int conId, google::protobuf::Message* message)
 {
 	reloadLua();
