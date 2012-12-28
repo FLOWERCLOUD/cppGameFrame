@@ -8,16 +8,7 @@ set(CXX_FLAGS
  -Wall
  -Wextra
  # -m32
- -Werror
- -Wconversion
- -Wno-unused-parameter
- -Wold-style-cast
- -Woverloaded-virtual
- -Wpointer-arith
- -Wshadow
- -Wwrite-strings
- -march=i686
-<<<<<<< .mine #-Werror
+ #-Werror
  #-Wconversion
  #-Wno-unused-parameter
  #-Wold-style-cast
@@ -26,17 +17,6 @@ set(CXX_FLAGS
  #-Wshadow
  #-Wwrite-strings
  #-march=i686
-======= -Werror
- -Wconversion
- -Wno-unused-parameter
- -Wold-style-cast
- -Woverloaded-virtual
- -Wpointer-arith
- -Wshadow
- -Wwrite-strings
- #-march=i686
-  -march=x86-64
->>>>>>> .theirs # -MMD
  -std=c++0x
  -rdynamic
  )
