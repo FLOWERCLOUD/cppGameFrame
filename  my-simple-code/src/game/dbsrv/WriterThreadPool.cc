@@ -72,6 +72,23 @@ void WriterThreadPool::ping()
 	}
 }
 
+#include <sstream>
+std::string WriterThreadPool::getQueueInfo()
+{
+	std::stringstream buf;
+	buf << "[";
+	for (int i = 0; i < threadnum_; i++)
+	{
+		buf << "{";
+		buf << i;
+		buf << ":";
+		buf << threads_[i]->getQueueSize();
+		buf << "}";
+	}
+	buf << "]";
+	return buf.str();
+}
+
 int WriterThreadPool::getThreadNum()
 {
 	return threadnum_;

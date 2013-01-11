@@ -28,6 +28,7 @@ set(dbsrv_SRCS
   main.cc
   PBSql.cc
   ProtoImporter.cc
+  SrvStateInfo.cc
   Util.cc
   WorkerThread.cc
   WorkerThreadPool.cc

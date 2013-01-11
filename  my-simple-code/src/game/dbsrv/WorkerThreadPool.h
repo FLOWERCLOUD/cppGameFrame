@@ -2,6 +2,7 @@
 #ifndef WORKERTHREADPOOL_H_
 #define WORKERTHREADPOOL_H_
 
+#include <string>
 #include <vector>
 
 #include <mysdk/base/Singleton.h>
@@ -20,6 +21,7 @@ public:
 	int push(struct ThreadParam& param);
 
 	void ping();
+	std::string getQueueInfo();
 private:
 	std::vector<WorkerThread* > asyncThreads_;
 };

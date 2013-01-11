@@ -34,6 +34,7 @@ public:
 	void stop();
 
 	void push(WriterThreadParam& param);
+	size_t getQueueSize();
 private:
 	void threadHandler();
 	void handler(WriterThreadParam& param);

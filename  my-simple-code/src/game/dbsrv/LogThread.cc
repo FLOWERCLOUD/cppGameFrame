@@ -139,7 +139,7 @@ void LogThread::rotateLog(LogFileType type)
 		lines_[type] = 0;
 	}
 }
-
+#include <string.h>
 void LogThread::renameLog(LogFileType type)
 {
 	char newpath[100];
@@ -149,10 +149,11 @@ void LogThread::renameLog(LogFileType type)
 
 	if(rename(getFileName(type).c_str(), newpath) != 0)
 	{
-		fprintf(stderr, "LogThread::renameLog, rename error, errno: %d\n", errno);
+		char buf[100];
+		fprintf(stderr, "LogThread::renameLog, rename error, errno: %d, %s, %s\n", errno, strerror_r(errno, buf, sizeof(buf) - 1), newpath);
 	}
 }
-#include <string.h>
+
 void LogThread::log(int level, const char* file, int line, const char* funcname, const char* msg, ...)
 {
 	if(!bstart_)return;

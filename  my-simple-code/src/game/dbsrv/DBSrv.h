@@ -56,7 +56,7 @@ public:
 
 	void tickMe();
 	void ping();
-
+	void srvinfo();
 private:
 	KabuCodec codec_;
 	ConMapT conMap_;

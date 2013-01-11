@@ -85,11 +85,14 @@ static void remove_pidfile(const char *pid_file)
       vperror("Could not remove the pid file %s", pid_file);
   }
 }
-
+#include "LogThread.h"
 int main(int argc, char **argv)
 {
 	// 设置要打印日志等级
 	//Logger::setLogLevel(Logger::INFO);
+
+	int logLevel = sConfigMgr.MainConfig.GetIntDefault("log", "logLevel", 0);
+	sLogThread.start("dbsrv", logLevel);
 
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 	int defalutPort = 5007;  //默认端口
@@ -296,5 +299,8 @@ int main(int argc, char **argv)
     }
 
 	google::protobuf::ShutdownProtobufLibrary();
+
+	sLogThread.stop();
+
 	return 0;
 }

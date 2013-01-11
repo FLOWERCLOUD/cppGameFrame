@@ -42,6 +42,7 @@ public:
 	void stop();
 
 	void push(struct ThreadParam& param);
+	size_t getQueueSize();
 private:
 	void threadHandler();
 

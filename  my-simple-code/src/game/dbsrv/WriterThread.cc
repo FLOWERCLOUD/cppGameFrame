@@ -47,6 +47,11 @@ void WriterThread::push(WriterThreadParam& param)
 	queue_.put(param);
 }
 
+size_t WriterThread::getQueueSize()
+{
+	return queue_.size();
+}
+
 static size_t saveSqlNum = 0;
 void WriterThread::threadHandler()
 {

@@ -147,6 +147,7 @@ DBSrv::DBSrv(EventLoop* loop, InetAddress& serverAddr):
 
 	 loop->runEvery(1, std::tr1::bind(&DBSrv::tickMe, this));
 	 loop->runEvery(10, std::tr1::bind(&DBSrv::ping, this));
+	 loop->runEvery(3, std::tr1::bind(&DBSrv::srvinfo, this));
 
 	 mysql_library_init(0, NULL, NULL);
 }
@@ -170,8 +171,16 @@ void DBSrv::ping()
 	sWriterThreadPool.ping();
 }
 
+#include "SrvStateInfo.h"
+void DBSrv::srvinfo()
+{
+	sSrvStateInfo.statistics(3);
+}
+
 void DBSrv::start()
 {
+	sSrvStateInfo.start();
+
 	setupSignalHandlers();
 
 	int workthreadnum = static_cast<int>(sConfigMgr.MainConfig.GetIntDefault("thread", "workthreadnum", 8));
@@ -180,8 +189,6 @@ void DBSrv::start()
 	int writethreadnum = static_cast<int>(sConfigMgr.MainConfig.GetIntDefault("thread", "writethreadnum", 8));
 	sWriterThreadPool.start(writethreadnum);
 
-	int logLevel = sConfigMgr.MainConfig.GetIntDefault("log", "logLevel", 0);
-	sLogThread.start("dbsrv", logLevel);
 	server_.start();
 }
 
@@ -189,7 +196,7 @@ void DBSrv::stop()
 {
 	sWorkThreadPool.stop();
 	sWriterThreadPool.stop();
-	sLogThread.stop();
+
 }
 
 static int nextid = 0;
@@ -217,7 +224,9 @@ void DBSrv::onConnectionCallback(mysdk::net::TcpConnection* pCon)
 	}
 }
 
-
+#include "SrvStateInfo.h"
+#include <google/protobuf/message.h>
+#include <google/protobuf/descriptor.h>
 void DBSrv::onKaBuMessage(mysdk::net::TcpConnection* pCon,
 		google::protobuf::Message* msg,
 		mysdk::Timestamp timestamp)
@@ -232,6 +241,9 @@ void DBSrv::onKaBuMessage(mysdk::net::TcpConnection* pCon,
 	param.msg = msg;
 	param.conId = context->conId;
 	sWorkThreadPool.push(param);
+
+	// 添加统计信息
+	sSrvStateInfo.addReqNum();
 }
 
 void DBSrv::sendReply(int conId, google::protobuf::Message* message)

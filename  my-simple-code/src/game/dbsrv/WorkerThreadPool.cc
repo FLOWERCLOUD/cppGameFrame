@@ -53,6 +53,24 @@ int WorkThreadPool::push(struct ThreadParam& param)
 	return nextThreadId;
 }
 
+#include <sstream>
+std::string WorkThreadPool::getQueueInfo()
+{
+	std::stringstream buf;
+	buf << "[";
+	size_t threadnum = asyncThreads_.size();
+	for (size_t i = 0; i < threadnum; i++)
+	{
+		buf << "{";
+		buf << i;
+		buf << ":";
+		buf << asyncThreads_[i]->getQueueSize();
+		buf << "}";
+	}
+	buf << "]";
+	return buf.str();
+}
+
 void WorkThreadPool::ping()
 {
 	struct ThreadParam param;

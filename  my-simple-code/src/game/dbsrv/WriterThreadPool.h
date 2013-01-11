@@ -22,6 +22,7 @@ public:
 	int getThreadNum();
 	void ping();
 
+	std::string getQueueInfo();
 public:
 	char* NewSqlBuf(size_t size)
 	{

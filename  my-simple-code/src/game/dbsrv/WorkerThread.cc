@@ -121,6 +121,11 @@ void WorkerThread::push(struct ThreadParam& param)
 	queue_.put(param);
 }
 
+size_t WorkerThread::getQueueSize()
+{
+	return queue_.size();
+}
+
 void WorkerThread::threadHandler()
 {
 	LOGEX_INFO("WorkerThread::threadHandler start... id[%d]", id_ );
