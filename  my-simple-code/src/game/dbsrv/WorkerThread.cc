@@ -153,7 +153,7 @@ void WorkerThread::handler(struct ThreadParam& param)
 {
 	int conId = param.conId;
 	google::protobuf::Message* message = static_cast<google::protobuf::Message*>(param.msg);
-	LOGEX_DEBUG("%d, %s, %s", conId, message->GetTypeName().c_str(), message->DebugString().c_str());
+	LOGEX_DEBUG("%d, %s", conId, message->GetTypeName().c_str());
 	dispatcher_.onProtobufMessage(conId, message);
 }
 
