@@ -1,15 +1,9 @@
 
 #include <game/dbsrv/WriterThreadPool.h>
 
-WriterThreadPool::WriterThreadPool(int threadnum):
-	threadnum_(threadnum)
+WriterThreadPool::WriterThreadPool():
+	threadnum_(0)
 {
-	threads_.resize(threadnum);
-
-	for (int i = 0; i < threadnum; i++)
-	{
-		threads_[i] = new WriterThread(i + 1);
-	}
 }
 
 WriterThreadPool::~WriterThreadPool()
@@ -20,8 +14,15 @@ WriterThreadPool::~WriterThreadPool()
 	}
 }
 
-void WriterThreadPool::start()
+void WriterThreadPool::start(int threadnum)
 {
+	threadnum_ = threadnum;
+	threads_.resize(threadnum);
+	for (int i = 0; i < threadnum; i++)
+	{
+		threads_[i] = new WriterThread(i + 1);
+	}
+
 	for (int i = 0; i < threadnum_; i++)
 	{
 		threads_[i]->start();

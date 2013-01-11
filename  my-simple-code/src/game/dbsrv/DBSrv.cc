@@ -4,6 +4,9 @@
 #include <game/dbsrv/WorkerThread.h>
 #include <game/dbsrv/version.h>
 
+#include "config/ConfigMgr.h"
+#include "LogThread.h"
+
 #include <string.h>
 #include <signal.h>
 //#define HAVE_BACKTRACE
@@ -46,12 +49,12 @@ static void *getMcontextEip(ucontext_t *uc) {
 
 void bugReportStart()
 {
-	LOG_WARN << "=== DBSrv BUG REPORT START: Cut & paste starting from here ===";
+	LOGEX_WARN("=== DBSrv BUG REPORT START: Cut & paste starting from here ===");
 }
 
 void bugReportEnd()
 {
-	  LOG_WARN <<  "=== DBSrv BUG REPORT END. Make sure to include from START to END. ===";
+	  LOGEX_WARN("=== DBSrv BUG REPORT END. Make sure to include from START to END. ===");
 }
 
 static void sigsegvHandler(int sig, siginfo_t *info, void *secret)
@@ -60,7 +63,7 @@ static void sigsegvHandler(int sig, siginfo_t *info, void *secret)
     struct sigaction act;
 
     bugReportStart();
-    LOG_WARN << "    DBSrv "  << DBSRVVERSION << " crashed by signal: " << sig;
+    LOGEX_WARN("    DBSrv %d, crashed by signal: %d", DBSRVVERSION, sig);
 
 	void *trace[100];
     /* Generate the stack trace */
@@ -71,10 +74,10 @@ static void sigsegvHandler(int sig, siginfo_t *info, void *secret)
         trace[1] = getMcontextEip(uc);
     }
     char **messages = backtrace_symbols(trace, trace_size);
-    LOG_WARN << "--- STACK TRACE" ;
+    LOGEX_WARN("--- STACK TRACE") ;
     for (int i=1; i<trace_size; ++i)
     {
-    	 LOG_WARN << messages[i];
+    	LOGEX_WARN("%s", messages[i]);
     }
 
     bugReportEnd();
@@ -95,7 +98,7 @@ static void sigsegvHandler(int sig, siginfo_t *info, void *secret)
 static bool shutdownSrv = false;
 static void sigtermHandler(int sig)
 {
-    LOG_WARN << "Received SIGTERM, scheduling shutdown...";
+    LOGEX_WARN("Received SIGTERM, scheduling shutdown...");
     shutdownSrv = true;
 }
 
@@ -122,7 +125,7 @@ void setupSignalHandlers(void)
     return;
 }
 
-DBSrv::DBSrv(EventLoop* loop, InetAddress& serverAddr, int workthreadnum, int writethreadnum):
+DBSrv::DBSrv(EventLoop* loop, InetAddress& serverAddr):
 	codec_(
 			std::tr1::bind(&DBSrv::onKaBuMessage,
 			this,
@@ -130,9 +133,7 @@ DBSrv::DBSrv(EventLoop* loop, InetAddress& serverAddr, int workthreadnum, int wr
 			std::tr1::placeholders::_2,
 			std::tr1::placeholders::_3)),
 	loop_(loop),
-	server_(loop, serverAddr, "DBSrv"),
-	threadPool_(this, workthreadnum),
-	writeThreadPool_(writethreadnum)
+	server_(loop, serverAddr, "dbsrv")
 {
 	server_.setConnectionCallback(std::tr1::bind(&DBSrv::onConnectionCallback,
 																this,
@@ -165,22 +166,30 @@ void DBSrv::tickMe()
 
 void DBSrv::ping()
 {
-	threadPool_.ping();
-	writeThreadPool_.ping();
+	sWorkThreadPool.ping();
+	sWriterThreadPool.ping();
 }
 
 void DBSrv::start()
 {
 	setupSignalHandlers();
-	threadPool_.start();
-	writeThreadPool_.start();
+
+	int workthreadnum = static_cast<int>(sConfigMgr.MainConfig.GetIntDefault("thread", "workthreadnum", 8));
+	sWorkThreadPool.start(this, workthreadnum);
+
+	int writethreadnum = static_cast<int>(sConfigMgr.MainConfig.GetIntDefault("thread", "writethreadnum", 8));
+	sWriterThreadPool.start(writethreadnum);
+
+	int logLevel = sConfigMgr.MainConfig.GetIntDefault("log", "logLevel", 0);
+	sLogThread.start("dbsrv", logLevel);
 	server_.start();
 }
 
 void DBSrv::stop()
 {
-	threadPool_.stop();
-	writeThreadPool_.stop();
+	sWorkThreadPool.stop();
+	sWriterThreadPool.stop();
+	sLogThread.stop();
 }
 
 static int nextid = 0;
@@ -222,7 +231,7 @@ void DBSrv::onKaBuMessage(mysdk::net::TcpConnection* pCon,
 	param.Type = CMD;
 	param.msg = msg;
 	param.conId = context->conId;
-	threadPool_.push(param);
+	sWorkThreadPool.push(param);
 }
 
 void DBSrv::sendReply(int conId, google::protobuf::Message* message)

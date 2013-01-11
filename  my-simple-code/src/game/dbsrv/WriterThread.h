@@ -14,11 +14,13 @@ typedef enum tagWriterThreadMsgType
 	WRITERTHREAD_STOP = 3
 } WriterThreadMsgType;
 
+#define REDISKEY_MAXLEN 29
 typedef struct tagWriterThreadParam
 {
 	WriterThreadMsgType Type;
 	void* sql;
 	unsigned long length;
+	char key[REDISKEY_MAXLEN + 1];
 }WriterThreadParam;
 
 class WriterThread
@@ -32,7 +34,6 @@ public:
 	void stop();
 
 	void push(WriterThreadParam& param);
-
 private:
 	void threadHandler();
 	void handler(WriterThreadParam& param);
@@ -42,5 +43,6 @@ private:
 	mysdk::Thread thread_;
 	MySQLConnection mysql_;
 };
+
 
 #endif /* WRITERTHREAD_H_ */

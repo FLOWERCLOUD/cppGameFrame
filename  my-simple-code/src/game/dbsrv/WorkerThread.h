@@ -55,7 +55,7 @@ private:
 	void onLuaMessage(int conId, google::protobuf::Message* message);
 private:
 	bool loadFromRedis(int uid, const std::string& tablename, ::db_srv::get_reply_table* table);
-	bool loadFromMySql(int uid, const std::string& tablename, ::db_srv::get_reply_table* table);
+	int loadFromMySql(int uid, const std::string& tablename, ::db_srv::get_reply_table* table);
 
 	bool saveToRedis(int uid, const ::db_srv::set_table& set_table, ::db_srv::set_reply_table_status* status);
 	bool saveToMySql(int uid, const ::db_srv::set_table& set_table, ::db_srv::set_reply_table_status* status);
@@ -71,6 +71,7 @@ private:
 	void _startTime(const std::string funname);
 	bool isParseTable(const std::string& tablename, std::string& outTypeName);
 	void dispatchWriterThread(WriterThreadParam& param);
+	void getRedisKey(int uid, std::string& table_name, char* outKey, int outKeyLen);
 private:
 	void reloadLua();
 	bool registerGlobalLua();

@@ -1,8 +1,7 @@
 
 #include "MySQLConnection.h"
-
 #include "QueryResult.h"
-
+#include <game/dbsrv/LogThread.h>
 #include <mysdk/base/Logging.h>
 
 #include <assert.h>
@@ -82,8 +81,10 @@ bool MySQLConnection::open()
   //  }
 
     //fprintf(stderr,  "Connected to MySQL database at: [%s]\n", connectionInfo_.getDatabase().c_str());
-    LOG_INFO << "[MySQL] " << "Connected to MySQL database at: ["
-						<< connectionInfo_.getHost().c_str()  << ":" << connectionInfo_.getDatabase() << "]";
+    LOGEX_INFO("[MySQL] Connected to MySQL database at: [ %s:%s ]",
+    		connectionInfo_.getHost().c_str(),
+    		connectionInfo_.getDatabase().c_str() );
+
     mysql_autocommit(mysql_, 1);
 
     // set connection properties to UTF8 to properly handle locales for different
@@ -104,8 +105,8 @@ bool MySQLConnection::execute(const char* sql)
         {
             uint32 lErrno = mysql_errno(mysql_);
 
-            LOG_INFO << "[SQL] " << sql;
-            LOG_ERROR << "[ " << lErrno << " ] " << mysql_error(mysql_);
+            LOGEX_INFO("[SQL] %s", sql);
+            LOGEX_ERROR("[ %d ] %s", lErrno, mysql_error(mysql_));
 
             if (handleMySQLErrno(lErrno))  // If it returns true, an error was handled successfully (i.e. reconnection)
             {
@@ -130,8 +131,8 @@ bool MySQLConnection::execute(const char* sql, unsigned long length)
         {
             uint32 lErrno = mysql_errno(mysql_);
 
-            LOG_INFO << "[SQL] " << sql;
-            LOG_ERROR << "[ " << lErrno << " ] " << mysql_error(mysql_);
+            LOGEX_INFO("[SQL] %s", sql);
+            LOGEX_ERROR("[ %d ] %s", lErrno, mysql_error(mysql_));
 
             if (handleMySQLErrno(lErrno))  // If it returns true, an error was handled successfully (i.e. reconnection)
             {
@@ -236,13 +237,13 @@ bool MySQLConnection::handleMySQLErrno(int errNo)
             mysql_close(getHandle());
             if (this->open())                           // Don't remove 'this' pointer unless you want to skip loading all prepared statements....
             {
-                LOG_INFO << "Connection to the MySQL server is active.";
+                LOGEX_INFO("Connection to the MySQL server is active.");
                 if (oldThreadId != mysql_thread_id(getHandle()))
                 {
-                	LOG_INFO << "Successfully reconnected to "
-										<< connectionInfo_.getDatabase() << " @"
-										<< connectionInfo_.getHost() << ":"
-										<< connectionInfo_.getPortOrSocket();
+                	LOGEX_INFO("Successfully reconnected to %s@%s:%s",
+										connectionInfo_.getDatabase().c_str(),
+										connectionInfo_.getHost().c_str(),
+										connectionInfo_.getPortOrSocket().c_str());
                 }
 
                 reconnectiong_ = false;
@@ -251,7 +252,7 @@ bool MySQLConnection::handleMySQLErrno(int errNo)
 
             uint32 lErrno = mysql_errno(getHandle());   // It's possible this attempted reconnect throws 2006 at us. To prevent crazy recursive calls, sleep here.
             sleep(1);                           // Sleep 1 seconds
-            LOG_INFO << "I[MYSQL] am sleeping!!!";
+            LOGEX_INFO("I[MYSQL] am sleeping!!!");
             return handleMySQLErrno(lErrno);           // Call self (recursive)
         }
 
@@ -264,8 +265,7 @@ bool MySQLConnection::handleMySQLErrno(int errNo)
             return false;
 
         default:
-        	LOG_INFO << "Unhandled MySQL errno "
-								<< errNo << ". Unexpected behaviour possible.";
+        	LOGEX_INFO("Unhandled MySQL errno %d . Unexpected behaviour possible.", errNo);
             return false;
     }
 }

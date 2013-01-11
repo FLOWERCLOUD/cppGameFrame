@@ -24,6 +24,7 @@ set(dbsrv_SRCS
   mysql/MySQLConnectionInfo.cc
   mysql/QueryResult.cc
   DBSrv.cc
+  LogThread.cc
   main.cc
   PBSql.cc
   ProtoImporter.cc
@@ -95,6 +96,7 @@ set(dbclient_SRCS
   tests/LuaClient.cc
   tests/main.cc
   ProtoImporter.cc
+  LogThread.cc
   Util.cc
   )
 add_executable(dbclient ${dbclient_SRCS})

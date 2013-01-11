@@ -1,6 +1,7 @@
 
 #include <game/dbsrv/config/ConfigMgr.h>
 #include <game/dbsrv/DBSrv.h>
+#include <game/dbsrv/LogThread.h>
 #include <game/dbsrv/version.h>
 
 #include <mysdk/base/Daemon.h>
@@ -167,14 +168,14 @@ int main(int argc, char **argv)
 		fullConfigFile =  tmp + "/" + configFile;
 	}
 
-	LOG_INFO << "============ start dbsrv ============ version "  << DBSRVVERSION;
+	LOGEX_INFO("============ start dbsrv ============ version %d", DBSRVVERSION);
 	if(sConfigMgr.MainConfig.SetSource(fullConfigFile.c_str(), true))
 	{
-		LOG_INFO << "Config Passed without errors. --- fullConfigFile: " << fullConfigFile;
+		LOGEX_INFO("Config Passed without errors. --- fullConfigFile: %s", fullConfigFile.c_str());
 	}
 	else
 	{
-		LOG_ERROR << "Config Encountered one or more errors. --- fullConfigFile: " << fullConfigFile;
+		LOGEX_ERROR("Config Encountered one or more errors. --- fullConfigFile: %s", fullConfigFile.c_str());
 		return -1;
 	}
 
@@ -278,17 +279,15 @@ int main(int argc, char **argv)
     }
 
 	uint16 srvPort = static_cast<uint16>(sConfigMgr.MainConfig.GetIntDefault("net", "port", defalutPort));
-	int workthreadnum = static_cast<int>(sConfigMgr.MainConfig.GetIntDefault("thread", "workthreadnum", 8));
-	int writethreadnum = static_cast<int>(sConfigMgr.MainConfig.GetIntDefault("thread", "writethreadnum", 8));
-	LOG_INFO << "dbsrv listen port[" << srvPort << "]" << " workthreadnum[" << workthreadnum << "] writethreadnum[" << writethreadnum << "]";
+
+	LOGEX_INFO("dbsrv listen port[%d]", srvPort);
 	EventLoop loop;
 	InetAddress listenAddr(srvPort);
-	DBSrv server(&loop, listenAddr, workthreadnum, writethreadnum);
+	DBSrv server(&loop, listenAddr);
 	server.start();
 	loop.loop();
 	server.stop();
-
-	LOG_INFO << "============  stop dbsrv ============ version "  << DBSRVVERSION;
+	LOGEX_INFO("============  stop dbsrv ============ version [%d]", DBSRVVERSION);
 
     /* remove the PID file if we're a daemon */
     if (do_daemonize)

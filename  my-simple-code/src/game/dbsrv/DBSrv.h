@@ -35,7 +35,7 @@ class DBSrv
 public:
 	typedef std::map<int, mysdk::net::TcpConnection*> ConMapT;
 public:
-	DBSrv(EventLoop* loop, InetAddress& serverAddr, int workthreadnum, int writethreadnum);
+	DBSrv(EventLoop* loop, InetAddress& serverAddr);
 	~DBSrv();
 
 public:
@@ -56,17 +56,12 @@ public:
 
 	void tickMe();
 	void ping();
-	WriterThreadPool& getWriteThreadPool()
-	{
-		return writeThreadPool_;
-	}
+
 private:
 	KabuCodec codec_;
 	ConMapT conMap_;
 	EventLoop* loop_;
 	TcpServer server_;
-	WorkThreadPool threadPool_;
-	WriterThreadPool writeThreadPool_;
 private:
 	DISALLOW_COPY_AND_ASSIGN(DBSrv);
 };

@@ -1,5 +1,6 @@
 set(TestDBClient_SRCS
 	linenoise.cc
+	../LogThread.cc
 	ClientThread.cc
 	DBClient.cc
 	##TestDBSrv.cc

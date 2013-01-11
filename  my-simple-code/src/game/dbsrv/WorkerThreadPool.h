@@ -4,15 +4,17 @@
 
 #include <vector>
 
+#include <mysdk/base/Singleton.h>
+
 class DBSrv;
 class WorkerThread;
 class WorkThreadPool
 {
 public:
-	WorkThreadPool(DBSrv* srv, int threadnum);
+	WorkThreadPool();
 	~WorkThreadPool();
 
-	void start();
+	void start(DBSrv* srv, int threadnum);
 	void stop();
 
 	int push(struct ThreadParam& param);
@@ -21,5 +23,7 @@ public:
 private:
 	std::vector<WorkerThread* > asyncThreads_;
 };
+
+#define sWorkThreadPool mysdk::Singleton<WorkThreadPool>::instance()
 
 #endif /* WORKERTHREADPOOL_H_ */

@@ -1,6 +1,6 @@
 
 #include "PBSql.h"
-
+#include "LogThread.h"
 #include <sstream>
 
 static std::string buildSelectSql(const google::protobuf::Descriptor* descriptor, const std::string& tablename, int uid)
@@ -36,7 +36,7 @@ google::protobuf::Message* PBSql::select(const std::string& tablename, const std
 	const google::protobuf::Reflection* reflection = message->GetReflection();
 	const google::protobuf::Descriptor* descriptor = message->GetDescriptor();
 	std::string query_sql = buildSelectSql(descriptor, tablename, uid);
-	//printf("sql: %s\n", query_sql.c_str());
+
     MYSQL_RES *result = NULL;
     MYSQL_FIELD *fields = NULL;
     uint64 rowCount = 0;
@@ -117,27 +117,21 @@ std::string PBSql::buildReplaceSql(const google::protobuf::Message* message, con
 {
 	if (!message) return "";
 
+	std::vector<const google::protobuf::FieldDescriptor*> output;
 	const google::protobuf::Reflection* reflection = message->GetReflection();
+	reflection->ListFields(*message, &output);
+	int size = static_cast<int>(output.size());
 
 	std::stringstream buf;
 	buf << "replace into ";
 	buf << tablename;
 	buf << "(";
-
-	std::vector<const google::protobuf::FieldDescriptor*> output;
-	reflection->ListFields(*message, &output);
-	int size = static_cast<int>(output.size());
 	for (int i = 0; i < size; i++)
 	{
 		buf << output[i]->name();
-
-		if (i != size - 1)
-		{
-			buf << ",";
-		}
+		buf << ", ";
 	}
-
-	buf << ")values(";
+	buf << "update_time)values(";
 
 	for (int i = 0; i < size; i++)
 	{
@@ -145,14 +139,14 @@ std::string PBSql::buildReplaceSql(const google::protobuf::Message* message, con
 		if (field->is_repeated())
 		{
 			fprintf(stderr, "current not support for repeated label\n");
-			continue;
+			return "";
 		}
-		if(field->type() == google::protobuf::FieldDescriptor::TYPE_STRING)
+		if(field->type() == google::protobuf::FieldDescriptor::TYPE_STRING ||
+				field->type() == google::protobuf::FieldDescriptor::TYPE_BYTES)
 		{
-			//std::string str = reflection->GetString(*message, field);
 			std::string str;
 			str = reflection->GetStringReference(*message, field, &str);
-			char str_rs[1024 * 10]; // 10k空间
+			char str_rs[1024 * 40]; // 40k空间
 			unsigned long len = mysql.format_to_real_string(str_rs, str.c_str(), str.length());
 			if (len == 0) return "";
 
@@ -183,11 +177,10 @@ std::string PBSql::buildReplaceSql(const google::protobuf::Message* message, con
 		else if (field->type() == google::protobuf::FieldDescriptor::TYPE_MESSAGE)
 		{
 			const google::protobuf::Message& msg = reflection->GetMessage(*message, field);
-
 			std::string str;
 			msg.SerializeToString(&str);
-			//std::string str(msg.SerializeAsString());
-			char str_rs[1024 * 20]; // 20k空间
+
+			char str_rs[1024 * 40]; // 40k空间
 			unsigned long len = mysql.format_to_real_string(str_rs, str.c_str(), str.length());
 			if (len == 0) return "";
 
@@ -201,11 +194,10 @@ std::string PBSql::buildReplaceSql(const google::protobuf::Message* message, con
 			 return "";
 		}
 
-		if (i != size - 1)
-		{
-			buf << ", ";
-		}
+		buf << ", ";
 	}
+
+	buf << time(NULL);
 	buf << ")";
 	return buf.str();
 }

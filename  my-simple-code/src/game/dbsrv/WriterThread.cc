@@ -2,6 +2,8 @@
 #include "WriterThread.h"
 
 #include <game/dbsrv/config/ConfigMgr.h>
+#include <game/dbsrv/LogThread.h>
+#include <game/dbsrv/WriterThreadPool.h>
 
 WriterThread::WriterThread(int id):
 	id_(id),
@@ -48,7 +50,7 @@ void WriterThread::push(WriterThreadParam& param)
 static size_t saveSqlNum = 0;
 void WriterThread::threadHandler()
 {
-	LOG_INFO << "WriterThread::threadHandler start... id[" << id_ << "]";
+	LOGEX_INFO("WriterThread::threadHandler start... id[%d]", id_);
 	while (true)
 	{
 		WriterThreadParam param = queue_.take();
@@ -63,7 +65,7 @@ void WriterThread::threadHandler()
 			if (saveSqlNum++ >= max_writesql_num)
 			{
 				saveSqlNum = 0;
-				sleep(1);
+				usleep(100);
 			}
 		}
 		else if (param.Type == WRITERTHREAD_PING)
@@ -73,8 +75,7 @@ void WriterThread::threadHandler()
 			size_t queue_size = queue_.size();
 			if (queue_size >= warn_queue_size)
 			{
-				LOG_WARN << "write thread queue size too larger, size: " << queue_size
-									<< " threadid: " << id_;
+				LOGEX_WARN("write thread queue size too larger, size: %d, threadid: %d", queue_size, id_);
 			}
 		}
 		else if (param.Type == WRITERTHREAD_STOP)
@@ -82,20 +83,21 @@ void WriterThread::threadHandler()
 			break;
 		}
 	}
-	LOG_INFO << "WriterThread::threadHandler stop... id[" << id_ << "]";
+	LOGEX_INFO("WriterThread::threadHandler stop... id[%d]", id_);
 }
 
 void WriterThread::handler(WriterThreadParam& param)
 {
 	char* sql = static_cast<char*>(param.sql);
-	LOG_DEBUG << "WriterThread::handler, sql: " << sql;
-	//LOG_SQL << "- " << sql;
+
+	LOGEX_DEBUG("WriterThread::handler, sql: %s",sql);
 	if (!mysql_.execute(sql, param.length))
 	{
 		// 保存到数据库失败~~~
 		// 怎么处理呢？？？
-		LOG_SQL << "- " << sql;
+		// 现在的处理方法是 保存保存不了的key到某个文件中
+		LOGEX_RAW("%s", param.key);
 	}
 	// 释放掉这个内存空间啦
-	delete[] sql;
+	sWriterThreadPool.DeleteSqlBuf(sql);
 }

@@ -3,14 +3,8 @@
 
 #include <game/dbsrv/WorkerThread.h>
 
-WorkThreadPool::WorkThreadPool(DBSrv* srv, int threadnum)
+WorkThreadPool::WorkThreadPool()
 {
-	asyncThreads_.resize(threadnum);
-
-	for (int i = 0; i < threadnum; i++)
-	{
-		asyncThreads_[i] = new WorkerThread(srv, i + 1);
-	}
 }
 
 WorkThreadPool::~WorkThreadPool()
@@ -22,10 +16,15 @@ WorkThreadPool::~WorkThreadPool()
 	}
 }
 
-void WorkThreadPool::start()
+void WorkThreadPool::start(DBSrv* srv, int threadnum)
 {
-	size_t threadnum = asyncThreads_.size();
-	for (size_t i = 0; i < threadnum; i++)
+	asyncThreads_.resize(threadnum);
+	for (int i = 0; i < threadnum; i++)
+	{
+		asyncThreads_[i] = new WorkerThread(srv, i + 1);
+	}
+
+	for (int i = 0; i < threadnum; i++)
 	{
 		asyncThreads_[i]->start();
 	}

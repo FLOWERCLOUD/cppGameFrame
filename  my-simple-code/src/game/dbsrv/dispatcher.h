@@ -10,6 +10,8 @@
 #include <map>
 #include <tr1/functional>
 
+#include "LogThread.h"
+
 class Callback
 {
 public:
@@ -56,11 +58,9 @@ public:
 
 	~ProtobufDispatcher()
 	{
-		LOG_TRACE << "ProtobufDispatcher::~ProtobufDispatcher";
 		CallbackMap::iterator it = callbacks_.begin();
 		for ( ; it != callbacks_.end(); ++it)
 		{
-			LOG_TRACE << "ProtobufDispatcher::~ProtobufDispatcher: " << it->first;
 			Callback* callback = it->second;
 			if (callback)
 			{
@@ -72,7 +72,6 @@ public:
 	void onProtobufMessage(int conId,
 													google::protobuf::Message* message) const
 	{
-		LOG_TRACE << "ProtobufDispatcher::onProtobufMessage";
 	    CallbackMap::const_iterator it = callbacks_.find(message->GetDescriptor());
 	    if (it != callbacks_.end())
 	    {

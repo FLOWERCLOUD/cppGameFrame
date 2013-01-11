@@ -1,6 +1,7 @@
 
 #include <game/dbsrv/cache/rcache.h>
 
+#include <game/dbsrv/LogThread.h>
 #include <mysdk/base/Logging.h>
 
 #include <strings.h>
@@ -44,7 +45,7 @@ bool Cache::Connect()
     if (m_redisContext->err)
     {
     	//printf("[redis] connection error: %d\n", m_redisContext->err);
-    	LOG_INFO << "[redis] connection error[" << m_redisContext->err << "]";
+    	LOGEX_INFO("[redis] connection error[%d]",m_redisContext->err);
     	return false;
     }
 
@@ -57,7 +58,7 @@ bool Cache::Connect()
 		if (!CheckReplyStatus(reply))
 		{
 			//printf("[redis] failed by password :%s\n", reply->str);
-	    	LOG_INFO << "[redis] failed by password[" << reply->str << "]";
+	    	LOGEX_INFO("[redis] failed by password[%s]",  reply->str);
 			freeReplyObject(reply);
 			return false;
 		}
@@ -73,14 +74,14 @@ bool Cache::Connect()
 		if (!CheckReplyStatus(reply))
 		{
 			//printf("[redis] failed by select db(%d) :%s\n", m_DBid, reply->str);
-			LOG_INFO << "[redis] failed by select db[" << m_DBid << "]:[" << reply->str << "]" ;
+			LOGEX_INFO("[redis] failed by select db[%d][%s]", m_DBid, reply->str) ;
 			freeReplyObject(reply);
 			return false;
 		}
 		freeReplyObject(reply);
 	}
 	//printf("[redis] successful connected %s :%d\n", m_redisIP.data(), m_redisPort);
-	LOG_INFO << "[redis] successful connected[" <<m_redisIP.data() << ":" << m_redisPort << "]" ;
+	LOGEX_INFO("[redis] successful connected[%s:%d]", m_redisIP.data(), m_redisPort) ;
     return true;
 }
 
@@ -114,11 +115,11 @@ bool Cache::Ping()
 			return true;
 		}
 		//printf("[redis]Ping has an error occur:%s\n ", reply->str);
-		LOG_INFO << "[redis]Ping has an error occur[" <<reply->str  << "]" ;
+		LOGEX_INFO("[redis]Ping has an error occur[%s]", reply->str) ;
 		freeReplyObject(reply);
 	}
 	//printf("[redis] Ping to Server Have Some Problem,So Reconnect Now \n");
-	LOG_INFO << "[redis] Ping to Server Have Some Problem,So Reconnect Now" ;
+	LOGEX_INFO("[redis] Ping to Server Have Some Problem,So Reconnect Now") ;
 	//ping不通，重新建立起连接
 	if (!ReConnect())
 	{
