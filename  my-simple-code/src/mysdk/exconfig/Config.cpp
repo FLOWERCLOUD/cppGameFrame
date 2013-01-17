@@ -287,6 +287,7 @@ bool ConfigFile::SetSource(const char* file, bool ignorecase)
 						end = line.find("\"", offset + 1);
 						if(end != string::npos)
 						{
+							if (end - 1 == offset) goto parse;
 							/* the closing quote is on the same line, oh goody. */
 							current_setting = line.substr(offset + 1, end - offset - 1);
 
