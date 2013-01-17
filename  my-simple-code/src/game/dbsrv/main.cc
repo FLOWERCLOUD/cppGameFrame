@@ -91,8 +91,6 @@ int main(int argc, char **argv)
 	// 设置要打印日志等级
 	//Logger::setLogLevel(Logger::INFO);
 
-	sLogThread.start("dbsrv", logLevel);
-
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 	int defalutPort = 5007;  //默认端口
 	std::string configFile("def.conf");
@@ -170,18 +168,21 @@ int main(int argc, char **argv)
 		fullConfigFile =  tmp + "/" + configFile;
 	}
 
-	LOGEX_INFO("============ start dbsrv ============ version %4.2f", DBSRVVERSION);
+
 	if(sConfigMgr.MainConfig.SetSource(fullConfigFile.c_str(), true))
 	{
-		LOGEX_INFO("Config Passed without errors. --- fullConfigFile: %s", fullConfigFile.c_str());
+		fprintf(stderr, "Config Passed without errors. --- fullConfigFile: %s", fullConfigFile.c_str());
 	}
 	else
 	{
-		LOGEX_ERROR("Config Encountered one or more errors. --- fullConfigFile: %s", fullConfigFile.c_str());
+		fprintf(stderr, "Config Encountered one or more errors. --- fullConfigFile: %s", fullConfigFile.c_str());
 		return -1;
 	}
 
 	int logLevel = sConfigMgr.MainConfig.GetIntDefault("log", "logLevel", 0);
+	sLogThread.start("dbsrv", logLevel);
+	LOGEX_INFO("============ start dbsrv ============ version %4.2f", DBSRVVERSION);
+
 	struct rlimit rlim;
     if (maxcore != 0)
     {
