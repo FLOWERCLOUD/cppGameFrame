@@ -171,7 +171,7 @@ int main(int argc, char **argv)
 		fullConfigFile =  tmp + "/" + configFile;
 	}
 
-	LOGEX_INFO("============ start dbsrv ============ version %d", DBSRVVERSION);
+	LOGEX_INFO("============ start dbsrv ============ version %4.2f", DBSRVVERSION);
 	if(sConfigMgr.MainConfig.SetSource(fullConfigFile.c_str(), true))
 	{
 		LOGEX_INFO("Config Passed without errors. --- fullConfigFile: %s", fullConfigFile.c_str());
