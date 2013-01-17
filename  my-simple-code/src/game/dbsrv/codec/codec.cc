@@ -295,24 +295,15 @@ google::protobuf::Message* KabuCodec::parse(const char* buf, int len, ErrorCode*
 	int16_t bodyLeftLen = static_cast<int16_t>(len - sizeof(int16_t));
 	if (nameLen >= 1 && nameLen <= bodyLeftLen)
 	{
-		// head
-		int32_t headLen = asInt32(buf  + sizeof(int16_t) + nameLen);
-		if (headLen > static_cast<int32_t>(bodyLeftLen - nameLen - headLen))
-		{
-			*error = kInvalidHeadLen;
-			return message;
-		}
-
-		//std::string typeName(buf + sizeof(int16_t), buf  + sizeof(int16_t) + nameLen);
 		std::string typeName = decodeTypeName(buf + sizeof(int16_t), nameLen);
 		// create message object
 		message = createMessage(typeName);
 		//message = createDynamicMessage(typeName);
 		if (message)
 		{
-		       // parse from buffer
-		       const char* data = buf + sizeof(int16_t) + nameLen + sizeof(int32_t) + headLen;
-		        int32 dataLen = static_cast<int32>(len - (sizeof(int16_t) + nameLen + sizeof(int32_t) + headLen));
+		       // parse from buffer ( + sizeof(int32_t) 跳过头的长度 )
+		       const char* data = buf + sizeof(int16_t) + nameLen + sizeof(int32_t) ;
+		        int32 dataLen = static_cast<int32>(len - (sizeof(int16_t) + nameLen + sizeof(int32_t)));
 		        ::google::protobuf::io::ArrayInputStream zeroCopy(static_cast<const void*>(data), dataLen);
 		        if(message->ParseFromZeroCopyStream(&zeroCopy))
 		        {
