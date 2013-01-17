@@ -1,0 +1,11 @@
+dbsrv
+========
+
+依赖的第三方库
+1.mysql
+2.redis
+3.google buffer
+
+编译环境要求
+linux 2.6.32
+gcc version 4.4.6

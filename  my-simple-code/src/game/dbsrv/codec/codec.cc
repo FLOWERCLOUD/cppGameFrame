@@ -93,6 +93,47 @@ std::string InitializationErrorMessage(const char* action,
   return result;
 }
 
+int16 asInt16(const char* buf)
+{
+  int16_t be16 = 0;
+  ::memcpy(&be16, buf, sizeof(be16));
+  return be16;
+  //return sockets::networkToHost16(be16);
+}
+
+int32 asInt32(const char* buf)
+{
+	  int32_t be32 = 0;
+	  ::memcpy(&be32, buf, sizeof(be32));
+	  return be32;
+}
+
+std::string decodeTypeName(const char* buf, int bufLen)
+{
+	if (bufLen >= 1024) return "";
+
+	char tmp[1024];
+	for (int i = 0; i < bufLen; i++)
+	{
+		tmp[i] = (char)(buf[i] ^ 0xFF);
+	}
+	tmp[bufLen] = 0;
+	return tmp;
+}
+
+std::string ecodeTypeName(const char* buf, int bufLen)
+{
+	if (bufLen >= 1024) return "";
+
+	char tmp[1024];
+	for (int i = 0; i < bufLen; i++)
+	{
+		tmp[i] = (char)(buf[i] ^ 0xFF);
+	}
+	tmp[bufLen] = 0;
+	return tmp;
+}
+
 void KabuCodec::fillEmptyBuff(Buffer* pBuf, google::protobuf::Message* message)
 {
 	assert(pBuf->readableBytes() == 0);
@@ -101,9 +142,11 @@ void KabuCodec::fillEmptyBuff(Buffer* pBuf, google::protobuf::Message* message)
 
 	int16 nameLen = static_cast<int16>(typeName.size());
 	pBuf->appendInt16(nameLen);
-	pBuf->append(typeName.c_str(), nameLen);
+	std::string eTypeName = ecodeTypeName(typeName.c_str(), nameLen);
+	pBuf->append(eTypeName.c_str(), nameLen);
+
 	// head
-	pBuf->appendInt16(0);
+	pBuf->appendInt32(0);
 
 	// code copied from MessageLite::SerializeToArray() and MessageLite::SerializePartialToArray().
 	GOOGLE_DCHECK(message->IsInitialized()) << InitializationErrorMessage("serialize", (*message));
@@ -167,14 +210,6 @@ void KabuCodec::defaultErrorCallback(TcpConnection* pCon,
   {
 	  pCon->shutdown();
   }
-}
-
-int16 asInt16(const char* buf)
-{
-  int16_t be16 = 0;
-  ::memcpy(&be16, buf, sizeof(be16));
-  return be16;
-  //return sockets::networkToHost16(be16);
 }
 
 void KabuCodec::onMessage(TcpConnection* pCon,
@@ -257,26 +292,27 @@ google::protobuf::Message* KabuCodec::parse(const char* buf, int len, ErrorCode*
 {
 	google::protobuf::Message* message = NULL;
 	int16_t nameLen = asInt16(buf);
-	if (nameLen >= 2 && nameLen <= static_cast<int16_t>(len - sizeof(int16_t)))
+	int16_t bodyLeftLen = static_cast<int16_t>(len - sizeof(int16_t));
+	if (nameLen >= 1 && nameLen <= bodyLeftLen)
 	{
 		// head
-		int16_t headLen = asInt16(buf  + sizeof(int16_t) + nameLen);
-		if (headLen > static_cast<int16_t>(len - sizeof(int16_t) - headLen))
+		int32_t headLen = asInt32(buf  + sizeof(int16_t) + nameLen);
+		if (headLen > static_cast<int32_t>(bodyLeftLen - nameLen - headLen))
 		{
 			*error = kInvalidHeadLen;
 			return message;
 		}
 
-		std::string typeName(buf + sizeof(int16_t), buf  + sizeof(int16_t) + nameLen);
+		//std::string typeName(buf + sizeof(int16_t), buf  + sizeof(int16_t) + nameLen);
+		std::string typeName = decodeTypeName(buf + sizeof(int16_t), nameLen);
 		// create message object
 		message = createMessage(typeName);
-		//printf("typename: %s\n", typeName.c_str());
 		//message = createDynamicMessage(typeName);
 		if (message)
 		{
 		       // parse from buffer
-		       const char* data = buf + sizeof(int16_t) + nameLen + sizeof(int16_t) + headLen;
-		        int32 dataLen = static_cast<int32>(len - (sizeof(int16_t) + nameLen + sizeof(int16_t) + headLen));
+		       const char* data = buf + sizeof(int16_t) + nameLen + sizeof(int32_t) + headLen;
+		        int32 dataLen = static_cast<int32>(len - (sizeof(int16_t) + nameLen + sizeof(int32_t) + headLen));
 		        ::google::protobuf::io::ArrayInputStream zeroCopy(static_cast<const void*>(data), dataLen);
 		        if(message->ParseFromZeroCopyStream(&zeroCopy))
 		        {
