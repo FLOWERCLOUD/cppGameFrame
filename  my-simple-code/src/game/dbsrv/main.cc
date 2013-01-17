@@ -91,7 +91,6 @@ int main(int argc, char **argv)
 	// 设置要打印日志等级
 	//Logger::setLogLevel(Logger::INFO);
 
-	int logLevel = sConfigMgr.MainConfig.GetIntDefault("log", "logLevel", 0);
 	sLogThread.start("dbsrv", logLevel);
 
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -159,7 +158,7 @@ int main(int argc, char **argv)
 		if (!(getcwd(path,
 				FILENAME_MAX)))
 		{
-			printf("dbsrv getcwd error! --- vesion: .%2f\n", DBSRVVERSION);
+			printf("dbsrv getcwd error! --- vesion: %4.2f\n", DBSRVVERSION);
 			return -1;
 		}
 		std::string tmp(path);
@@ -182,6 +181,7 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
+	int logLevel = sConfigMgr.MainConfig.GetIntDefault("log", "logLevel", 0);
 	struct rlimit rlim;
     if (maxcore != 0)
     {
