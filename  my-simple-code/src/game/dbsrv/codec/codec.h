@@ -16,8 +16,8 @@
 // {
 //   int32  len;
 //   int16  nameLen;
-//   char    typeName[nameLen];
-//   int16  headlen;
+//   char   typeName[nameLen];
+//   int32  headlen;
 //   char   headcontent[headlen];
 //   char   protobufData[len-nameLen-headlen - 2*sizeof(int16)];
 // }

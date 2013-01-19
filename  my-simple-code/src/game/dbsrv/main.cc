@@ -2,6 +2,8 @@
 #include <game/dbsrv/config/ConfigMgr.h>
 #include <game/dbsrv/DBSrv.h>
 #include <game/dbsrv/LogThread.h>
+#include <game/dbsrv/ProtoImporter.h>
+#include <game/dbsrv/Util.h>
 #include <game/dbsrv/version.h>
 
 #include <mysdk/base/Daemon.h>
@@ -281,6 +283,13 @@ int main(int argc, char **argv)
     {
     	save_pid(getpid(), pid_file);
     }
+    // import proto file
+	std::string filenames = sConfigMgr.MainConfig.GetStringDefault("proto", "filelist", "game.proto");
+	std::vector<std::string> vec = StrSplit(filenames, ",");
+	for (size_t i = 0; i < vec.size(); i++)
+	{
+		sProtoImporter.Import(vec[i]);
+	}
 
 	uint16 srvPort = static_cast<uint16>(sConfigMgr.MainConfig.GetIntDefault("net", "port", defalutPort));
 

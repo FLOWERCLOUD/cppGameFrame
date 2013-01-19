@@ -36,18 +36,6 @@ ProtoImporter::ProtoImporter():
 		}
 		//printf("[ProtoImporter] protopath:%s\n", protopath);
 		LOG_INFO << "[ProtoImporter] protopath:" << protopath;
-		std::string filenames = sConfigMgr.MainConfig.GetStringDefault("proto", "filelist", "game.proto");
-
-		std::vector<std::string> vec = StrSplit(filenames, ",");
-		for (size_t i = 0; i < vec.size(); i++)
-		{
-			const  google::protobuf::FileDescriptor* filedescriptor = importer.Import(vec[i]);
-			 if (!filedescriptor)
-			 {
-				 //fprintf(stderr, "import (%s) file descriptor error\n", vec[i].c_str());
-				 LOG_WARN << "import file descriptor error, filename:" << vec[i].c_str();
-			 }
-		}
 }
 
 bool ProtoImporter::Import(const std::string& filename)
