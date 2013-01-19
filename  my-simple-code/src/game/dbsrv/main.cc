@@ -170,21 +170,6 @@ int main(int argc, char **argv)
 		fullConfigFile =  tmp + "/" + configFile;
 	}
 
-
-	if(sConfigMgr.MainConfig.SetSource(fullConfigFile.c_str(), true))
-	{
-		fprintf(stderr, "Config Passed without errors. --- fullConfigFile: %s", fullConfigFile.c_str());
-	}
-	else
-	{
-		fprintf(stderr, "Config Encountered one or more errors. --- fullConfigFile: %s", fullConfigFile.c_str());
-		return -1;
-	}
-
-	int logLevel = sConfigMgr.MainConfig.GetIntDefault("log", "logLevel", 0);
-	sLogThread.start("dbsrv", logLevel);
-	LOGEX_INFO("============ start dbsrv ============ version %4.2f", DBSRVVERSION);
-
 	struct rlimit rlim;
     if (maxcore != 0)
     {
@@ -283,6 +268,19 @@ int main(int argc, char **argv)
     {
     	save_pid(getpid(), pid_file);
     }
+
+	if(sConfigMgr.MainConfig.SetSource(fullConfigFile.c_str(), true))
+	{
+		fprintf(stderr, "Config Passed without errors. fullConfigFile: %s\n", fullConfigFile.c_str());
+	}
+	else
+	{
+		fprintf(stderr, "Config Encountered one or more errors. fullConfigFile: %s\n", fullConfigFile.c_str());
+		return -1;
+	}
+	int logLevel = sConfigMgr.MainConfig.GetIntDefault("log", "logLevel", 0);
+	sLogThread.start("dbsrv", logLevel);
+	LOGEX_INFO("============ start dbsrv ============ version %4.2f", DBSRVVERSION);
     // import proto file
 	std::string filenames = sConfigMgr.MainConfig.GetStringDefault("proto", "filelist", "game.proto");
 	std::vector<std::string> vec = StrSplit(filenames, ",");
